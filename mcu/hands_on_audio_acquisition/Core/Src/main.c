@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
+  **************************
   * @file           : main.c
   * @brief          : Main program body
-  ******************************************************************************
+  **************************
   * @attention
   *
   * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
@@ -14,12 +14,15 @@
   * License. You may obtain a copy of the License at:
   *                        opensource.org/licenses/BSD-3-Clause
   *
-  ******************************************************************************
+  **************************
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
 #include "usart.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -31,11 +34,12 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_BUF_SIZE 256
+#define ADC_BUF_SIZE 10000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -65,9 +69,14 @@ uint32_t get_signal_power(uint16_t *buffer, size_t len);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == B1_Pin) {
-		state = 1-state;
-	}
+	if(GPIO_Pin == B1_Pin){
+
+	        // Démarre le sampling ADC en DMA
+	        HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADCBuffer, 2*ADC_BUF_SIZE);
+	        // Démarre le timer (qui déclenche ADC)
+	        HAL_TIM_Base_Start(&htim3);
+	    }
+
 }
 
 void hex_encode(char* s, const uint8_t* buf, size_t len) {
@@ -118,11 +127,15 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_LPUART1_UART_Init();
+  MX_ADC1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&hlpuart1);
   printf("Hello world!\r\n");
@@ -133,16 +146,16 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+
   while (1)
   {
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-	HAL_Delay(500);
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-	HAL_Delay(500);
+	  __WFI();
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+
   /* USER CODE END 3 */
 }
 
@@ -189,8 +202,19 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
-
+uint32_t threshold = 0;
 /* USER CODE BEGIN 4 */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	uint32_t power_signal = get_signal_power(ADCBuffer, ADC_BUF_SIZE);
+	printf("power signal %d\n", power_signal);
+	printf("threshold %d\n", threshold);
+	if (power_signal > threshold){
+			HAL_TIM_Base_Stop(&htim3);
+			HAL_ADC_Stop_DMA(&hadc1);
+			print_buffer(ADCBuffer);
+	}
+}
 
 /* USER CODE END 4 */
 

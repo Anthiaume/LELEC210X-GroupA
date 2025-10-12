@@ -76,13 +76,13 @@ if __name__ == "__main__":
 
             buffer_size = len(msg)
             times = np.linspace(0, buffer_size - 1, buffer_size) * 1 / FREQ_SAMPLING
-            voltage_mV = msg * VDD / VAL_MAX_ADC * 1e3
+            voltage_V = msg * VDD / VAL_MAX_ADC*1E3
 
-            plt.plot(times, voltage_mV)
+            plt.plot(times, voltage_V)
             plt.title(f"Acquisition #{msg_counter}")
             plt.xlabel("Time (s)")
-            plt.ylabel("Voltage (mV)")
-            plt.ylim([0, 3300])
+            plt.ylabel("Voltage (V)")
+            plt.ylim([0, 3.3])
             plt.draw()
             plt.pause(0.001)
             plt.cla()
