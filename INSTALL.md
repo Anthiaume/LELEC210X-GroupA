@@ -315,7 +315,7 @@ echo "export LIBGL_ALWAYS_INDIRECT=1" >> ~/.bashrc
 
 We can now install the different components required to use the LimeSDR with GNU Radio.
 We follow the information provided [here](https://wiki.myriadrf.org/Lime_Suite)
-by the company who sells the LimeSDR, _Myriad-RF_.
+by the company who sells the LimeSDR, _Myriad-RF_.  
 
 #### Ubuntu - Install LimeSuite
 

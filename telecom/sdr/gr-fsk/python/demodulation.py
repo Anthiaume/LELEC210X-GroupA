@@ -28,11 +28,26 @@ from gnuradio import gr
 
 def demodulate(y, B, R, Fdev):
     """
-    Non-coherent demodulator.
+    Démodulateur non-cohérent vectorisé et ultra-rapide (FSK).
     """
-    nb_syms = int(len(y) / R)
-    bits_hat = np.zeros(nb_syms, dtype=int)
-    return bits_hat  # TODO
+    nb_syms = len(y) // R
+    y = y[:nb_syms * R].reshape(nb_syms, R)  # Vue sans recopie
+
+    # Références de phase
+    ph = 2 * np.pi * Fdev * np.arange(R) / (R * B)
+    s_0 = np.exp(-1j * ph)
+    s_1 = np.exp( 1j * ph)
+
+    # Corrélation vectorisée sur tout le signal
+    r0 = np.abs(y @ s_0)  # Produit matriciel = somme sur R pour chaque symbole
+    r1 = np.abs(y @ s_1)
+
+    # Décision binaire vectorisée
+    bits_hat = (r1 < r0).astype(np.uint8)
+
+    return bits_hat
+
+
 
 
 

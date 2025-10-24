@@ -170,17 +170,37 @@ class BasicChain(Chain):
     ideal_cfo_estimation = True
 
     def cfo_estimation(self, y):
-        """Estimates CFO using Moose algorithm, on first samples of preamble."""
-        # TO DO: extract 2 blocks of size N*R at the start of y
-        R = self.osr_rx
-        N = 4  # You can change this value if needed
-        y_sequence = y[0 : 2*R*N]  # Extract first 2 symbols (4 samples each)
-        # TO DO: apply the Moose algorithm on these two blocks to estimate the CFO
+        # """Estimates CFO using Moose algorithm, on first samples of preamble."""
+        # # TO DO: extract 2 blocks of size N*R at the start of y
+        # R = self.osr_rx
+        # N = 4  # You can change this value if needed
+        # y_sequence = y[0 : 2*R*N]  # Extract first 2 symbols (4 samples each)
+        # # TO DO: apply the Moose algorithm on these two blocks to estimate the CFO
         
-        alpha_hat = np.sum(y_sequence[-N*R:]*np.conj(y_sequence[:N*R]))
-        cfo_est = np.angle(alpha_hat)/(2*np.pi*N/(self.bit_rate))
-        print("CFO estimation (Hz): ", cfo_est)
+        # alpha_hat = np.sum(y_sequence[-N*R:]*np.conj(y_sequence[:N*R]))
+        # cfo_est = np.angle(alpha_hat)/(2*np.pi*N/(self.bit_rate))
+        # print("CFO estimation (Hz): ", cfo_est)
 
+        # return cfo_est
+        R = self.osr_rx
+        B = self.bit_rate
+        """
+        Estimation ultra-rapide du CFO (Carrier Frequency Offset)
+        avec l'algorithme de Moose, sur les premiers échantillons du préambule.
+        """
+        N = 4  # Nombre de symboles utilisés (modifiable selon le préambule)
+        M = N * R  # Taille d’un bloc en échantillons
+
+        # Pas de copie mémoire inutile : utilisation directe de vues sur y
+        y1 = y[:M]
+        y2 = y[M:2*M]
+
+        # Produit conjugué cumulatif vectorisé (Moose)
+        alpha_hat = np.vdot(y1, y2)  # np.vdot = sum(y1*conj(y2)), très optimisé en C
+
+        # Estimation du décalage fréquentiel
+        cfo_est = np.angle(alpha_hat) * B / (2 * np.pi * N)
+        print("CFO estimation (Hz): ", cfo_est )
         return cfo_est
 
     ideal_sto_estimation = True
@@ -206,44 +226,44 @@ class BasicChain(Chain):
         return np.mod(save_i + 1, R)
 
     def demodulate(self, y):
-        """Non-coherent demodulator."""
+        # """Non-coherent demodulator."""
         R = self.osr_rx  # Receiver oversampling factor
-        nb_syms = len(y) // R  # Number of CPFSK symbols in y
+        # nb_syms = len(y) // R  # Number of CPFSK symbols in y
         fd = self.freq_dev  # Frequency deviation, Delta_f
         B = self.bit_rate  # B=1/T
 
-        # Group symbols together, in a matrix. Each row contains the R samples over one symbol period
-        y = np.resize(y, (nb_syms, R))
+        # # Group symbols together, in a matrix. Each row contains the R samples over one symbol period
+        # y = np.resize(y, (nb_syms, R))
 
-        # TO DO: generate the reference waveforms used for the correlation
-        # hint: look at what is done in modulate() in chain.py
-        ph = 2 * np.pi * fd * (np.arange(R) / R) / B  # Phase of reference waveform
-        s_0  = np.exp(-1j * ph)  # Reference waveform for bit 0
-        s_1  = np.exp(1j * ph)  # Reference waveform for bit 1
-
-        # TO DO: compute the correlations with the two reference waveforms (r0 and r1)
-        # r_0 = np.abs(np.sum(y * s_0, axis=1))  # Correlation with s_0
-        # r_1 = np.abs(np.sum(y * s_1, axis=1))  # Correlation with s_1
-
-        bits_hat = np.zeros(nb_syms, dtype=int)
-        for k in range(nb_syms):
-            r_0 = 0
-            r_1 = 0
-            for i in range(R):
-                r_0 += y[k][i] * s_0[i]  # Correlation with s_0
-                r_1 += y[k][i] * s_1[i] # Correlation with s_1
-            r_0 = np.abs(r_0)
-            r_1 = np.abs(r_1)
-            
-            if(r_1 < r_0):
-                bits_hat[k] = 1
-            else:
-                bits_hat[k] = 0
-                  
-
-
-        # TO DO: performs the decision based on r0 and r1
+        # ph = 2 * np.pi * fd * (np.arange(R) / R) / B  # Phase of reference waveform
+        # s_0  = np.exp(-1j * ph)  # Reference waveform for bit 0
+        # s_1  = np.exp(1j * ph)  # Reference waveform for bit 1
 
         # bits_hat = np.zeros(nb_syms, dtype=int)
+        # for k in range(nb_syms):
+        #     r_0 = np.abs(np.sum(y[k,:] * s_0))  # Correlation with s_0
+        #     r_1 = np.abs(np.sum(y[k,:] * s_1))  # Correlation with s_1
+        #     if(r_1 < r_0):
+        #         bits_hat[k] = 1
+        #     else:
+        #         bits_hat[k] = 0      
+        # return bits_hat
+        """
+        Démodulateur non-cohérent vectorisé et ultra-rapide (FSK).
+        """
+        nb_syms = len(y) // R
+        y = y[:nb_syms * R].reshape(nb_syms, R)  # Vue sans recopie
+
+        # Références de phase
+        ph = 2 * np.pi * fd * np.arange(R) / (R * B)
+        s_0 = np.exp(-1j * ph)
+        s_1 = np.exp( 1j * ph)
+
+        # Corrélation vectorisée sur tout le signal
+        r0 = np.abs(y @ s_0)  # Produit matriciel = somme sur R pour chaque symbole
+        r1 = np.abs(y @ s_1)
+
+        # Décision binaire vectorisée
+        bits_hat = (r1 < r0).astype(np.uint8)
 
         return bits_hat

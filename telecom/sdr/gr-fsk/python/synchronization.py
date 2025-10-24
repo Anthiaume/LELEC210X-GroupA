@@ -29,9 +29,24 @@ from .utils import logging, measurements_logger
 
 def cfo_estimation(y, B, R, Fdev):
     """
-    Estimate CFO using Moose algorithm, on first samples of preamble
+    Estimation ultra-rapide du CFO (Carrier Frequency Offset)
+    avec l'algorithme de Moose, sur les premiers échantillons du préambule.
     """
-    return 0.0  # TODO
+    N = 2  # Nombre de symboles utilisés (modifiable selon le préambule)
+    M = N * R  # Taille d’un bloc en échantillons
+
+    # Pas de copie mémoire inutile : utilisation directe de vues sur y
+    y1 = y[:M]
+    y2 = y[M:2*M]
+
+    #  Produit conjugué cumulatif vectorisé (Moose)
+    alpha_hat = np.vdot(y1, y2)  # np.vdot = sum(y1*conj(y2)), très optimisé en C
+
+    #  Estimation du décalage fréquentiel
+    cfo_est = np.angle(alpha_hat) * B / (2 * np.pi * N)
+    print("CFO estimation (Hz): ", cfo_est)
+
+    return cfo_est
 
 
 def sto_estimation(y, B, R, Fdev):
