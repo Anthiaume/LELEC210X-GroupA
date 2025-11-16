@@ -126,7 +126,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: 868e6
+    value: 860e6
   states:
     bus_sink: false
     bus_source: false
@@ -284,6 +284,7 @@ blocks:
   id: variable_qtgui_entry
   parameters:
     comment: ''
+    entry_signal: editingFinished
     gui_hint: ''
     label: TX power used (no impact, just for logging)
     type: int
@@ -551,4 +552,4 @@ connections:
 
 metadata:
   file_format: 1
-  grc_version: 3.10.7.0
+  grc_version: 3.10.12.0

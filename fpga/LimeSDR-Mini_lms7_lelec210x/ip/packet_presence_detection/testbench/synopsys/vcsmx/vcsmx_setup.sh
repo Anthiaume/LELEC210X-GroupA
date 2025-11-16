@@ -12,7 +12,7 @@
 # or its authorized distributors. Please refer to the applicable 
 # agreement for further details.
 
-# ACDS 18.1 625 win32 2025.11.03.10:38:55
+# ACDS 18.1 625 win32 2025.11.14.17:02:47
 
 # ----------------------------------------
 # vcsmx - auto-generated simulation script
@@ -20,7 +20,7 @@
 # ----------------------------------------
 # This script provides commands to simulate the following IP detected in
 # your Quartus project:
-#     packet_presence_detection_tb_gen_tb
+#     lms_dsp_tb
 # 
 # Altera recommends that you source this Quartus-generated IP simulation
 # script from your own customized top-level script, and avoid editing this
@@ -96,7 +96,7 @@
 # 
 # IP SIMULATION SCRIPT
 # ----------------------------------------
-# If packet_presence_detection_tb_gen_tb is one of several IP cores in your
+# If lms_dsp_tb is one of several IP cores in your
 # Quartus project, you can generate a simulation script
 # suitable for inclusion in your top-level simulation
 # script by running the following command line:
@@ -107,12 +107,12 @@
 # within the Quartus project, and generate a unified
 # script which supports all the Altera IP within the design.
 # ----------------------------------------
-# ACDS 18.1 625 win32 2025.11.03.10:38:55
+# ACDS 18.1 625 win32 2025.11.14.17:02:47
 # ----------------------------------------
 # initialize variables
-TOP_LEVEL_NAME="packet_presence_detection_tb_gen_tb"
+TOP_LEVEL_NAME="lms_dsp_tb"
 QSYS_SIMDIR="./../../"
-QUARTUS_INSTALL_DIR="C:/intelfpga/18.1/quartus/"
+QUARTUS_INSTALL_DIR="C:/intelfpga_lite/18.1/quartus/"
 SKIP_FILE_COPY=0
 SKIP_DEV_COM=0
 SKIP_COM=0
@@ -148,21 +148,38 @@ fi
 # create compilation libraries
 mkdir -p ./libraries/work/
 mkdir -p ./libraries/altera_common_sv_packages/
+mkdir -p ./libraries/error_adapter_0/
+mkdir -p ./libraries/timing_adapter_1/
+mkdir -p ./libraries/timing_adapter_0/
+mkdir -p ./libraries/data_format_adapter_0/
 mkdir -p ./libraries/rst_controller/
+mkdir -p ./libraries/avalon_st_adapter_003/
+mkdir -p ./libraries/avalon_st_adapter_002/
+mkdir -p ./libraries/avalon_st_adapter_001/
+mkdir -p ./libraries/avalon_st_adapter/
 mkdir -p ./libraries/st_splitter_0/
 mkdir -p ./libraries/packet_presence_detection_0/
-mkdir -p ./libraries/packet_presence_detection_tb_gen_inst_source_bfm/
-mkdir -p ./libraries/packet_presence_detection_tb_gen_inst_sink_bfm/
-mkdir -p ./libraries/packet_presence_detection_tb_gen_inst_reset_bfm/
-mkdir -p ./libraries/packet_presence_detection_tb_gen_inst_clk_bfm/
-mkdir -p ./libraries/packet_presence_detection_tb_gen_inst_cfg_bfm/
-mkdir -p ./libraries/packet_presence_detection_tb_gen_inst/
+mkdir -p ./libraries/fir_compiler_ii_0/
+mkdir -p ./libraries/FIFO2AVS_0/
+mkdir -p ./libraries/AVS2FIFO_0/
+mkdir -p ./libraries/lms_dsp_inst_reset_bfm/
+mkdir -p ./libraries/lms_dsp_inst_ppd_bfm/
+mkdir -p ./libraries/lms_dsp_inst_fifo_out_bfm/
+mkdir -p ./libraries/lms_dsp_inst_fifo_in_bfm/
+mkdir -p ./libraries/lms_dsp_inst_clk_bfm/
+mkdir -p ./libraries/lms_dsp_inst/
 mkdir -p ./libraries/altera_ver/
 mkdir -p ./libraries/lpm_ver/
 mkdir -p ./libraries/sgate_ver/
 mkdir -p ./libraries/altera_mf_ver/
 mkdir -p ./libraries/altera_lnsim_ver/
 mkdir -p ./libraries/fiftyfivenm_ver/
+mkdir -p ./libraries/altera/
+mkdir -p ./libraries/lpm/
+mkdir -p ./libraries/sgate/
+mkdir -p ./libraries/altera_mf/
+mkdir -p ./libraries/altera_lnsim/
+mkdir -p ./libraries/fiftyfivenm/
 
 # ----------------------------------------
 # copy RAM/ROM files to simulation directory
@@ -177,26 +194,73 @@ if [ $SKIP_DEV_COM -eq 0 ]; then
   vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim.sv"                     -work altera_lnsim_ver
   vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QUARTUS_INSTALL_DIR/eda/sim_lib/fiftyfivenm_atoms.v"                 -work fiftyfivenm_ver 
   vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QUARTUS_INSTALL_DIR/eda/sim_lib/synopsys/fiftyfivenm_atoms_ncrypt.v" -work fiftyfivenm_ver 
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_syn_attributes.vhd"           -work altera          
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_standard_functions.vhd"       -work altera          
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/alt_dspbuilder_package.vhd"          -work altera          
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_europa_support_lib.vhd"       -work altera          
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_primitives_components.vhd"    -work altera          
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_primitives.vhd"               -work altera          
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/220pack.vhd"                         -work lpm             
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/220model.vhd"                        -work lpm             
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/sgate_pack.vhd"                      -work sgate           
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/sgate.vhd"                           -work sgate           
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_mf_components.vhd"            -work altera_mf       
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_mf.vhd"                       -work altera_mf       
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim.sv"                     -work altera_lnsim    
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim_components.vhd"         -work altera_lnsim    
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QUARTUS_INSTALL_DIR/eda/sim_lib/synopsys/fiftyfivenm_atoms_ncrypt.v" -work fiftyfivenm     
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/fiftyfivenm_atoms.vhd"               -work fiftyfivenm     
+  vhdlan $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS                   "$QUARTUS_INSTALL_DIR/eda/sim_lib/fiftyfivenm_components.vhd"          -work fiftyfivenm     
 fi
 
 # ----------------------------------------
 # compile design files in correct order
 if [ $SKIP_COM -eq 0 ]; then
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/verbosity_pkg.sv"                   -work altera_common_sv_packages                       
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/avalon_utilities_pkg.sv"            -work altera_common_sv_packages                       
-  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_reset_controller.v"          -work rst_controller                                  
-  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_reset_synchronizer.v"        -work rst_controller                                  
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_avalon_st_splitter.sv"       -work st_splitter_0                                   
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/packet_presence_detection.sv"       -work packet_presence_detection_0                     
-  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/short_shift.v"                      -work packet_presence_detection_0                     
-  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/long_shift.v"                       -work packet_presence_detection_0                     
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_avalon_st_sink_bfm.sv"       -work packet_presence_detection_tb_gen_inst_source_bfm
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_avalon_st_source_bfm.sv"     -work packet_presence_detection_tb_gen_inst_sink_bfm  
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_avalon_reset_source.sv"      -work packet_presence_detection_tb_gen_inst_reset_bfm 
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_avalon_clock_source.sv"      -work packet_presence_detection_tb_gen_inst_clk_bfm   
-  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/altera_conduit_bfm.sv"              -work packet_presence_detection_tb_gen_inst_cfg_bfm   
-  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/submodules/packet_presence_detection_tb_gen.v" -work packet_presence_detection_tb_gen_inst           
-  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/packet_presence_detection_tb_gen_tb/simulation/packet_presence_detection_tb_gen_tb.v"                                                               
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/verbosity_pkg.sv"                                                 -work altera_common_sv_packages  
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_003_error_adapter_0.sv"                 -work error_adapter_0            
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_002_timing_adapter_1.sv"                -work timing_adapter_1           
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_002_timing_adapter_0.sv"                -work timing_adapter_0           
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_002_data_format_adapter_0.sv"           -work data_format_adapter_0      
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_002_data_format_adapter_0_state_ram.sv" -work data_format_adapter_0      
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_002_data_format_adapter_0_data_ram.sv"  -work data_format_adapter_0      
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_001_timing_adapter_1.sv"                -work timing_adapter_1           
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_001_timing_adapter_0.sv"                -work timing_adapter_0           
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_001_data_format_adapter_0.sv"           -work data_format_adapter_0      
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_001_data_format_adapter_0_state_ram.sv" -work data_format_adapter_0      
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_001_data_format_adapter_0_data_ram.sv"  -work data_format_adapter_0      
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_error_adapter_0.sv"                     -work error_adapter_0            
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_reset_controller.v"                                        -work rst_controller             
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_reset_synchronizer.v"                                      -work rst_controller             
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_003.v"                                  -work avalon_st_adapter_003      
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_002.v"                                  -work avalon_st_adapter_002      
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter_001.v"                                  -work avalon_st_adapter_001      
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_avalon_st_adapter.v"                                      -work avalon_st_adapter          
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_avalon_st_splitter.sv"                                     -work st_splitter_0              
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/packet_presence_detection.sv"                                     -work packet_presence_detection_0
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/short_shift.v"                                                    -work packet_presence_detection_0
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/long_shift.v"                                                     -work packet_presence_detection_0
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/dspba_library_package.vhd"                                        -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/dspba_library.vhd"                                                -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/auk_dspip_math_pkg_hpfir.vhd"                                     -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/auk_dspip_lib_pkg_hpfir.vhd"                                      -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/auk_dspip_avalon_streaming_controller_hpfir.vhd"                  -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/auk_dspip_avalon_streaming_sink_hpfir.vhd"                        -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/auk_dspip_avalon_streaming_source_hpfir.vhd"                      -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/auk_dspip_roundsat_hpfir.vhd"                                     -work fir_compiler_ii_0          
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_avalon_sc_fifo.v"                                          -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_fir_compiler_ii_0_rtl_core.vhd"                           -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_fir_compiler_ii_0_ast.vhd"                                -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_fir_compiler_ii_0.vhd"                                    -work fir_compiler_ii_0          
+  vhdlan -xlrm $USER_DEFINED_VHDL_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS             "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp_fir_compiler_ii_0_tb.vhd"                                 -work fir_compiler_ii_0          
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/fifo2avs.v"                                                       -work FIFO2AVS_0                 
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/avs2fifo.v"                                                       -work AVS2FIFO_0                 
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_avalon_reset_source.sv"                                    -work lms_dsp_inst_reset_bfm     
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_conduit_bfm_0003.sv"                                       -work lms_dsp_inst_ppd_bfm       
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_conduit_bfm_0002.sv"                                       -work lms_dsp_inst_fifo_out_bfm  
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_conduit_bfm.sv"                                            -work lms_dsp_inst_fifo_in_bfm   
+  vlogan +v2k -sverilog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/altera_avalon_clock_source.sv"                                    -work lms_dsp_inst_clk_bfm       
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/submodules/lms_dsp.v"                                                        -work lms_dsp_inst               
+  vlogan +v2k $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS           "$QSYS_SIMDIR/lms_dsp_tb/simulation/lms_dsp_tb.v"                                                                                                 
 fi
 
 # ----------------------------------------
