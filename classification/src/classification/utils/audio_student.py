@@ -58,17 +58,16 @@ class AudioUtil:
         sign *= C
         return (sign, sr)
 
-    def resample(audio, newsr=11025) -> tuple[ndarray, int]:
+    def resample(audio, newsr=11025) -> tuple[np.ndarray, int]:
         """
         Resample to target sampling frequency.
-
+    
         :param audio: The audio signal as a tuple (signal, sample_rate).
         :param newsr: The target sampling frequency.
         """
-        sig, sr = audio
 
-        ### TO COMPLETE
-
+        resig = signal.resample(audio[0], int(round(len(audio[0]) * newsr / audio[1])))
+    
         return (resig, newsr)
 
     def pad_trunc(audio, max_ms) -> tuple[ndarray, int]:
@@ -109,11 +108,11 @@ class AudioUtil:
         :param audio: The audio signal as a tuple (signal, sample_rate).
         :param scaling_limit: The maximum scaling factor.
         """
-        sig, sr = audio
-
         ### TO COMPLETE
-
-        return audio
+        sig, sr = audio
+        scaling_factor = random.uniform(1 / scaling_limit, scaling_limit)
+        sig = sig * scaling_factor
+        return (sig, sr)
 
     def add_noise(audio, sigma=0.05) -> tuple[ndarray, int]:
         """
@@ -122,11 +121,10 @@ class AudioUtil:
         :param audio: The audio signal as a tuple (signal, sample_rate).
         :param sigma: Standard deviation of the gaussian noise.
         """
-        sig, sr = audio
-
         ### TO COMPLETE
-
-        return audio
+        sig, sr = audio
+        sig += np.random.normal(0, sigma, len(sig))
+        return (sig, sr)
 
     def echo(audio, nechos=2) -> tuple[ndarray, int]:
         """
@@ -148,20 +146,21 @@ class AudioUtil:
 
     def filter(audio, filt) -> tuple[ndarray, int]:
         """
-        Filter the audio signal with a provided filter. Note the filter is given for positive frequencies only and is thus symmetrized in the function.
+        Filter the audio signal with a provided filter. Note the filter is given for positive frequencies only and is thus
+        symmetrized in the function.
 
         :param audio: The audio signal as a tuple (signal, sample_rate).
         :param filt: The filter to apply.
         """
-        sig, sr = audio
-
         ### TO COMPLETE
+        sig, sr = audio
+        filt_full = np.concatenate((filt, filt[-2:0:-1]))
+        sig_fft = np.fft.fft(sig)
+        sig_fft_filtered = sig_fft * filt_full
+        sig_filtered = np.fft.ifft(sig_fft_filtered).real
+        return (sig_filtered, sr)
 
-        return (sig, sr)
-
-    def add_bg(
-        audio, dataset, num_sources=1, max_ms=5000, amplitude_limit=0.1
-    ) -> tuple[ndarray, int]:
+    def add_bg(audio, dataset, num_sources=1, max_ms=5000, amplitude_limit=0.1) -> tuple[ndarray, int]:
         """
         Adds up sounds uniformly chosen at random to audio.
 
@@ -171,22 +170,63 @@ class AudioUtil:
         :param max_ms: The maximum duration of the sounds to add.
         :param amplitude_limit: The maximum amplitude of the added sounds.
         """
-        sig, sr = audio
-
         ### TO COMPLETE
+        sig, sr = audio
+        sig_len = len(sig)
+        for _ in range(num_sources):
+            class_name = random.choice(dataset.list_classes())
+            idx = random.randint(0, dataset.naudio[class_name] - 1)
+            bg_audio = dataset[class_name, idx]
+            bg_audio = AudioUtil.resample(bg_audio, sr)
+            bg_audio = AudioUtil.pad_trunc(bg_audio, max_ms)
+            bg_sig = bg_audio[0]
+            if len(bg_sig) > sig_len:
+                start_idx = random.randint(0, len(bg_sig) - sig_len)
+                bg_sig = bg_sig[start_idx : start_idx + sig_len]
+            else:
+                pad_len = sig_len - len(bg_sig)
+                pad_begin_len = random.randint(0, pad_len)
+                pad_end_len = pad_len - pad_begin_len
+                pad_begin = np.zeros(pad_begin_len)
+                pad_end = np.zeros(pad_end_len)
+                bg_sig = np.concatenate((pad_begin, bg_sig, pad_end))
+            amplitude = random.uniform(0, amplitude_limit)
+            sig += amplitude * bg_sig
 
-        return audio
+        return (sig, sr)
 
     def specgram(audio, Nft=512, fs2=11025) -> ndarray:
         """
         Compute a Spectrogram.
-
-        :param aud: The audio signal as a tuple (signal, sample_rate).
-        :param Nft: The number of points of the FFT.
-        :param fs2: The sampling frequency.
+    
+        Args:
+        ----
+            :param aud: The audio signal as a tuple (signal, sample_rate).
+            :param Nft: The number of points of the FFT.
+            :param fs2: The sampling frequency.
+        
+        Returns:
+        -------
+          stft (numpy array 2D): spectrogram of y : stored in a matrix of size (Nft//2, N/Nft)
+    
         """
-        ### TO COMPLETE
-        # stft /= float(2**8)
+        
+        y, _ = AudioUtil.resample(audio, fs2)
+
+        # Homemade computation of stft
+        "Crop the signal such that its length is a multiple of Nft"
+        L = len(y)
+        y = y[: L - L % Nft]
+        L = len(y)
+        
+        "Reshape the signal with a piece for each row"
+        audiomat = np.reshape(y, (L // Nft, Nft))
+        audioham = audiomat * np.hamming(Nft)  # Windowing. Hamming, Hanning, Blackman,..
+        z = np.reshape(audioham, -1)  # y windowed by pieces
+        "FFT row by row"
+        stft = np.fft.fft(audioham, axis=1)
+        stft = np.abs(stft[:, : Nft // 2].T)  # Taking only positive frequencies and computing the magnitude
+    
         return stft
 
     def get_hz2mel(fs2=11025, Nft=512, Nmel=20) -> ndarray:
@@ -206,14 +246,36 @@ class AudioUtil:
     def melspectrogram(audio, Nmel=20, Nft=512, fs2=11025) -> ndarray:
         """
         Generate a Melspectrogram.
-
+    
         :param audio: The audio signal as a tuple (signal, sample_rate).
         :param Nmel: The number of mel bands.
         :param Nft: The number of points of the FFT.
         :param fs2: The sampling frequency.
+    
+        Returns:
+        -------
+          melspec ((numpy array 2D): compressed spectrogram of x using the Mel's method stored in a matrix of size (Nmel,N/Nft)
+    
         """
-        ### TO COMPLETE
+        ### TO COMPLETE, using the functions resample() and specgram() defined above
+    
+        "Obtain the Hz2Mel transformation matrix"
+        # mels = librosa.filters.mel(sr=fs2, n_fft=Nft, n_mels=Nmel)
+        
 
+        mels = librosa.filters.mel(sr=fs2, n_fft=Nft, n_mels=Nmel)
+        mels = mels[:, :-1]
+        mels = mels / np.max(mels)
+
+        ### Normalize the mels matrix such that its maximum value is one.
+        # mels = mels / np.max(mels)
+    
+        "Getting the spec of the downsampled signal"
+        stft = AudioUtil.specgram(audio, Nft=Nft, fs2=fs2)
+    
+        "Melspectrogram computation"
+        ###  Perform the matrix multiplication between the Hz2Mel matrix and stft.
+        melspec = mels @ stft
         return melspec
 
     def spectro_aug_timefreq_masking(
