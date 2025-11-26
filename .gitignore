@@ -1,3 +1,8 @@
+# General
+
+uv.lock
+Basilicus/
+
 # Python
 
 __pycache__/

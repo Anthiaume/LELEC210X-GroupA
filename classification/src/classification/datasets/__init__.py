@@ -20,9 +20,9 @@ def get_cls_from_path(file: Path) -> str:
 
 
 class Dataset:
-    def __init__(
-        self, folder: Path = Path(__file__).parent / "soundfiles", format: str = "wav"
-    ):
+    def __init__(self,
+                 folder: Path = Path(__file__).parent / "soundfiles",
+                 format: str = "wav"):
         """
         Initialize a dataset from a given folder, including
         subfolders. Uses :func:`get_cls_from_path` to determine

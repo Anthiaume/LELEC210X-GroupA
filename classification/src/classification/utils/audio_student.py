@@ -110,7 +110,7 @@ class AudioUtil:
         """
         ### TO COMPLETE
         sig, sr = audio
-        scaling_factor = random.uniform(1 / scaling_limit, scaling_limit)
+        scaling_factor = random.uniform(0, scaling_limit)
         sig = sig * scaling_factor
         return (sig, sr)
 
@@ -173,25 +173,26 @@ class AudioUtil:
         ### TO COMPLETE
         sig, sr = audio
         sig_len = len(sig)
-        for _ in range(num_sources):
-            class_name = random.choice(dataset.list_classes())
-            idx = random.randint(0, dataset.naudio[class_name] - 1)
-            bg_audio = dataset[class_name, idx]
-            bg_audio = AudioUtil.resample(bg_audio, sr)
-            bg_audio = AudioUtil.pad_trunc(bg_audio, max_ms)
-            bg_sig = bg_audio[0]
-            if len(bg_sig) > sig_len:
-                start_idx = random.randint(0, len(bg_sig) - sig_len)
-                bg_sig = bg_sig[start_idx : start_idx + sig_len]
-            else:
-                pad_len = sig_len - len(bg_sig)
-                pad_begin_len = random.randint(0, pad_len)
-                pad_end_len = pad_len - pad_begin_len
-                pad_begin = np.zeros(pad_begin_len)
-                pad_end = np.zeros(pad_end_len)
-                bg_sig = np.concatenate((pad_begin, bg_sig, pad_end))
+        extraction = Feature_vector_DS(dataset)
+
+        for i in range(num_sources):
+            # Choisir une classe et un fichier au hasard et recuperer le signal audio
+            bg_cls = random.choice(list(dataset.files.keys()))
+            bg_file = random.choice(dataset.files[bg_cls])
+            bg_audio, sr_bg = extraction.get_audiosignal([bg_cls, dataset.files[bg_cls].index(bg_file)])
+
+            # Vérifier que le signal n'est pas trop long
+            if len(bg_audio) > sr_bg * max_ms / 1000:
+                bg_audio = bg_audio[: int(sr_bg * max_ms / 1000)]
+
+            # Vérifier que le signal peut rentrer dans le signal principal
+            if len(bg_audio) >= sig_len:
+                bg_audio = bg_audio[:sig_len]
+
+            # Ajouter le signal avec une amplitude aléatoire à une position aléatoire
             amplitude = random.uniform(0, amplitude_limit)
-            sig += amplitude * bg_sig
+            index_slice = random.randint(0, sig_len - len(bg_audio))
+            sig[index_slice : index_slice+len(bg_audio)] += amplitude * bg_audio
 
         return (sig, sr)
 
@@ -216,6 +217,7 @@ class AudioUtil:
         # Homemade computation of stft
         "Crop the signal such that its length is a multiple of Nft"
         L = len(y)
+        #print(L)
         y = y[: L - L % Nft]
         L = len(y)
         
@@ -275,7 +277,9 @@ class AudioUtil:
     
         "Melspectrogram computation"
         ###  Perform the matrix multiplication between the Hz2Mel matrix and stft.
+        #print(mels.shape, stft.shape)
         melspec = mels @ stft
+        
         return melspec
 
     def spectro_aug_timefreq_masking(
@@ -356,9 +360,9 @@ class Feature_vector_DS:
         :param cls_index: Class name and index.
         """
         audio_file = self.dataset[cls_index]
+        #print(audio_file)
         aud = AudioUtil.open(audio_file)
         aud = AudioUtil.resample(aud, self.sr)
-
         if self.data_aug is not None:
             if "add_bg" in self.data_aug:
                 aud = AudioUtil.add_bg(
@@ -480,6 +484,6 @@ class Feature_vector_DS:
             fv /= np.linalg.norm(fv, axis=1, keepdims=True)
 
         if self.pca is not None:
-            fv = np.array([self.pca.transform([i])[0] for i in fv])
+            fv = np.array([self.pca.transform(n_components=[i])[0] for i in fv])
 
         return fv
