@@ -4,6 +4,7 @@ ELEC PROJECT - 210x
 """
 
 import argparse
+import os 
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -66,11 +67,22 @@ if __name__ == "__main__":
 
     else:
         input_stream = reader(port=args.port)
+        print("Input strem:", input_stream)
         msg_counter = 0
+        os.open("mel_spectrogram_1.png", os.O_CREAT)
 
         for melvec in input_stream:
             msg_counter += 1
+            with open(f"model_MLP2.pkl", "rb") as f:
+                model = pickle.load(f)
+            with open("pca_model_MLP2.pkl", "rb") as f:
+                pca = pickle.load(f)
+            print(melvec.shape)
 
+            mdata = pca.transform(melvec.reshape(1, -1))
+            prediction = model.predict(mdata)
+            print(f"Prediction: {prediction}")
+            # input("Press Enter to continue...")
             print(f"MEL Spectrogram #{msg_counter}")
             with open("model_MLP2.pkl", "rb") as f:
                 model = pickle.load(f)
