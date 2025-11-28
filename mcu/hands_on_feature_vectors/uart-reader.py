@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import serial
 from serial.tools import list_ports
+import pickle, time
 
 from classification.utils.plots import plot_specgram
 
@@ -71,7 +72,14 @@ if __name__ == "__main__":
             msg_counter += 1
 
             print(f"MEL Spectrogram #{msg_counter}")
-
+            with open("model_MLP2.pkl", "rb") as f:
+                model = pickle.load(f)
+            with open("pca_model_MLP2.pkl", "rb") as f:
+                pca = pickle.load(f)
+            normalized_melvec = melvec.reshape(1, -1) / np.linalg.norm(melvec.reshape(1, -1))
+            pca_melvec = pca.transform(normalized_melvec)
+            prediction = model.predict(pca_melvec)
+            print(f"Predicted class: {prediction[0]}\n")
             plt.figure()
             plot_specgram(
                 melvec.reshape((N_MELVECS, MELVEC_LENGTH)).T,
@@ -80,6 +88,8 @@ if __name__ == "__main__":
                 title=f"MEL Spectrogram #{msg_counter}",
                 xlabel="Mel vector",
             )
-            plt.draw()
-            plt.pause(0.001)
-            plt.clf()
+            plt.show()
+            #plt.pause(0.001)
+            time.sleep(2)
+            # plt.clf()
+            plt.close()
