@@ -27,7 +27,7 @@ def parse_buffer(line):
     if line.startswith(PRINT_PREFIX):
         return bytes.fromhex(line[len(PRINT_PREFIX) :])
     else:
-        print(line)
+        #print(line)
         return None
 
 
@@ -39,7 +39,7 @@ def reader(port=None):
             line += ser.read_until(b"\n", size=2 * N_MELVECS * MELVEC_LENGTH).decode(
                 "ascii"
             )
-            print(line)
+            #print(line)
         line = line.strip()
         buffer = parse_buffer(line)
         if buffer is not None:
@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 model = pickle.load(f)
             with open("pca_model_MLP2.pkl", "rb") as f:
                 pca = pickle.load(f)
-            print(melvec.shape)
+
 
             mdata = pca.transform(melvec.reshape(1, -1))
             prediction = model.predict(mdata)
