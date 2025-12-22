@@ -38,6 +38,11 @@ int make_packet(uint8_t *packet, size_t payload_len, uint8_t sender_id, uint32_t
     memset(packet, 0, PACKET_HEADER_LENGTH);
     // So is the tag
 	memset(packet + payload_len + PACKET_HEADER_LENGTH, 0, PACKET_TAG_LENGTH);
+	//
+	memset(packet + 1, sender_id, 1);
+	memset(packet + 2, payload_len, 2);
+	memset(packet + 4, serial, 4);
+
 
 	// TO DO :  replace the two previous command by properly
 	//			setting the packet header with the following structure :
@@ -58,6 +63,7 @@ int make_packet(uint8_t *packet, size_t payload_len, uint8_t sender_id, uint32_t
 	 *		 		- and operator (&) with hex value, e.g.to perform 0xFF
 	 *		 	This will be helpful when setting fields that are on multiple bytes.
 	*/
+
 
 	// For the tag field, you have to calculate the tag. The function call below is correct but
 	// tag_cbc_mac function, calculating the tag, is not implemented.

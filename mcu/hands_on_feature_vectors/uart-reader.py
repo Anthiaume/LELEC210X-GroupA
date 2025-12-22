@@ -4,6 +4,7 @@ ELEC PROJECT - 210x
 """
 
 import argparse
+import os 
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +14,7 @@ import pickle, time
 
 from classification.utils.plots import plot_specgram
 
-PRINT_PREFIX = "DF:HEX:"
+PRINT_PREFIX = "DF:HEX:"  
 FREQ_SAMPLING = 10200
 MELVEC_LENGTH = 20
 N_MELVECS = 20
@@ -26,7 +27,7 @@ def parse_buffer(line):
     if line.startswith(PRINT_PREFIX):
         return bytes.fromhex(line[len(PRINT_PREFIX) :])
     else:
-        print(line)
+        #print(line)
         return None
 
 
@@ -38,7 +39,7 @@ def reader(port=None):
             line += ser.read_until(b"\n", size=2 * N_MELVECS * MELVEC_LENGTH).decode(
                 "ascii"
             )
-            print(line)
+            #print(line)
         line = line.strip()
         buffer = parse_buffer(line)
         if buffer is not None:
@@ -66,16 +67,23 @@ if __name__ == "__main__":
 
     else:
         input_stream = reader(port=args.port)
+        print("Input strem:", input_stream)
         msg_counter = 0
+        os.open("mel_spectrogram_1.png", os.O_CREAT)
 
         for melvec in input_stream:
             msg_counter += 1
-
-            print(f"MEL Spectrogram #{msg_counter}")
-            with open("model_MLP2.pkl", "rb") as f:
+            with open(f"model_MLP2.pkl", "rb") as f:
                 model = pickle.load(f)
             with open("pca_model_MLP2.pkl", "rb") as f:
                 pca = pickle.load(f)
+            pickle.dump(melvec, open(f"helicopter_{msg_counter}.pkl", "wb"))
+
+
+            mdata = pca.transform(melvec.reshape(1, -1))
+            prediction = model.predict(mdata)
+            #print(f"Prediction: {prediction}")
+            print(f"MEL Spectrogram #{msg_counter}")
             normalized_melvec = melvec.reshape(1, -1) / np.linalg.norm(melvec.reshape(1, -1))
             pca_melvec = pca.transform(normalized_melvec)
             prediction = model.predict(pca_melvec)
@@ -88,8 +96,10 @@ if __name__ == "__main__":
                 title=f"MEL Spectrogram #{msg_counter}",
                 xlabel="Mel vector",
             )
-            plt.show()
+            #plt.show()
+            plt.savefig(f"helicopter_{msg_counter}.pdf")
             #plt.pause(0.001)
-            time.sleep(2)
+            time.sleep(0.5)
             # plt.clf()
             plt.close()
+   

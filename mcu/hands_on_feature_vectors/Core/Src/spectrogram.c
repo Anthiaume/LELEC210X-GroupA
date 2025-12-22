@@ -23,8 +23,8 @@ void Spectrogram_Format(q15_t *buf)
 {
 	// STEP 0.1 : Increase fixed-point scale
 	//            --> Pointwise shift
-	//            Complexity: O(<TODO>)
-	//            Number of cycles: <TODO>
+	//            Complexity: O(<1>)
+	//            Number of cycles: <1>
 
 	// The output of the ADC is stored in an unsigned 12-bit format, so buf[i] is in [0 , 2**12 - 1]
 	// In order to better use the scale of the signed 16-bit format (1 bit of sign and 15 integer bits), we can multiply by 2**(15-12) = 2**3
@@ -39,8 +39,8 @@ void Spectrogram_Format(q15_t *buf)
 
 	// STEP 0.2 : Remove DC Component
 	//            --> Pointwise substract
-	//            Complexity: O(<TODO>)
-	//            Number of cycles: <TODO>
+	//            Complexity: O(<SAMPLES_PER_MELVEC>)
+	//            Number of cycles: <SAMPLES_PER_MELVEC>
 
 	// Since we use a signed representation, we should now center the value around zero, we can do this by substracting 2**14.
 	// Now the value of buf[i] is in [-2**14 , 2**14 - 1]
@@ -62,14 +62,14 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 {
 	// STEP 1  : Windowing of input samples
 	//           --> Pointwise product
-	//           Complexity: O(<TODO>)
-	//           Number of cycles: <TODO>
+	//           Complexity: O(<SAMPLES_PER_MELVEC>)
+	//           Number of cycles: <SAMPLES_PER_MELVEC>
 	arm_mult_q15(samples, hamming_window, buf, SAMPLES_PER_MELVEC);
 
 	// STEP 2  : Discrete Fourier Transform
 	//           --> In-place Fast Fourier Transform (FFT) on a real signal
 	//           --> For our spectrogram, we only keep only positive frequencies (symmetry) in the next operations.
-	//           Complexity: O(<TODO>)
+	//           Complexity: O(<SAMPLES_PER_MELVEC*log(2*SAMPLES_PER_MELVEC)>)
 	//           Number of cycles: <TODO>
 
 	// Since the FFT is a recursive algorithm, the values are rescaled in the function to ensure that overflow cannot happen.
@@ -86,7 +86,7 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	//           [?] Is there a more efficient way to this using only shifting ?
 
 	// STEP 3.1: Find the extremum value (maximum of absolute values)
-	//           Complexity: O(<TODO>)
+	//           Complexity: O(<SAMPLES_PER_MELVEC>)
 	//           Number of cycles: <TODO>
 
 	q15_t vmax;
@@ -95,7 +95,7 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	arm_absmax_q15(buf_fft, SAMPLES_PER_MELVEC, &vmax, &pIndex);
 
 	// STEP 3.2: Normalize the vector
-	//           Complexity: O(<TODO>)
+	//           Complexity: O(<SAMPLES_PER_MELVEC>)
 	//           Number of cycles: <TODO>
 
 	for (int i=0; i < SAMPLES_PER_MELVEC; i++)
