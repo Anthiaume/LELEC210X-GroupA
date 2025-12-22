@@ -14,7 +14,7 @@ import pickle, time
 
 from classification.utils.plots import plot_specgram
 
-PRINT_PREFIX = "DF:HEX:"
+PRINT_PREFIX = "DF:HEX:"  
 FREQ_SAMPLING = 10200
 MELVEC_LENGTH = 20
 N_MELVECS = 20
@@ -77,17 +77,13 @@ if __name__ == "__main__":
                 model = pickle.load(f)
             with open("pca_model_MLP2.pkl", "rb") as f:
                 pca = pickle.load(f)
+            pickle.dump(melvec, open(f"helicopter_{msg_counter}.pkl", "wb"))
 
 
             mdata = pca.transform(melvec.reshape(1, -1))
             prediction = model.predict(mdata)
-            print(f"Prediction: {prediction}")
-            # input("Press Enter to continue...")
+            #print(f"Prediction: {prediction}")
             print(f"MEL Spectrogram #{msg_counter}")
-            with open("model_MLP2.pkl", "rb") as f:
-                model = pickle.load(f)
-            with open("pca_model_MLP2.pkl", "rb") as f:
-                pca = pickle.load(f)
             normalized_melvec = melvec.reshape(1, -1) / np.linalg.norm(melvec.reshape(1, -1))
             pca_melvec = pca.transform(normalized_melvec)
             prediction = model.predict(pca_melvec)
@@ -100,8 +96,10 @@ if __name__ == "__main__":
                 title=f"MEL Spectrogram #{msg_counter}",
                 xlabel="Mel vector",
             )
-            plt.show()
+            #plt.show()
+            plt.savefig(f"helicopter_{msg_counter}.pdf")
             #plt.pause(0.001)
-            time.sleep(2)
+            time.sleep(0.5)
             # plt.clf()
             plt.close()
+   
