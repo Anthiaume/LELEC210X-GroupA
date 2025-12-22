@@ -470,7 +470,7 @@ blocks:
     bus_structure: null
     coordinate: [544, 324.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: qtgui_sink_x_0
   id: qtgui_sink_x
   parameters:
@@ -540,7 +540,6 @@ connections:
 - [fsk_demodulation_0, '0', fsk_packet_parser_0, '0']
 - [fsk_onQuery_noise_estimation_0, NoisePow, fsk_synchronization_0, NoisePow]
 - [fsk_packet_parser_0, '0', zeromq_pub_sink_0, '0']
-- [fsk_preamble_detect_0, '0', fsk_synchronization_0, '0']
 - [fsk_preamble_detect_0, '0', low_pass_filter_0, '0']
 - [fsk_preamble_detect_0, SignalPow, fsk_synchronization_0, SignalPow]
 - [fsk_synchronization_0, '0', fsk_demodulation_0, '0']
@@ -551,4 +550,4 @@ connections:
 
 metadata:
   file_format: 1
-  grc_version: 3.10.7.0
+  grc_version: 3.10.12.0

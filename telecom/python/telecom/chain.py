@@ -78,9 +78,13 @@ class Chain:
         return x
 
     # Rx methods
+<<<<<<< HEAD
+    ideal_preamble_detect: bool = True
+=======
     ideal_preamble_detect: bool = False
  
     use_dynamic_ppd: bool = False
+>>>>>>> origin/main
 
     def preamble_detect(self, y: np.array) -> int | None:
         """
@@ -101,6 +105,8 @@ class Chain:
             or None if not found.
         """
         raise NotImplementedError
+
+    ideal_cfo_estimation: bool = True
 
     ideal_cfo_estimation: bool = False
 

@@ -481,9 +481,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [552, 324.0]
+    coordinate: [552, 316.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: qtgui_sink_x_0
   id: qtgui_sink_x
   parameters:
@@ -555,7 +555,6 @@ connections:
 - [fsk_packet_parser_0, '0', virtual_sink_0, '0']
 - [fsk_packet_parser_0, '0', zeromq_pub_sink_0, '0']
 - [fsk_synchronization_0, '0', fsk_demodulation_0, '0']
-- [limesdr_fpga_flag_detector_0, '0', fsk_synchronization_0, '0']
 - [limesdr_fpga_flag_detector_0, '0', low_pass_filter_0, '0']
 - [limesdr_fpga_flag_detector_0, SignalPow, fsk_synchronization_0, SignalPow]
 - [limesdr_fpga_source_0, '0', fsk_onQuery_noise_estimation_0, '0']
