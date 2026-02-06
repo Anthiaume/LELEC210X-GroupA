@@ -1,5 +1,5 @@
 EDA Netlist Writer report for LimeSDR-Mini_lms7_lelec210x
-Fri Nov 14 17:14:12 2025
+Thu Jan 08 10:07:25 2026
 Quartus Prime Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
 
 
@@ -36,7 +36,7 @@ refer to the applicable agreement for further details.
 +-------------------------------------------------------------------+
 ; EDA Netlist Writer Summary                                        ;
 +---------------------------+---------------------------------------+
-; EDA Netlist Writer Status ; Successful - Fri Nov 14 17:14:12 2025 ;
+; EDA Netlist Writer Status ; Successful - Thu Jan 08 10:07:25 2026 ;
 ; Revision Name             ; LimeSDR-Mini_lms7_lelec210x           ;
 ; Top-level Entity Name     ; lms7_trx_top                          ;
 ; Family                    ; MAX 10                                ;
@@ -66,13 +66,13 @@ refer to the applicable agreement for further details.
 +---------------------------------------------------------------------------------------------------+------------------------+
 
 
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Simulation Generated Files                                                                                                                                ;
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Generated Files                                                                                                                                           ;
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-; C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/simulation/modelsim/LimeSDR-Mini_lms7_lelec210x.vho ;
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------------------------+
+; Simulation Generated Files                                                                                           ;
++----------------------------------------------------------------------------------------------------------------------+
+; Generated Files                                                                                                      ;
++----------------------------------------------------------------------------------------------------------------------+
+; C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/simulation/modelsim/LimeSDR-Mini_lms7_lelec210x.vho ;
++----------------------------------------------------------------------------------------------------------------------+
 
 
 +-----------------------------+
@@ -81,16 +81,16 @@ refer to the applicable agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus Prime EDA Netlist Writer
     Info: Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
-    Info: Processing started: Fri Nov 14 17:14:08 2025
+    Info: Processing started: Thu Jan 08 10:07:06 2026
 Info: Command: quartus_eda --read_settings_files=off --write_settings_files=off LimeSDR-Mini_lms7_lelec210x -c LimeSDR-Mini_lms7_lelec210x
 Warning (125092): Tcl Script File lms_auto_dsp/synthesis/lms_auto_dsp.qip not found
     Info (125063): set_global_assignment -name QIP_FILE lms_auto_dsp/synthesis/lms_auto_dsp.qip
 Warning (10905): Generated the EDA functional simulation netlist because it is the only supported netlist type for this device.
-Info (204019): Generated file LimeSDR-Mini_lms7_lelec210x.vho in folder "C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file LimeSDR-Mini_lms7_lelec210x.vho in folder "C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/simulation/modelsim/" for EDA simulation tool
 Info: Quartus Prime EDA Netlist Writer was successful. 0 errors, 2 warnings
-    Info: Peak virtual memory: 4817 megabytes
-    Info: Processing ended: Fri Nov 14 17:14:12 2025
-    Info: Elapsed time: 00:00:04
-    Info: Total CPU time (on all processors): 00:00:04
+    Info: Peak virtual memory: 4812 megabytes
+    Info: Processing ended: Thu Jan 08 10:07:26 2026
+    Info: Elapsed time: 00:00:20
+    Info: Total CPU time (on all processors): 00:00:10
 
 

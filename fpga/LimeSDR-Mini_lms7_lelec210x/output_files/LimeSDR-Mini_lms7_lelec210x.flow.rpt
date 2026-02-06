@@ -1,5 +1,5 @@
 Flow report for LimeSDR-Mini_lms7_lelec210x
-Fri Nov 14 17:14:12 2025
+Thu Jan 08 10:07:25 2026
 Quartus Prime Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
 
 
@@ -40,7 +40,7 @@ refer to the applicable agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Flow Summary                                                                     ;
 +------------------------------------+---------------------------------------------+
-; Flow Status                        ; Successful - Fri Nov 14 17:14:12 2025       ;
+; Flow Status                        ; Successful - Thu Jan 08 10:07:25 2026       ;
 ; Quartus Prime Version              ; 18.1.0 Build 625 09/12/2018 SJ Lite Edition ;
 ; Revision Name                      ; LimeSDR-Mini_lms7_lelec210x                 ;
 ; Top-level Entity Name              ; lms7_trx_top                                ;
@@ -66,7 +66,7 @@ refer to the applicable agreement for further details.
 +-------------------+-----------------------------+
 ; Option            ; Setting                     ;
 +-------------------+-----------------------------+
-; Start date & time ; 11/14/2025 17:10:26         ;
+; Start date & time ; 01/08/2026 09:59:10         ;
 ; Main task         ; Compilation                 ;
 ; Revision Name     ; LimeSDR-Mini_lms7_lelec210x ;
 +-------------------+-----------------------------+
@@ -77,7 +77,7 @@ refer to the applicable agreement for further details.
 +--------------------------------------+------------------------------------------------------------------+-----------------------------+---------------------+----------------+
 ; Assignment Name                      ; Value                                                            ; Default Value               ; Entity Name         ; Section Id     ;
 +--------------------------------------+------------------------------------------------------------------+-----------------------------+---------------------+----------------+
-; COMPILER_SIGNATURE_ID                ; 237785202591408.176313662606940                                  ; --                          ; --                  ; --             ;
+; COMPILER_SIGNATURE_ID                ; 1096684287894.176786274905060                                    ; --                          ; --                  ; --             ;
 ; EDA_OUTPUT_DATA_FORMAT               ; Vhdl                                                             ; --                          ; --                  ; eda_simulation ;
 ; EDA_SIMULATION_TOOL                  ; ModelSim-Altera (VHDL)                                           ; <None>                      ; --                  ; --             ;
 ; ENABLE_SIGNALTAP                     ; Off                                                              ; --                          ; --                  ; --             ;
@@ -154,13 +154,13 @@ refer to the applicable agreement for further details.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:01:37     ; 1.0                     ; 5218 MB             ; 00:01:58                           ;
-; Fitter               ; 00:01:26     ; 1.9                     ; 6381 MB             ; 00:04:17                           ;
-; Assembler            ; 00:00:02     ; 1.0                     ; 4742 MB             ; 00:00:02                           ;
-; Power Analyzer       ; 00:00:10     ; 4.1                     ; 5038 MB             ; 00:00:29                           ;
-; Timing Analyzer      ; 00:00:12     ; 4.8                     ; 5033 MB             ; 00:00:31                           ;
-; EDA Netlist Writer   ; 00:00:04     ; 1.0                     ; 4817 MB             ; 00:00:04                           ;
-; Total                ; 00:03:31     ; --                      ; --                  ; 00:07:21                           ;
+; Analysis & Synthesis ; 00:02:13     ; 1.0                     ; 5161 MB             ; 00:02:15                           ;
+; Fitter               ; 00:03:12     ; 1.8                     ; 6271 MB             ; 00:06:30                           ;
+; Assembler            ; 00:00:04     ; 1.0                     ; 4739 MB             ; 00:00:03                           ;
+; Power Analyzer       ; 00:01:00     ; 1.4                     ; 5034 MB             ; 00:00:58                           ;
+; Timing Analyzer      ; 00:00:57     ; 2.4                     ; 5049 MB             ; 00:00:50                           ;
+; EDA Netlist Writer   ; 00:00:19     ; 1.0                     ; 4812 MB             ; 00:00:09                           ;
+; Total                ; 00:07:45     ; --                      ; --                  ; 00:10:45                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
@@ -169,12 +169,12 @@ refer to the applicable agreement for further details.
 +----------------------+------------------+------------+------------+----------------+
 ; Module Name          ; Machine Hostname ; OS Name    ; OS Version ; Processor type ;
 +----------------------+------------------+------------+------------+----------------+
-; Analysis & Synthesis ; msizaoudi        ; Windows 10 ; 10.0       ; x86_64         ;
-; Fitter               ; msizaoudi        ; Windows 10 ; 10.0       ; x86_64         ;
-; Assembler            ; msizaoudi        ; Windows 10 ; 10.0       ; x86_64         ;
-; Power Analyzer       ; msizaoudi        ; Windows 10 ; 10.0       ; x86_64         ;
-; Timing Analyzer      ; msizaoudi        ; Windows 10 ; 10.0       ; x86_64         ;
-; EDA Netlist Writer   ; msizaoudi        ; Windows 10 ; 10.0       ; x86_64         ;
+; Analysis & Synthesis ; Polaris          ; Windows 10 ; 10.0       ; x86_64         ;
+; Fitter               ; Polaris          ; Windows 10 ; 10.0       ; x86_64         ;
+; Assembler            ; Polaris          ; Windows 10 ; 10.0       ; x86_64         ;
+; Power Analyzer       ; Polaris          ; Windows 10 ; 10.0       ; x86_64         ;
+; Timing Analyzer      ; Polaris          ; Windows 10 ; 10.0       ; x86_64         ;
+; EDA Netlist Writer   ; Polaris          ; Windows 10 ; 10.0       ; x86_64         ;
 +----------------------+------------------+------------+------------+----------------+
 
 

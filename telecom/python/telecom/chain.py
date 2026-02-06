@@ -55,10 +55,10 @@ class Chain:
     preamble: np.ndarray = PREAMBLE
     sync_word: np.ndarray = SYNC_WORD
 
-    payload_len: int = 8 * 100  # Number of bits per packet
+    payload_len: int = 800  # Number of bits per packet
 
     # Simulation parameters
-    n_packets: int = 100  # Number of sent packets
+    n_packets: int = 200  # Number of sent packets
 
     # Channel parameters
     sto_val: float = 0
@@ -113,13 +113,15 @@ class Chain:
         return x
 
     # Rx methods
-<<<<<<< HEAD
     ideal_preamble_detect: bool = True
+<<<<<<< Updated upstream
 =======
     ideal_preamble_detect: bool = False
 
+=======
+ 
+>>>>>>> Stashed changes
     use_dynamic_ppd: bool = False
->>>>>>> origin/main
 
     def preamble_detect(self, y: np.array) -> int | None:
         """
@@ -141,9 +143,9 @@ class Chain:
         """
         raise NotImplementedError
 
-    ideal_cfo_estimation: bool = True
-
     ideal_cfo_estimation: bool = False
+
+    #ideal_cfo_estimation: bool = False
 
     def cfo_estimation(self, y: np.array) -> float:
         """
@@ -181,9 +183,13 @@ class BasicChain(Chain):
 
     cfo_val, sto_val = np.nan, np.nan  # CFO and STO are random
 
-    ideal_preamble_detect = False
+    ideal_preamble_detect = True
 
+<<<<<<< Updated upstream
     use_dynamic_ppd = True
+=======
+    use_dynamic_ppd       = False
+>>>>>>> Stashed changes
 
     def preamble_detect_ppd(self, y):
         """Detect a preamble computing the received energy (average on a window)."""
@@ -224,7 +230,7 @@ class BasicChain(Chain):
 
         return None
 
-    ideal_cfo_estimation = True
+    ideal_cfo_estimation = False
 
     def cfo_estimation(self, y):
         # """Estimates CFO using Moose algorithm, on first samples of preamble."""
@@ -245,7 +251,7 @@ class BasicChain(Chain):
         Estimation ultra-rapide du CFO (Carrier Frequency Offset)
         avec l'algorithme de Moose, sur les premiers échantillons du préambule.
         """
-        N = 4  # Nombre de symboles utilisés (modifiable selon le préambule)
+        N = 2  # Nombre de symboles utilisés (modifiable selon le préambule)
         M = N * R  # Taille d’un bloc en échantillons
 
         # Pas de copie mémoire inutile : utilisation directe de vues sur y

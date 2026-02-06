@@ -10,6 +10,7 @@ from auth import PRINT_PREFIX
 from common.env import load_dotenv
 from common.logging import logger
 from leaderboard.utils import get_url
+import numpy as np
 
 from .utils import payload_to_melvecs
 
@@ -96,7 +97,21 @@ def main(
             logger.info(f"Parsed payload into Mel vectors: {melvecs}")
 
             if m:
-                # TODO: perform classification with your model
+                # Begin
+                with open(f"model_MLP2.pkl", "rb") as f:
+                    model = pickle.load(f)
+                with open("pca_model_MLP2.pkl", "rb") as f:
+                    pca = pickle.load(f)
+
+
+                mdata = pca.transform(melvecs.reshape(1, -1))
+                prediction = model.predict(mdata)
+                #print(f"Prediction: {prediction}")
+                print(f"MEL Spectrogram")
+                normalized_melvec = melvecs.reshape(1, -1) / np.linalg.norm(melvecs.reshape(1, -1))
+                pca_melvec = pca.transform(normalized_melvec)
+                prediction = model.predict(pca_melvec)
+                # End
                 guess = "fire"
 
                 if submit:

@@ -1,5 +1,5 @@
 Power Analyzer report for LimeSDR-Mini_lms7_lelec210x
-Fri Nov 14 17:13:54 2025
+Thu Jan 08 10:06:03 2026
 Quartus Prime Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
 
 
@@ -49,22 +49,22 @@ refer to the applicable agreement for further details.
 +----------------------------+-------------+
 ; Processors                 ; Number      ;
 +----------------------------+-------------+
-; Number detected on machine ; 16          ;
+; Number detected on machine ; 12          ;
 ; Maximum allowed            ; 10          ;
 ;                            ;             ;
-; Average used               ; 4.14        ;
+; Average used               ; 1.35        ;
 ; Maximum used               ; 10          ;
 ;                            ;             ;
 ; Usage by Processor         ; % Time Used ;
 ;     Processor 1            ; 100.0%      ;
-;     Processors 2-10        ;  34.9%      ;
+;     Processors 2-10        ;   3.9%      ;
 +----------------------------+-------------+
 
 
 +-------------------------------------------------------------------------------------------+
 ; Power Analyzer Summary                                                                    ;
 +----------------------------------------+--------------------------------------------------+
-; Power Analyzer Status                  ; Successful - Fri Nov 14 17:13:53 2025            ;
+; Power Analyzer Status                  ; Successful - Thu Jan 08 10:06:01 2026            ;
 ; Quartus Prime Version                  ; 18.1.0 Build 625 09/12/2018 SJ Lite Edition      ;
 ; Revision Name                          ; LimeSDR-Mini_lms7_lelec210x                      ;
 ; Top-level Entity Name                  ; lms7_trx_top                                     ;
@@ -879,7 +879,7 @@ refer to the applicable agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus Prime Power Analyzer
     Info: Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
-    Info: Processing started: Fri Nov 14 17:13:43 2025
+    Info: Processing started: Thu Jan 08 10:05:01 2026
 Info: Command: quartus_pow --read_settings_files=off --write_settings_files=off LimeSDR-Mini_lms7_lelec210x -c LimeSDR-Mini_lms7_lelec210x
 Warning (125092): Tcl Script File lms_auto_dsp/synthesis/lms_auto_dsp.qip not found
     Info (125063): set_global_assignment -name QIP_FILE lms_auto_dsp/synthesis/lms_auto_dsp.qip
@@ -911,32 +911,32 @@ Info (332104): Reading SDC File: 'lms_ctr/synthesis/submodules/altera_reset_cont
 Info (332104): Reading SDC File: 'lms_ctr/synthesis/submodules/altera_onchip_flash.sdc'
 Info (332104): Reading SDC File: 'lms_ctr/synthesis/submodules/lms_ctr_nios2_cpu_cpu.sdc'
 Info (332104): Reading SDC File: 'LMS7002_timing.sdc'
-Warning (332174): Ignored filter at LMS7002_timing.sdc(64): *pll_top*|pll1|clk[1] could not be matched with a pin File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 64
-Critical Warning (332049): Ignored create_generated_clock at LMS7002_timing.sdc(60): Argument <targets> is an empty collection File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 60
+Warning (332174): Ignored filter at LMS7002_timing.sdc(64): *pll_top*|pll1|clk[1] could not be matched with a pin File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 64
+Critical Warning (332049): Ignored create_generated_clock at LMS7002_timing.sdc(60): Argument <targets> is an empty collection File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 60
     Info (332050): create_generated_clock     -name   TX_C1 \
                                 -master     [get_clocks LMS_MCLK2] \
                                 -source     [get_pins -compatibility_mode *pll_top*|pll1|inclk[0]] \
                                 -phase 90 \
-                                            [get_pins -compatibility_mode *pll_top*|pll1|clk[1]] File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 60
-Warning (332174): Ignored filter at LMS7002_timing.sdc(223): TX_C1 could not be matched with a clock File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 223
-Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(223): Argument <from> is an empty collection File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 223
+                                            [get_pins -compatibility_mode *pll_top*|pll1|clk[1]] File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 60
+Warning (332174): Ignored filter at LMS7002_timing.sdc(223): TX_C1 could not be matched with a clock File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 223
+Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(223): Argument <from> is an empty collection File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 223
     Info (332050): set_false_path -setup     -rise_from     [get_clocks TX_C1] -rise_to \
-                                                [get_clocks LMS_FCLK1] File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 223
-Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(225): Argument <from> is an empty collection File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 225
+                                                [get_clocks LMS_FCLK1] File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 223
+Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(225): Argument <from> is an empty collection File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 225
     Info (332050): set_false_path -setup     -fall_from     [get_clocks TX_C1] -fall_to \
-                                                [get_clocks LMS_FCLK1] File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 225
-Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(227): Argument <from> is an empty collection File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 227
+                                                [get_clocks LMS_FCLK1] File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 225
+Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(227): Argument <from> is an empty collection File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 227
     Info (332050): set_false_path -hold     -rise_from     [get_clocks TX_C1] -fall_to \
-                                                [get_clocks LMS_FCLK1] File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 227
-Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(229): Argument <from> is an empty collection File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 229
+                                                [get_clocks LMS_FCLK1] File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 227
+Warning (332049): Ignored set_false_path at LMS7002_timing.sdc(229): Argument <from> is an empty collection File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 229
     Info (332050): set_false_path -hold     -fall_from     [get_clocks TX_C1] -rise_to \
-                                                [get_clocks LMS_FCLK1] File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 229
+                                                [get_clocks LMS_FCLK1] File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/LMS7002_timing.sdc Line: 229
 Info (332104): Reading SDC File: 'FT601_timing.sdc'
 Info (332104): Reading SDC File: 'timing.sdc'
 Info (332151): Clock uncertainty is not calculated until you update the timing netlist.
 Warning (332043): Overwriting existing clock: altera_reserved_tck
 Info (332104): Reading SDC File: 'Clock_groups.sdc'
-Warning (332174): Ignored filter at Clock_groups.sdc(16): TX_C1 could not be matched with a clock File: C:/Users/ismae/Desktop/UCLouvain/Master/Projet_Elec/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/Clock_groups.sdc Line: 16
+Warning (332174): Ignored filter at Clock_groups.sdc(16): TX_C1 could not be matched with a clock File: C:/Users/amali/LELEC210X-GroupA/fpga/LimeSDR-Mini_lms7_lelec210x/Clock_groups.sdc Line: 16
 Info (332097): The following timing edges are non-unate.  The Timing Analyzer will assume pos-unate behavior for these edges in the clock network.
     Info (332098): Cell: altera_internal_jtag  from: tck  to: tckutap
 Info (332123): Deriving Clock Uncertainty. Please refer to report_sdc in the Timing Analyzer to see clock uncertainties.
@@ -10956,9 +10956,9 @@ Info (218004): PLL "pll_top:inst1_pll_top|rxtx_pll:rxtx_pll_inst0|altpll:altpll_
 Info (215049): Average toggle rate for this design is 9.900 millions of transitions / sec
 Info (215031): Total thermal power estimate for the design is 901.25 mW
 Info: Quartus Prime Power Analyzer was successful. 0 errors, 12004 warnings
-    Info: Peak virtual memory: 5038 megabytes
-    Info: Processing ended: Fri Nov 14 17:13:54 2025
-    Info: Elapsed time: 00:00:11
-    Info: Total CPU time (on all processors): 00:00:29
+    Info: Peak virtual memory: 5034 megabytes
+    Info: Processing ended: Thu Jan 08 10:06:03 2026
+    Info: Elapsed time: 00:01:02
+    Info: Total CPU time (on all processors): 00:01:00
 
 

@@ -255,6 +255,107 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                 - (detect_idx + tau_hat + start_frame * chain.osr_rx) / (R * B)
             ) ** 2
 
+    # === Lecture de toutes les simulations ===
+    sim_data_list = []
+    if dest.exists():
+        with open(dest, "r") as f:
+            lines = f.readlines()
+
+        current_data = []
+        current_header = ""
+        for line in lines:
+            if line.startswith("#"):
+                if current_data:  # Save previous simulation
+                    sim_data_list.append((current_header, np.array(current_data)))
+                    current_data = []
+                current_header = line.strip()
+            else:
+                current_data.append([float(x) for x in line.split()])
+        if current_data:
+            sim_data_list.append((current_header, np.array(current_data)))
+
+    # === Plot BER / PER ===
+    EsN0_th = np.arange(EsN0s_dB[0], EsN0s_dB[-1])
+    BER_th = 0.5 * erfc(np.sqrt(10 ** (EsN0_th / 10) / 2))
+    BER_th_BPSK = 0.5 * erfc(np.sqrt(10 ** (EsN0_th / 10)))
+    BER_th_noncoh = 0.5 * np.exp(-(10 ** (EsN0_th / 10)) / 2)
+
+    colors = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown"]
+
+    fig, ax = plt.subplots(1, 2, constrained_layout=True, figsize=(10, 4))
+    fig_bis, ax_bis = plt.subplots(1, 2, constrained_layout=True, figsize=(10, 4))
+
+    for i, (header, data) in enumerate(sim_data_list):
+        EsN0s = data[:, 0]
+        BERs = data[:, 1]
+        PERs = data[:, 2]
+        RMSE_cfos = data[:, 3]
+        RMSE_stos = data[:, 4]
+
+        # Extract payload_len and n_packets from header
+        import re
+        m_payload = re.search(r"payload_len=(\d+)", header)
+        m_packets = re.search(r"n_packets=(\d+)", header)
+        label = ""
+        payload_len_sim = 1
+        if i ==0:
+            label= "100 payload bits, 100 pkts\n ref : ideal synchronisation"
+        elif i==1:
+            label= "100 payload bits, 100 pkts"
+        elif i==2:
+            label= "200 payload bits, 800 pkts"
+        elif i==3:
+            label= "800 payload bits, 200 pkts"
+       
+        #if m_payload and m_packets:
+        #    payload_len_sim = int(m_payload.group(1))
+        #    label = f"{m_payload.group(1)} bits, {m_packets.group(1)} pkts"
+
+        color = colors[i % len(colors)]
+        ax[0].plot(EsN0s, BERs, "-o", color=color, label=label)
+        ax[1].plot(EsN0s, PERs, "-o", color=color, label=label)
+        ax_bis[0].plot(EsN0s, RMSE_cfos, "-o", color=color, label=label)
+        ax_bis[1].plot(EsN0s, RMSE_stos, "-o", color=color, label=label)
+
+    # Theoretical BER
+    ax[0].plot(EsN0_th, BER_th, "k--", label="AWGN Th. FSK")
+    ax[0].plot(EsN0_th, BER_th_noncoh, "k-.", label="AWGN Th. FSK non-coh.")
+    ax[0].plot(EsN0_th, BER_th_BPSK, "k:", label="AWGN Th. BPSK")
+    ax[0].set_ylabel("BER")
+    ax[0].set_xlabel("$E_s/N_0$ [dB]")
+    ax[0].set_yscale("log")
+    ax[0].set_ylim((1e-6, 1))
+    ax[0].grid(True)
+    ax[0].legend()
+    ax[0].set_title("Average Bit Error Rate")
+
+    ax_bis[0].set_ylabel("RMSE CFO [-]")
+    ax_bis[0].set_xlabel("$E_s/N_0$ [dB]")
+    ax_bis[0].grid(True)
+    ax_bis[0].legend()
+    ax_bis[0].set_title("RMSE CFO")
+
+
+    # Theoretical PER
+    ax[1].plot(EsN0_th, 1 - (1 - BER_th) ** payload_len_sim, "k--", label="AWGN Th. FSK")
+    ax[1].plot(EsN0_th, 1 - (1 - BER_th_noncoh) ** payload_len_sim, "k-.", label="AWGN Th. FSK non-coh.")
+    ax[1].plot(EsN0_th, 1 - (1 - BER_th_BPSK) ** payload_len_sim, "k:", label="AWGN Th. BPSK")
+    ax[1].set_ylabel("PER")
+    ax[1].set_xlabel("$E_s/N_0$ [dB]")
+    ax[1].set_yscale("log")
+    ax[1].set_ylim((1e-6, 1))
+    ax[1].grid(True)
+    ax[1].legend()
+    ax[1].set_title("Average Packet Error Rate")
+
+    ax_bis[1].set_ylabel("RMSE STO [-]")
+    ax_bis[1].set_xlabel("$E_s/N_0$ [dB]")
+    ax_bis[1].grid(True)
+    ax_bis[1].legend()
+    ax_bis[1].set_title("RMSE STO")
+
+    plt.show()
+
     # Metrics
     BER = bit_errors / chain.payload_len / chain.n_packets
     PER = packet_errors / chain.n_packets
@@ -265,7 +366,6 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
 
     # FIR response plot
     if chain.numtaps != 0:
-        # Filter transfer function
         w, h = freqz(taps)
         f = w * fs * 0.5 / np.pi
         _fig, ax = plt.subplots(1, 1, constrained_layout=True, figsize=(7, 4))
@@ -280,89 +380,54 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
         ax2.grid(True)
         ax2.axis("tight")
 
-    # Theoretical curves
-    EsN0_th = np.arange(EsN0s_dB[0], EsN0s_dB[-1])
-
-    BER_th = 0.5 * erfc(np.sqrt(10 ** (EsN0_th / 10) / 2))
-    BER_th_BPSK = 0.5 * erfc(np.sqrt(10 ** (EsN0_th / 10)))
-    BER_th_noncoh = 0.5 * np.exp(-(10 ** (EsN0_th / 10)) / 2)
-
-    _fig, ax = plt.subplots(1, 2, constrained_layout=True, figsize=(10, 4))
-    ax[0].plot(EsN0s_dB, BER, "-s", label="Simulation")
-    ax[0].plot(EsN0_th, BER_th, label="AWGN Th. FSK")
-    ax[0].plot(EsN0_th, BER_th_noncoh, label="AWGN Th. FSK non-coh.")
-    ax[0].plot(EsN0_th, BER_th_BPSK, label="AWGN Th. BPSK")
-    ax[0].set_ylabel("BER")
-    ax[0].set_xlabel("$E_{s}/N_{0}$ [dB]")
-    ax[0].set_yscale("log")
-    ax[0].set_ylim((1e-6, 1))
-    ax[0].set_xlim((EsN0s_dB[0], EsN0s_dB[-1]))
-    ax[0].grid(True)
-    ax[0].set_title("Average Bit Error Rate")
-    ax[0].legend()
-    # Packet error rate
-    ax[1].plot(EsN0s_dB, PER, "-s", label="Simulation")
-    ax[1].plot(EsN0_th, 1 - (1 - BER_th) ** chain.payload_len, label="AWGN Th. FSK")
-    ax[1].plot(
-        EsN0_th,
-        1 - (1 - BER_th_noncoh) ** chain.payload_len,
-        label="AWGN Th. FSK non-coh.",
-    )
-    ax[1].plot(
-        EsN0_th, 1 - (1 - BER_th_BPSK) ** chain.payload_len, label="AWGN Th. BPSK"
-    )
-    ax[1].set_ylabel("PER")
-    ax[1].set_xlabel("$E_{s}/N_{0}$ [dB]")
-    ax[1].set_yscale("log")
-    ax[1].set_ylim((1e-6, 1))
-    ax[1].set_xlim((EsN0s_dB[0], EsN0s_dB[-1]))
-    ax[1].grid(True)
-    ax[1].set_title("Average Packet Error Rate")
-    ax[1].legend()
-
-    # Preamble metrics
+    # Preamble / RMSE plots
     _fig, ax = plt.subplots(1, 3, constrained_layout=True, figsize=(10, 4))
     ax[0].plot(EsN0s_dB, preamble_mis * 100, "-s", label="Miss-detection")
     ax[0].plot(EsN0s_dB, preamble_false * 100, "-s", label="False-detection")
-    ax[0].set_title("Preamble detection error ")
+    ax[0].set_title("Preamble detection error")
     ax[0].set_ylabel("[%]")
-    ax[0].set_xlabel("$E_{s}/N_{0}$ [dB]")
+    ax[0].set_xlabel("$E_s/N_0$ [dB]")
     ax[0].set_ylim([-1, 101])
     ax[0].grid()
     ax[0].legend()
-    # RMSE CFO
+
     ax[1].semilogy(EsN0s_dB, RMSE_cfo, "-s")
     ax[1].set_title("RMSE CFO")
     ax[1].set_ylabel("RMSE [-]")
-    ax[1].set_xlabel("$E_{s}/N_{0}$ [dB]")
+    ax[1].set_xlabel("$E_s/N_0$ [dB]")
     ax[1].grid()
-    # RMSE STO
+
     ax[2].semilogy(EsN0s_dB, RMSE_sto, "-s")
     ax[2].set_title("RMSE STO")
     ax[2].set_ylabel("RMSE [-]")
-    ax[2].set_xlabel("$E_{s}/N_{0}$ [dB]")
+    ax[2].set_xlabel("$E_s/N_0$ [dB]")
     ax[2].grid()
 
     plt.show()
 
-    # Save simulation outputs (for later post-processing, building new figures,...)
-    save_var = np.column_stack(
-        (
-            EsN0s_dB,
-            BER,
-            PER,
-            RMSE_cfo,
-            RMSE_sto,
-            preamble_mis,
-            preamble_false,
-        )
-    )
-    np.savetxt(dest, save_var, delimiter="\t")
+    # Save simulation outputs
+    save_var = np.column_stack((
+        EsN0s_dB,
+        BER,
+        PER,
+        RMSE_cfo,
+        RMSE_sto,
+        preamble_mis,
+        preamble_false
+    ))
+    with open(dest, "a") as f:
+        f.write(f"# Simulation chain={chain_name}, payload_len={chain.payload_len}, n_packets={chain.n_packets}, seed={seed}\n")
+        f.write("# EsN0_dB\tBER\tPER\tRMSE_cfo\tRMSE_sto\tpreamble_mis\tpreamble_false\n")
+        np.savetxt(f, save_var, delimiter="\t")
+
+
+    #np.savetxt(dest, save_var, delimiter="\t")
 
     # Read file:
-    # data = np.loadtxt('test.csv')
-    # SNRs_dB = data[:,0]
-    # ...
+    #data = np.loadtxt('telecom\python\telecom\sim_results.txt')
+    #SNRs_dB = data[:,0]
+    #BERs = data[:,1]
+
 
 
 if __name__ == "__main__":
