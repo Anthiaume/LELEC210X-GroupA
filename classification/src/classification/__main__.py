@@ -83,11 +83,11 @@ def main(
         if key is None:
             raise click.UsageError("You must provide a key to submit guesses.")
         url = url or get_url()
-    if model:
-        with open(model, "rb") as file:
-            m = pickle.load(file)
-    else:
-        m = None
+    #if model:
+        # with open(model, "rb") as file:
+        #     m = pickle.load(file)
+#else:
+    #    m = None
 
     for payload in _input:
         if PRINT_PREFIX in payload:
@@ -96,11 +96,11 @@ def main(
             melvecs = payload_to_melvecs(payload, melvec_length, n_melvecs)
             logger.info(f"Parsed payload into Mel vectors: {melvecs}")
 
-            if m:
+            if 1: #m:
                 # Begin
-                with open(f"model_MLP2.pkl", "rb") as f:
+                with open(r"model_MLP2.pkl", "rb") as f:
                     model = pickle.load(f)
-                with open("pca_model_MLP2.pkl", "rb") as f:
+                with open(r"pca_model_MLP2.pkl", "rb") as f:
                     pca = pickle.load(f)
 
 
@@ -112,7 +112,11 @@ def main(
                 pca_melvec = pca.transform(normalized_melvec)
                 prediction = model.predict(pca_melvec)
                 # End
-                guess = "fire"
+                # with open ("blanche neige.txt", 'w') as file:
+                #     file.write(str(prediction))
+                #     file.write(type(prediction))
+                print("Woupie, la prediction est : ", prediction)
+                guess = prediction[0]
 
                 if submit:
                     response = requests.post(
