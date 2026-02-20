@@ -15,52 +15,105 @@ const uint8_t AES_Key[16]  = {
 							0x00,0x00,0x00,0x00,
 							0x00,0x00,0x00,0x00};
 
+// void tag_cbc_mac(uint8_t *tag, const uint8_t *msg, size_t msg_len) {
+// 	// Allocate a buffer of the key size to store the input and result of AES
+// 	// uint32_t[4] is 4*(32/8)= 16 bytes long
+// 	uint32_t statew[4] = {0};
+// 	// state is a pointer to the start of the buffer
+// 	uint8_t *state = (uint8_t*) statew;
+//     size_t i;
+
+//     size_t n = ((msg_len / 16) - 1 > 1) ? ((msg_len / 16) - 1) : 1; // Number of blocks of 16 bytes in the message
+// 	// int reste = msg_len % 16; // Number of bytes in the last block if the message length is not a multiple of 16
+// 	// int nbr_0_padding = 16 - reste; // Number of bytes to pad with zeros if the message length is not a multiple of 16	
+// 	for(i=0; i<n+1; i++) {
+// 		if(i==0) {
+// 			// For the first block, the input to AES is the first 16 bytes of the message
+// 			for (int j=0; j<16; j++) {
+// 				state[j] = msg[j];
+// 			}
+// 		} else if (i>0 && i<n) {
+// 			// For the next blocks, the input to AES is the XOR of the previous state and the next 16 bytes of the message
+// 			for (int j=0; j<16; j++) {
+// 				state[j] = state[j] ^ msg[i*16 + j];
+// 			}
+// 		} else {
+// 			// For the last block, if the message length is not a multiple of 16, we need to pad the last block with zeros
+// 			for (int j=0; j<16; j++) {
+// 				if (i*16 + j < msg_len) {
+// 					state[j] = state[j] ^ msg[i*16 + j];
+// 				} else {
+// 					state[j] = state[j] ^ 0x00;
+// 				}
+// 			}
+// 		}
+// 		AES128_encrypt(state, AES_Key);
+// 	}
+//     // TO DO : Complete the CBC-MAC_AES
+
+	
+
+//     // Copy the result of CBC-MAC-AES to the tag.3
+//     for (int j=0; j<16; j++) {
+//         tag[j] = state[j];
+//     }
+// }
+
+
 void tag_cbc_mac(uint8_t *tag, const uint8_t *msg, size_t msg_len) {
-	// Allocate a buffer of the key size to store the input and result of AES
-	// uint32_t[4] is 4*(32/8)= 16 bytes long
-	uint32_t statew[4] = {0};
-	// state is a pointer to the start of the buffer
-	uint8_t *state = (uint8_t*) statew;
+
+    // Buffer 16 bytes (4 * 32 bits)
+    uint32_t statew[4] = {0};
+    // state is a pointer to the start of the buffer
+    uint8_t *state = (uint8_t*) statew;
     size_t i;
 
-    size_t n = ((msg_len / 16) - 1 > 1) ? ((msg_len / 16) - 1) : 1; // Number of blocks of 16 bytes in the message
-	// int reste = msg_len % 16; // Number of bytes in the last block if the message length is not a multiple of 16
-	// int nbr_0_padding = 16 - reste; // Number of bytes to pad with zeros if the message length is not a multiple of 16	
-	for(i=0; i<n+1; i++) {
-		if(i==0) {
-			// For the first block, the input to AES is the first 16 bytes of the message
-			for (int j=0; j<16; j++) {
-				state[j] = msg[j];
-			}
-		} else if (i>0 && i<n) {
-			// For the next blocks, the input to AES is the XOR of the previous state and the next 16 bytes of the message
-			for (int j=0; j<16; j++) {
-				state[j] = state[j] ^ msg[i*16 + j];
-			}
-		} else {
-			// For the last block, if the message length is not a multiple of 16, we need to pad the last block with zeros
-			for (int j=0; j<16; j++) {
-				if (i*16 + j < msg_len) {
-					state[j] = state[j] ^ msg[i*16 + j];
-				} else {
-					state[j] = state[j] ^ 0x00;
-				}
-			}
-		}
-		AES128_encrypt(state, AES_Key);
-	}
-    // TO DO : Complete the CBC-MAC_AES
+    // Nombre de blocs (arrondi supérieur)
+    size_t n = (msg_len + 15) / 16;
 
-    // Copy the result of CBC-MAC-AES to the tag.3
-    for (int j=0; j<16; j++) {
+    // Cas message vide
+    if (msg_len == 0) {
+        for (int j = 0; j < 16; j++) {
+            tag[j] = 0;
+        }
+        return;
+    }
+
+    for (i = 0; i < n; i++) {
+
+        uint8_t block[16] = {0};
+
+        // Taille réelle du bloc courant
+        size_t remaining = msg_len - i * 16;
+        size_t block_len = (remaining >= 16) ? 16 : remaining;
+
+        // Copie + zero padding implicite
+        for (int j = 0; j < block_len; j++) {
+            block[j] = msg[i * 16 + j];
+        }
+
+        // XOR avec l'état précédent
+        for (int j = 0; j < 16; j++) {
+            state[j] ^= block[j];
+        }
+
+        // Chiffrement AES
+        AES128_encrypt(state, AES_Key);
+    }
+
+    // Copie du tag
+    for (int j = 0; j < 16; j++) {
         tag[j] = state[j];
     }
 }
 
+
+
+
 // Assumes payload is already in place in the packet
 int make_packet(uint8_t *packet, size_t payload_len, uint8_t sender_id, uint32_t serial)
 {
-	printf("make_packet called with payload_len=%u, sender_id=%u, serial=%u\n", payload_len, sender_id, serial);
+	// printf("make_packet called with payload_len=%u, sender_id=%u, serial=%u\n", payload_len, sender_id, serial);
     size_t packet_len = payload_len + PACKET_HEADER_LENGTH + PACKET_TAG_LENGTH;
 
     // Initially, the whole packet header is set to 0s
