@@ -1,5 +1,7 @@
 import argparse
-import os 
+from genericpath import isfile
+import os
+from os.path import isfile, join
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,49 +18,60 @@ N_MELVECS = 20
 
 LOCAL = "sud11"
 SPEAKER = "local_speakers"
-TYPE = "chainsaw" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
-save_name = None # None, "xxx.pdf"
-plot_type = "single" # "single" or "multiple"
-multiple_plot_dimension = (3, 3)
+TYPE = "crackling fire" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
+NUMBER = 1 # number of the melspectrogram to plot, only for single plot
+plot_type = "all" # "single" or "all"
+multiple_plot_dimension = 4 # It is a squared plot, so it is the number of rows and columns (e.g., 4 means 4x4 = 16 plots)
 
 
 if __name__ == "__main__":
-    mypath = os.path.join("dataset", LOCAL, SPEAKER, f"{TYPE}.pkl",)
-
-    with open(mypath, "rb") as f:
-        melvec = pickle.load(f)
 
     if plot_type == "single":
+        mypath = os.getcwd()#os.path.join("dataset", LOCAL, SPEAKER, f"{TYPE}.pkl",)
+        mypath = os.path.join(mypath, f"{TYPE}_{NUMBER}.pkl",)
+        print("mypath:", mypath)
+        with open(mypath, "rb") as f:
+            melvec = pickle.load(f)
+
         plt.figure()
         plot_specgram(
             melvec.reshape((N_MELVECS, MELVEC_LENGTH)).T,
             ax=plt.gca(),
             is_mel=True,
-            title=f"MEL Spectrogram : {save_name}",
+            title=f"MEL Spectrogram : {TYPE}_{NUMBER}",
             xlabel="Mel vector",
         )
         #plt.show()
-        if save_name:
-            plt.savefig(save_name)
+        plt.savefig(f"Melspectrogram - {TYPE}_{NUMBER}.pdf")
         plt.close()
 
-    elif plot_type == "multiple":
-        fig, axes = plt.subplots(*multiple_plot_dimension, figsize=(12, 12))
-        for i in range(multiple_plot_dimension[0]):
-            for j in range(multiple_plot_dimension[1]):
-                idx = i * multiple_plot_dimension[1] + j
-                if idx < melvec.shape[0]:
-                    plot_specgram(
-                        melvec[idx].reshape((N_MELVECS, MELVEC_LENGTH)).T,
-                        ax=axes[i, j],
-                        is_mel=True,
-                        title=f"Mel spectrogram {idx}",
-                        xlabel="Mel vector",
-                    )
-                else:
-                    axes[i, j].axis("off")
-        plt.tight_layout()
-        #plt.show()
-        if save_name:
-            plt.savefig(save_name)
-        plt.close()
+    elif plot_type == "all":
+        mypath = os.getcwd()#os.path.join("dataset", LOCAL, SPEAKER)
+        onlyfiles = [f  for f in os.listdir(mypath) if (isfile(join(mypath, f)) and f.endswith(".pkl") and f.startswith(TYPE))]
+        data = []
+        for i in range(len(onlyfiles)):
+            with open(os.path.join(mypath, onlyfiles[i]), "rb") as f:
+                melvec = pickle.load(f)
+                data.append(melvec)
+
+        plots = 0
+        while plots < len(data):
+            fig, axes = plt.subplots(multiple_plot_dimension, multiple_plot_dimension, figsize=(12, 12))
+            for i in range(multiple_plot_dimension):
+                for j in range(multiple_plot_dimension):
+                    idx = i * multiple_plot_dimension + j + plots
+                    if idx < len(data):
+                        plot_specgram(
+                            data[idx].reshape((N_MELVECS, MELVEC_LENGTH)).T,
+                            ax=axes[i, j],
+                            is_mel=True,
+                            title=f"Mel spectrogram {idx+1}",
+                            xlabel="Mel vector",
+                        )
+                    else:
+                        axes[i, j].axis("off")
+            # save if the square is full or if it's the last row
+            plt.tight_layout()
+            plt.savefig(f"Melspectrograms - {TYPE} - part {plots // 16}.pdf")
+            plots += 16
+

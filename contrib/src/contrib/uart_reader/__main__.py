@@ -2,6 +2,10 @@ import datetime
 import pathlib as pathl
 import sys
 import time
+import pickle
+import os
+from os import listdir
+from os.path import isfile, join
 
 import click
 import matplotlib
@@ -561,6 +565,23 @@ class GUIMELWindow(QMainWindow):
             mel_vec = np.frombuffer(
                 array_hex, dtype=np.dtype(np.uint16).newbyteorder("<")
             )
+
+            ##########################
+            ### BEGIN STUDENT CODE ###
+            ##########################
+
+            save = False
+            if save:
+                TYPE = "gunshot" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
+                mypath = os.getcwd()#os.path.join(SPEAKER)
+                onlyfiles = [f  for f in listdir(mypath) if (isfile(join(mypath, f)) and f.endswith(".pkl") and f.startswith(TYPE))]
+                maximum = max([int(f.split('_')[1].strip('.pkl')) for f in onlyfiles if f.startswith(TYPE) and f.endswith(".pkl")] , default=0)
+                pickle.dump(mel_vec, open(f"{TYPE}_{maximum+1}.pkl", "wb"))
+
+            ##########################
+            ### END STUDENT CODE #####
+            ##########################
+
             self.add_data(mel_vec)
 
     def create_ui(self):
