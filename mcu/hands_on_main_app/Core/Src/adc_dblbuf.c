@@ -8,6 +8,8 @@
 #include "packet.h"
 
 
+
+
 static volatile uint16_t ADCDoubleBuf[2*ADC_BUF_SIZE]; /* ADC group regular conversion data (array of data) */
 static volatile uint16_t* ADCData[2] = {&ADCDoubleBuf[0], &ADCDoubleBuf[ADC_BUF_SIZE]};
 static volatile uint8_t ADCDataRdy[2] = {0, 0};
@@ -18,6 +20,7 @@ static q15_t mel_vectors[N_MELVECS][MELVEC_LENGTH];
 static uint32_t packet_cnt = 0;
 
 static volatile int32_t rem_n_bufs = 0;
+
 
 int StartADCAcq(int32_t n_bufs) {
 	rem_n_bufs = n_bufs;
@@ -62,6 +65,7 @@ static void print_encoded_packet(uint8_t *packet) {
 
 static void encode_packet(uint8_t *packet, uint32_t* packet_cnt) {
 	// BE encoding of each mel coef
+	
 	for (size_t i=0; i<N_MELVECS; i++) {
 		for (size_t j=0; j<MELVEC_LENGTH; j++) {
 			(packet+PACKET_HEADER_LENGTH)[(i*MELVEC_LENGTH+j)*2]   = mel_vectors[i][j] >> 8;
@@ -91,7 +95,7 @@ static void send_spectrogram() {
 
 	print_encoded_packet(packet);
 }
-
+int go = 0;
 static void ADC_Callback(int buf_cplt) {
 	if (rem_n_bufs != -1) {
 		rem_n_bufs--;
@@ -106,13 +110,24 @@ static void ADC_Callback(int buf_cplt) {
 	//start_cycle_count();
 	Spectrogram_Format((q15_t *)ADCData[buf_cplt]);
 	Spectrogram_Compute((q15_t *)ADCData[buf_cplt], mel_vectors[cur_melvec]);
+	printf("Sending: %d\n", sending);
+	if(sending){
+		go = 1;
+	}
 	cur_melvec++;
 	//stop_cycle_count("spectrogram");
 	ADCDataRdy[buf_cplt] = 0;
-
+	printf("go: %d\r\n", go);
 	if (rem_n_bufs == 0) {
-		print_spectrogram();
-		send_spectrogram();
+		if(go){
+			print_spectrogram();
+			send_spectrogram();
+			printf("Done sending packet\n");
+			go = 0;
+		}else{			DEBUG_PRINT("Not sending packet\r\n");
+		}
+		// print_spectrogram();
+		// send_spectrogram();
 	}
 }
 

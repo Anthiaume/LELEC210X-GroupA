@@ -9,6 +9,7 @@
 #define INC_SPECTROGRAM_H_
 
 #include "arm_math.h"
+#include <stdbool.h>
 
 static inline float q15_to_float(q15_t x)
 {
@@ -29,5 +30,6 @@ void Spectrogram_Format(q15_t *buf);
 
 // Compute spectrogram of samples into melvec. Modifies samples.
 void Spectrogram_Compute(q15_t *samples, q15_t *melvector);
+extern volatile bool sending;
 
 #endif /* INC_SPECTROGRAM_H_ */
