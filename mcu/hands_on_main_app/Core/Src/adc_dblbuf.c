@@ -22,6 +22,7 @@ static uint32_t packet_cnt = 0;
 static volatile int32_t rem_n_bufs = 0;
 
 
+
 int StartADCAcq(int32_t n_bufs) {
 	rem_n_bufs = n_bufs;
 	cur_melvec = 0;
@@ -110,6 +111,19 @@ static void ADC_Callback(int buf_cplt) {
 	//start_cycle_count();
 	Spectrogram_Format((q15_t *)ADCData[buf_cplt]);
 	Spectrogram_Compute((q15_t *)ADCData[buf_cplt], mel_vectors[cur_melvec]);
+	for(int i=0; i < N_SPECS*N_MELVECS-1; i++){
+		long_sum_energy[i] = long_sum_energy[i+1];
+	}
+	Threshold = 0.0;
+	printf("threshold sum: %f\n", Threshold);
+	long_sum_energy[N_SPECS*N_MELVECS-1] = energy_sum;
+	for(int i=0; i < N_SPECS*N_MELVECS; i++){
+		Threshold += long_sum_energy[i];
+	}
+	printf("threshold sum: %f\n", Threshold);
+	Threshold /= (N_SPECS*N_MELVECS);
+	Threshold *= 2; // Adjust this multiplier based on your requirements
+	printf("Updated Threshold: %f\n", Threshold);
 	printf("Sending: %d\n", sending);
 	if(sending){
 		go = 1;

@@ -31,5 +31,7 @@ void Spectrogram_Format(q15_t *buf);
 // Compute spectrogram of samples into melvec. Modifies samples.
 void Spectrogram_Compute(q15_t *samples, q15_t *melvector);
 extern volatile bool sending;
+extern volatile double energy_sum;
+extern volatile double Threshold;
 
 #endif /* INC_SPECTROGRAM_H_ */

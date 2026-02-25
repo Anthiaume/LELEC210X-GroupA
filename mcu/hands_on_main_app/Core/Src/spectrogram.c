@@ -17,6 +17,8 @@ q15_t buf_fft[2*SAMPLES_PER_MELVEC  ]; // Double size (real|imag) buffer needed 
 q15_t buf_tmp[  SAMPLES_PER_MELVEC/2]; // Intermediate buffer for arm_mat_mult_fast_q15
 
 volatile bool sending = false;
+volatile double energy_sum = 0.0;
+volatile double Threshold = 0.0;
 
 // Convert 12-bit DC ADC samples to Q1.15 fixed point signal and remove DC component
 void Spectrogram_Format(q15_t *buf)
@@ -99,20 +101,20 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	//           Number of cycles: <TODO>
 
 	arm_cmplx_mag_q15(buf, buf, SAMPLES_PER_MELVEC/2);
-	double energy_sum = 0.0;
+	energy_sum = 0.0;
 	for (int i=0; i < SAMPLES_PER_MELVEC/2; i++)
 	{
 		energy_sum += (double) buf[i] * (double) buf[i];
 	}
 	printf("Energy sum: %f\n", energy_sum);
 
-	int K = 1.1; // Adjust this value based on your requirements
-	double threshold = 2.23*10E8 * K; // Adjust this threshold based on your requirements
-	sending = energy_sum > threshold;
-	if(energy_sum > threshold) {
-		printf("Energy sum exceeds the threshold! Energy sum: %f, Threshold: %f\n", energy_sum, threshold);
+	// int K = 1.1; // Adjust this value based on your requirements
+	// double threshold = 2.23*10E8 * K; // Adjust this threshold based on your requirements
+	sending = energy_sum > Threshold;
+	if(energy_sum > Threshold) {
+		printf("Energy sum exceeds the threshold! Energy sum: %f, Threshold: %f\n", energy_sum, Threshold);
 	} else {
-		printf("Energy sum is below the threshold. Energy sum: %f, Threshold: %f\n", energy_sum, threshold);
+		printf("Energy sum is below the threshold. Energy sum: %f, Threshold: %f\n", energy_sum, Threshold);
 	}
 	
 
