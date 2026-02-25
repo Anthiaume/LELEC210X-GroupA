@@ -1,0 +1,1 @@
+# model names: assindria, berolinum, constantia, dispargum, erfordia, francofortum, goslaria, herbipolis, iuliacum, locoritum, misnia, norimberga, patavia, rigomagus, stutgardia
