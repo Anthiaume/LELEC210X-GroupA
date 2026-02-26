@@ -1,3 +1,5 @@
+from itertools import count
+
 from load_data import load_data
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.neural_network import MLPClassifier
@@ -7,25 +9,27 @@ import pickle
 
 # Names of the models: amorium, bithynion, chios, dorystolon, ephesos, flaviopolis, gangra, halikarnassos, iconium, karthago, lebessos, mesembria, nicosia, ophis, philadelphia, quiza, rhodos, samos, tarsos
 
-MLP_amorium = False
+MLP_amorium = False # Clôturé le jeudi 26 février 2026 à 17h13
 if MLP_amorium:
     """
     Model description:
     Basic MLP model with 5 classes
-    Dataset: mcu13, vinikot, JBL Flip 5 - Auguste - spec_20_20
+    Dataset: mcu13, vinikot, JBL Flip 5 - Auguste - spec_20_20 --> chainsaw, crackling fire, fireworks, gunshot
+             mcu13, fisher, local speakers - spec_20_20 --> background
+    Pas op !!! background est pas enregistré dans le même local que les autres classes
+    Modèle clôturé le jeudi 26 février 2026 à 17h13
     """
     GS_amorium  = False
     Gen_amorium = False
     KF_amorium  = False
 
-    mcu = "mcu13"
-    locals = ["vinikot"]
-    speakers = ["JBL Flip 5 - Auguste - spec_20_20"] 
-    data, labels = load_data(mcu, locals, speakers)
+    records = [("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"), # chainsaw, crackling fire, fireworks, gunshot
+               ("mcu13", "fisher", "local speakers - spec_20_20")       ] # background
+    data, labels = load_data(records)
 
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
-    x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True)
-
+    x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
+    
     if GS_amorium:
         parameters = {
             'hidden_layer_sizes': [(400, 400, 300, 200, 100, 50, 10), (300, 300, 200, 100, 50, 10), (200, 200, 100, 50, 10), (100, 100, 50, 10), (50, 50, 10)],
@@ -49,6 +53,10 @@ if MLP_amorium:
             x_train_fold, x_test_fold = x_train[train_index], x_train[val_index]
             y_train_fold, y_test_fold = y_train[train_index], y_train[val_index]
 
+            # count labels in y_train_fold
+            unique, counts = np.unique(y_train_fold, return_counts=True)
+            print(f"Labels distribution in training fold: {dict(zip(unique, counts))}")
+
             
             mlp.fit(x_train_fold, y_train_fold)
             y_pred = mlp.predict(x_test_fold)
@@ -67,6 +75,11 @@ if MLP_amorium:
         print(confusion_matrix(y_test, y_pred))
         pickle.dump(mlp, open("MLP_amorium.pkl", "wb"))
         print("Model saved as MLP_amorium.pkl")
+        print("classes: ", mlp.classes_)
+        probas = mlp.predict_proba(x_test)
+        probas = np.round(probas, decimals=2)
+        # for i in range(len(y_test)):
+        #     print(f"True label: {y_test[i]}, Predicted label: {y_pred[i]}, Predicted probabilities: chainsaw: {probas[i][0]}, fire: {probas[i][1]}, fireworks: {probas[i][2]}, gunshot: {probas[i][3]}")
 
 MLP_bithynion = False
 if MLP_bithynion:
