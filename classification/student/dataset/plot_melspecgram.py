@@ -16,8 +16,6 @@ FREQ_SAMPLING = 10200
 MELVEC_LENGTH = 20
 N_MELVECS = 20
 
-LOCAL = "sud11"
-SPEAKER = "local_speakers"
 TYPE = "crackling fire" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
 NUMBER = 1 # number of the melspectrogram to plot, only for single plot
 plot_type = "all" # "single" or "all"

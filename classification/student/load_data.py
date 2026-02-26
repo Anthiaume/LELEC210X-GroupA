@@ -12,7 +12,7 @@ def load_data(records):
                              ("mcu13", "fisher", "local speakers - spec_20_20")       ]
     Output:
     - data: numpy array of melspectrograms
-    - labels: numpy array of labels (e.g. "vinikot", "JBL Flip 5 - Auguste")
+    - labels: numpy array of labels (e.g. "chainsaw", "crackling fire", "fireworks", "gunshot", "background")
     """
     data = []
     labels = []
