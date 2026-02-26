@@ -39,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_BUF_SIZE 10000
+#define ADC_BUF_SIZE 30000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -203,18 +203,33 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
-uint32_t threshold = 0;
+
 /* USER CODE BEGIN 4 */
+u_int32_t threshold=0;
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-	uint32_t power_signal = get_signal_power(ADCBuffer, ADC_BUF_SIZE);
-	printf("power signal %d\n", power_signal);
+	uint32_t power_signal = get_signal_power(ADCData2, ADC_BUF_SIZE);
+	printf("power signal %ld\n", power_signal);
 	printf("threshold %d\n", threshold);
 	if (power_signal > threshold){
 			HAL_TIM_Base_Stop(&htim3);
 			HAL_ADC_Stop_DMA(&hadc1);
-			print_buffer(ADCBuffer);
+			print_buffer(ADCData2);
 	}
+}
+
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	uint32_t power_signal = get_signal_power(ADCData1, ADC_BUF_SIZE);
+	printf("power signal %ld\n", power_signal);
+	printf("threshold %d\n", threshold);
+	if (power_signal > threshold){
+			HAL_TIM_Base_Stop(&htim3);
+			HAL_ADC_Stop_DMA(&hadc1);
+			print_buffer(ADCData1);
+	}
+
+
 }
 
 /* USER CODE END 4 */

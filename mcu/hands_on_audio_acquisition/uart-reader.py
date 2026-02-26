@@ -12,7 +12,8 @@ import soundfile as sf
 from serial.tools import list_ports
 
 PRINT_PREFIX = "SND:HEX:"
-FREQ_SAMPLING = 10200
+#FREQ_SAMPLING = 10200
+FREQ_SAMPLING=11000
 VAL_MAX_ADC = 4096
 VDD = 3.3
 
@@ -47,6 +48,7 @@ def generate_audio(buf, file_name):
     buf = buf - np.mean(buf)
     buf /= max(abs(buf))
     sf.write("audio_files/" + file_name + ".ogg", buf, FREQ_SAMPLING)
+    print("je suis ici")
 
 
 if __name__ == "__main__":
@@ -70,8 +72,9 @@ if __name__ == "__main__":
         plt.figure(figsize=(10, 5))
         input_stream = reader(port=args.port)
         msg_counter = 0
-
+        print("ici")
         for msg in input_stream:
+           # sf.write("audio_files/" + f"acq-{msg_counter}" + ".ogg", msg, FREQ_SAMPLING)
             print(f"Acquisition #{msg_counter}")
 
             buffer_size = len(msg)
