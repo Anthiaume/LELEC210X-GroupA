@@ -81,9 +81,39 @@ if MLP_amorium:
         # for i in range(len(y_test)):
         #     print(f"True label: {y_test[i]}, Predicted label: {y_pred[i]}, Predicted probabilities: chainsaw: {probas[i][0]}, fire: {probas[i][1]}, fireworks: {probas[i][2]}, gunshot: {probas[i][3]}")
 
-MLP_bithynion = False
+MLP_bithynion = True
 if MLP_bithynion:
-    print("not implemented yet")
+    GS_bithynion  = False
+    Gen_bithynion = True
+
+    records = [("mcu13", "fisher", "local speakers - spec_20_20")] # 5 classes, 122 samples per class
+    data, labels = load_data(records)
+
+    records_2 = [("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")] # 4 classes
+    data_2, labels_2 = load_data(records_2)
+    data_2_normalized = data_2 / np.linalg.norm(data_2, axis=1, keepdims=True)
+
+    data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+    x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
+
+    if Gen_bithynion:
+        mlp = MLPClassifier(hidden_layer_sizes=(200, 200, 100, 50, 10), max_iter=500, random_state=42, activation="relu", learning_rate="constant")
+        mlp.fit(x_train, y_train)
+        y_pred = mlp.predict(x_test)
+        score = accuracy_score(y_test, y_pred)
+        print(f"Test score: {score}")
+        print("Confusion Matrix:")
+        print(confusion_matrix(y_test, y_pred))
+        pickle.dump(mlp, open("MLP_bithynion.pkl", "wb"))
+        print("Model saved as MLP_bithynion.pkl")
+
+        # Testing on second dataset
+        y_pred_2 = mlp.predict(data_2_normalized)
+        score_2 = accuracy_score(labels_2, y_pred_2)
+        print(f"Test score on second dataset: {score_2}")
+        print("Confusion Matrix on second dataset:")
+        print(confusion_matrix(labels_2, y_pred_2))
+
 
 # with open("hyperparameter_tuning amorium 1.pkl", "rb") as f:
 #     hyperparameter_tuning = pickle.load(f)
