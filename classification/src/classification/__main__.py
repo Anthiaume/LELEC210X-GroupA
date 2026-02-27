@@ -98,23 +98,10 @@ def main(
 
             if 1: #m:
                 # Begin
-                with open(r"model_MLP2.pkl", "rb") as f:
+                with open(r"MLP_amorium.pkl", "rb") as f:
                     model = pickle.load(f)
-                with open(r"pca_model_MLP2.pkl", "rb") as f:
-                    pca = pickle.load(f)
-
-
-                mdata = pca.transform(melvecs.reshape(1, -1))
-                prediction = model.predict(mdata)
-                #print(f"Prediction: {prediction}")
-                print(f"MEL Spectrogram")
-                normalized_melvec = melvecs.reshape(1, -1) / np.linalg.norm(melvecs.reshape(1, -1))
-                pca_melvec = pca.transform(normalized_melvec)
-                prediction = model.predict(pca_melvec)
-                # End
-                # with open ("blanche neige.txt", 'w') as file:
-                #     file.write(str(prediction))
-                #     file.write(type(prediction))
+                melvecs_normalized = melvecs / np.linalg.norm(melvecs, axis=1, keepdims=True)
+                prediction = model.predict(melvecs_normalized.reshape(1, -1))
                 print("Woupie, la prediction est : ", prediction)
                 guess = prediction[0]
 
