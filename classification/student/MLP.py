@@ -1,6 +1,6 @@
 from itertools import count
 
-from load_data import load_data
+from student_fct import load_data, save_confusion_matrix
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -86,12 +86,9 @@ if MLP_bithynion:
     GS_bithynion  = False
     Gen_bithynion = True
 
-    records = [("mcu13", "fisher", "local speakers - spec_20_20")] # 5 classes, 122 samples per class
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")]   # 5 classes, 111 samples per class
     data, labels = load_data(records)
-
-    records_2 = [("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")] # 4 classes
-    data_2, labels_2 = load_data(records_2)
-    data_2_normalized = data_2 / np.linalg.norm(data_2, axis=1, keepdims=True)
 
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
     x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
@@ -106,13 +103,7 @@ if MLP_bithynion:
         print(confusion_matrix(y_test, y_pred))
         pickle.dump(mlp, open("MLP_bithynion.pkl", "wb"))
         print("Model saved as MLP_bithynion.pkl")
-
-        # Testing on second dataset
-        y_pred_2 = mlp.predict(data_2_normalized)
-        score_2 = accuracy_score(labels_2, y_pred_2)
-        print(f"Test score on second dataset: {score_2}")
-        print("Confusion Matrix on second dataset:")
-        print(confusion_matrix(labels_2, y_pred_2))
+        save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_bithynion.pdf", show=True)
 
 
 # with open("hyperparameter_tuning amorium 1.pkl", "rb") as f:
