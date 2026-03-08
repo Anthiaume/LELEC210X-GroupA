@@ -9,6 +9,8 @@ from scipy.special import erfc
 
 from .chain import Chain
 
+TYPE = "GARDNER"  # Type of STO estimation to use in the simulation (ML or corr)
+
 
 def add_delay(chain: Chain, x: np.ndarray, tau: float) -> tuple[np.ndarray, int]:
     """
@@ -206,7 +208,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                         tau_hat = sto_idx
                 else:
                     tau_hat = chain.sto_estimation(
-                        y_sync[: hdr_len_byte * 8 * chain.osr_rx]
+                        y_sync[: hdr_len_byte * 8 * chain.osr_rx], TYPE, x_pr
                     )
 
                 y_sync = y_sync[tau_hat:]
@@ -241,7 +243,6 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                 else:  # if the number of demodulated symbols is incorrect
                     errors = 0.5 * np.ones(len(bits))  # flag all bits as wrong
             # end if preamble
-
             bit_errors[k] += np.sum(errors)
             packet_errors[k] += 1 if any(errors) else 0
             cfo_err[k] += (cfo - cfo_hat) ** 2
@@ -252,7 +253,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                     + len(chain.sync_word) * chain.osr_rx
                 )
                 / (R * B)
-                - (detect_idx + tau_hat + start_frame * chain.osr_rx) / (R * B)
+                - (detect_idx + np.int64(tau_hat) + start_frame * chain.osr_rx) / (R * B)
             ) ** 2
 
     # === Lecture de toutes les simulations ===
@@ -307,9 +308,9 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
         elif i==3:
             label= "800 payload bits, 200 pkts"
        
-        #if m_payload and m_packets:
-        #    payload_len_sim = int(m_payload.group(1))
-        #    label = f"{m_payload.group(1)} bits, {m_packets.group(1)} pkts"
+        if m_payload and m_packets:
+           payload_len_sim = int(m_payload.group(1))
+           label = f"{m_payload.group(1)} bits, {m_packets.group(1)} pkts"
 
         color = colors[i % len(colors)]
         ax[0].plot(EsN0s, BERs, "-o", color=color, label=label)
@@ -421,13 +422,121 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
         np.savetxt(f, save_var, delimiter="\t")
 
 
-    #np.savetxt(dest, save_var, delimiter="\t")
+    np.savetxt(dest, save_var, delimiter="\t")
 
     # Read file:
-    #data = np.loadtxt('telecom\python\telecom\sim_results.txt')
-    #SNRs_dB = data[:,0]
-    #BERs = data[:,1]
+    #     data = np.loadtxt('telecom\python\telecom\sim_results.txt')
+    #     SNRs_dB = data[:,0]
+    #     BERs = data[:,1]
 
+
+
+    def create_simulation_csv(base_path, chain_name, sto_method, p_len, n_pkts, snr_dB, ber, per, rmse_cfo, rmse_sto):
+        # On s'assure que le dossier existe
+        target_dir = Path(base_path)
+        target_dir.mkdir(parents=True, exist_ok=True) 
+
+        # Nom du fichier
+        filename = f"sim_{sto_method}_len{p_len}_pkts{n_pkts}_freqdev{chain.freq_dev}.csv"
+        full_path = target_dir / filename
+
+        # On prépare les données
+        save_var = np.column_stack((snr_dB, ber, per, rmse_cfo, rmse_sto))
+
+        # Écriture
+        with open(full_path, "w") as f:
+            f.write(f"# METHOD: {sto_method} | PAYLOAD: {p_len} | PACKETS: {n_pkts} | FREQ_DEV: {chain.freq_dev}\n")
+            f.write("# EsN0_dB\tBER\tPER\tRMSE_cfo\tRMSE_sto\n")
+            np.savetxt(f, save_var, delimiter="\t", fmt="%.8e")
+        
+        # ON IMPRIME LE CHEMIN ABSOLU POUR LE TROUVER
+        print(f"\n🚀 FICHIER CRÉÉ ICI : {full_path.absolute()}")
+        return full_path
+    
+    create_simulation_csv(
+        base_path=r"C:\Users\ismae\Desktop\UCLouvain\Master\Projet_Elec\LELEC210X-GroupA\telecom\python\telecom",
+        chain_name=chain_name,
+        sto_method=TYPE,
+        p_len=chain.payload_len,
+        n_pkts=chain.n_packets,
+        snr_dB=EsN0s_dB,
+        ber=BER,
+        per=PER,
+        rmse_cfo=RMSE_cfo,
+        rmse_sto=RMSE_sto
+    )
+    def plot_simulations(data_folder="."):
+        pathlist = Path(data_folder).glob("sim_*.csv")
+        
+        fig, axes = plt.subplots(1, 3, figsize=(18, 5), constrained_layout=True)
+        
+        # Couleurs et styles pour différencier
+        styles = {"ML": "-", "corr": "--"}
+        markers = ["o", "s", "d", "x", "^"]
+
+        found_files = False
+
+        for i, path in enumerate(pathlist):
+            found_files = True
+            # Extraction du nom pour la légende (ex: ML_len100)
+            # On utilise regex pour isoler la méthode et la longueur du nom de fichier
+            #extraction deviation de fréquence
+            dev_frq = re.search(r"freqdev([\d\.]+)", path.name)
+            freq_dev = dev_frq.group(1) if dev_frq else "N/A"
+            match = re.search(r"sim_(.*)_len(\d+)", path.name)
+            if match:
+                method, p_len = match.groups()
+                label = f"{method} (L={p_len}, FreqDev={freq_dev})"
+            else:
+                label = path.name
+
+            # Chargement des données (en sautant les commentaires)
+            data = np.loadtxt(path)
+            print(data)
+            snr_dB   = data[:, 0]
+            ber      = data[:, 1]
+            per      = data[:, 2]
+            rmse_cfo = data[:, 3]
+            rmse_sto = data[:, 4]
+
+            # 1. Plot BER
+            axes[0].semilogy(snr_dB, ber, marker=markers[i % 5], 
+                            linestyle=styles.get(method, "-"), label=label)
+            
+            # 2. Plot PER
+            axes[1].semilogy(snr_dB, per, marker=markers[i % 5], 
+                            linestyle=styles.get(method, "-"), label=label)
+            
+            # 3. Plot RMSE STO
+            axes[2].semilogy(snr_dB, rmse_sto, marker=markers[i % 5], 
+                            linestyle=styles.get(method, "-"), label=label)
+            
+        axes[0].plot(EsN0_th, 1 - (1 - BER_th_noncoh) ** payload_len_sim, "k-.", label="AWGN Th. FSK non-coh.")
+        axes[1].plot(EsN0_th, 1 - (1 - BER_th_noncoh) ** payload_len_sim, "k-.", label="AWGN Th. FSK non-coh.")
+
+        if not found_files:
+            print("❌ Aucun fichier sim_*.csv trouvé dans le dossier.")
+            return
+
+        # --- Mise en forme ---
+        axes[0].set_title("Bit Error Rate (BER)")
+        axes[0].set_ylabel("BER")
+        axes[0].set_ylim(1e-6, 1)
+
+        axes[1].set_title("Packet Error Rate (PER)")
+        axes[1].set_ylabel("PER")
+
+        axes[2].set_title("RMSE STO")
+        axes[2].set_ylabel("RMSE (normalisé)")
+
+        for ax in axes:
+            ax.set_xlabel("$E_s/N_0$ [dB]")
+            ax.grid(True, which="both", linestyle="--", alpha=0.5)
+            ax.legend()
+
+        plt.suptitle("Comparaison des performances de synchronisation STO", fontsize=16)
+        plt.show()
+    plot_simulations(data_folder=r"C:\Users\ismae\Desktop\UCLouvain\Master\Projet_Elec\LELEC210X-GroupA\telecom\python\telecom")
 
 
 if __name__ == "__main__":

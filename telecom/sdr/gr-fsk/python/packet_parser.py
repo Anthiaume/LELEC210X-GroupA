@@ -158,6 +158,7 @@ class packet_parser(gr.basic_block):
         is_correct = all(crc == crc_verif)
         measurements_logger.info(
             f"packet_number={self.nb_packet},correct={is_correct},payload=[{','.join(map(str, payload))}]"
+            # f"packet_number={self.nb_packet},correct={is_correct}]"
         )
         if is_correct:
             if self.log_payload:

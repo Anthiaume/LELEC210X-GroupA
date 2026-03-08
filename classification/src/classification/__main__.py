@@ -100,12 +100,16 @@ def main(
                 # Begin
                 with open(r"MLP_amorium.pkl", "rb") as f:
                     model = pickle.load(f)
-                melvecs_normalized = melvecs / np.linalg.norm(melvecs, axis=1, keepdims=True)
+                print("MELVEC SHAPE : ", melvecs.flatten().shape)
+                print("TYPE MELVEC : ", type(melvecs.flatten()))
+                melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
                 prediction = model.predict(melvecs_normalized.reshape(1, -1))
                 print("Woupie, la prediction est : ", prediction)
                 guess = prediction[0]
+                if prediction[0] == "crackling fire":
+                    guess = "fire"
 
-                if submit:
+                if submit and guess != "background":
                     response = requests.post(
                         f"{url}/lelec210x/leaderboard/submit/{key}/{guess}"
                     )

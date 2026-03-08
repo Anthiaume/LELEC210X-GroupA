@@ -101,6 +101,7 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	//           Number of cycles: <TODO>
 
 	arm_cmplx_mag_q15(buf, buf, SAMPLES_PER_MELVEC/2);
+	// arm_cmplx_mag_squared_q15(buf, buf, SAMPLES_PER_MELVEC/2);
 	energy_sum = 0.0;
 	for (int i=0; i < SAMPLES_PER_MELVEC/2; i++)
 	{
@@ -139,12 +140,11 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 
 	// /!\ In order to avoid overflows completely the input signals should be scaled down. Scale down one of the input matrices by log2(numColsA) bits to avoid overflows,
 	// as a total of numColsA additions are computed internally for each output element. Because our hz2mel_mat matrix contains lots of zeros in its rows, this is not necessary.
-	
+	start_cycle_count();
 	arm_matrix_instance_q15 hz2mel_inst, fftmag_inst, melvec_inst;
-
 	arm_mat_init_q15(&hz2mel_inst, MELVEC_LENGTH, SAMPLES_PER_MELVEC/2, hz2mel_mat);
 	arm_mat_init_q15(&fftmag_inst, SAMPLES_PER_MELVEC/2, 1, buf);
 	arm_mat_init_q15(&melvec_inst, MELVEC_LENGTH, 1, melvec);
-
 	arm_mat_mult_fast_q15(&hz2mel_inst, &fftmag_inst, &melvec_inst, buf_tmp);
+	stop_cycle_count("Print Matrix multiplication");
 }

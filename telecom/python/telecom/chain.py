@@ -1,7 +1,7 @@
 # ruff: noqa: N806
 import numpy as np
 
-BIT_RATE = 50e3
+BIT_RATE = 100e3
 PREAMBLE = np.array([int(bit) for bit in f"{0xAAAAAAAA:0>32b}"])
 SYNC_WORD = np.array([int(bit) for bit in f"{0x3E2A54B7:0>32b}"])
 
@@ -46,8 +46,10 @@ class Chain:
     name: str = ""
 
     # Communication parameters
+
     bit_rate: float = BIT_RATE
-    freq_dev: float = BIT_RATE / 4
+    freq_dev: float = BIT_RATE/2
+    # freq_dev: float = BIT_RATE/4
 
     osr_tx: int = 64
     osr_rx: int = 8
@@ -58,10 +60,10 @@ class Chain:
     payload_len: int = 800  # Number of bits per packet
 
     # Simulation parameters
-    n_packets: int = 200  # Number of sent packets
+    n_packets: int = 2000  # Number of sent packets
 
     # Channel parameters
-    sto_val: float = 0
+    sto_val: float = 2
     sto_range: float = 10 / BIT_RATE  # defines the delay range when random
 
     cfo_val: float = np.nan
@@ -114,13 +116,6 @@ class Chain:
 
     # Rx methods
     ideal_preamble_detect: bool = True
-<<<<<<< Updated upstream
-=======
-    ideal_preamble_detect: bool = False
-
-=======
- 
->>>>>>> Stashed changes
     use_dynamic_ppd: bool = False
 
     def preamble_detect(self, y: np.array) -> int | None:
@@ -156,9 +151,9 @@ class Chain:
         """
         raise NotImplementedError
 
-    ideal_sto_estimation: bool = True
+    ideal_sto_estimation: bool = False
 
-    def sto_estimation(self, y: np.array) -> float:
+    def sto_estimation(self, y: np.array, TYPE) -> float:
         """
         Estimates the STO based on the received signal.
 
@@ -185,11 +180,7 @@ class BasicChain(Chain):
 
     ideal_preamble_detect = True
 
-<<<<<<< Updated upstream
     use_dynamic_ppd = True
-=======
-    use_dynamic_ppd       = False
->>>>>>> Stashed changes
 
     def preamble_detect_ppd(self, y):
         """Detect a preamble computing the received energy (average on a window)."""
@@ -251,7 +242,7 @@ class BasicChain(Chain):
         Estimation ultra-rapide du CFO (Carrier Frequency Offset)
         avec l'algorithme de Moose, sur les premiers échantillons du préambule.
         """
-        N = 2  # Nombre de symboles utilisés (modifiable selon le préambule)
+        N = 4  # Nombre de symboles utilisés (modifiable selon le préambule)
         M = N * R  # Taille d’un bloc en échantillons
 
         # Pas de copie mémoire inutile : utilisation directe de vues sur y
@@ -263,30 +254,111 @@ class BasicChain(Chain):
 
         # Estimation du décalage fréquentiel
         cfo_est = np.angle(alpha_hat) * B / (2 * np.pi * N)
-        print("CFO estimation (Hz): ", cfo_est )
+        # print("CFO estimation (Hz): ", cfo_est )
         return cfo_est
 
-    ideal_sto_estimation = True
+    ideal_sto_estimation = False
 
-    def sto_estimation(self, y):
+    def sto_estimation(self, y, TYPE="ML", preamble=None):
         """Estimates symbol timing (fractional) based on phase shifts."""
         R = self.osr_rx
 
-        # Computation of derivatives of phase function
-        phase_function = np.unwrap(np.angle(y))
-        phase_derivative_1 = phase_function[1:] - phase_function[:-1]
-        phase_derivative_2 = np.abs(phase_derivative_1[1:] - phase_derivative_1[:-1])
+        if TYPE == "GARDNER":
+            # Computation of Gardner timing error
+            # y_early = y[::R]  # Early samples (start of each symbol)
+            # y_late = y[R // 2 :: R]  # Late samples (middle of each symbol)
+            # y_mid = y[R // 4 :: R]  # Mid samples (quarter of symbol)
 
-        sum_der_saved = -np.inf
-        save_i = 0
-        for i in range(0, R):
-            sum_der = np.sum(phase_derivative_2[i::R])  # Sum every R samples
+            # timing_error = np.real((y_early - y_late) * np.conj(y_mid))
+            # tau_est = np.mean(timing_error) / np.mean(np.abs(y_mid) ** 2) * (R / 4)
+            # return int(np.round(tau_est)) % R
+            mu = 0.0                 # phase fractionnaire
+            i = 0                    # index dans le signal
+            out = []                 # symboles récupérés
+            err = []                 # erreur Gardner
+            mu_hist = []             # historique du timing
+            sps = R                   # samples per symbol
+            gain = 0.01              # gain de la boucle de timing
+            rx  = y                     # signal reçu
 
-            if sum_der > sum_der_saved:
-                sum_der_saved = sum_der
-                save_i = i
+            while i + sps < len(rx)-1:
 
-        return np.mod(save_i + 1, R)
+                # interpolation linéaire pour échantillonner à phase mu
+                idx = int(i + mu)
+                frac = mu - int(mu)
+
+                s0 = rx[idx]
+                s1 = rx[idx+1]
+
+
+                sample = (1-frac)*s0 + frac*s1
+
+                # échantillons pour Gardner
+                mid = rx[idx + sps//2]
+                prev = rx[idx - sps//2] if idx - sps//2 >= 0 else 0
+
+                # erreur Gardner
+                e = np.real((mid - prev) * np.conj(rx[idx]))
+
+
+                err.append(e)
+
+                # mise à jour timing
+                mu = (mu + gain * e)%1
+
+                mu_hist.append(mu)
+
+                out.append(sample)
+
+                # avancer d'un symbole
+                i += sps
+                # estimation tau
+            tau_est = np.array(mu_hist) / sps
+            tau_final = np.mean(tau_est[-100:])
+
+            print(tau_final)
+            return int(tau_final)  # Retourne la partie fractionnaire du timing offset
+
+
+        if TYPE == "ML":
+            L = len(preamble)
+
+            metric_best = -np.inf
+            best_tau = 0
+
+            s_ref = preamble
+
+            for tau in range(R):
+
+                if tau + L > len(y):
+                    break
+
+                segment = y[tau:tau+L]
+
+                # Noncoherent ML-like metric (phase marginalized)
+                corr = np.sum(segment * np.conj(s_ref))
+                metric = (np.abs(corr)**2) / np.sum(np.abs(s_ref)**2)  # Normalized energy of correlation
+
+                if metric > metric_best:
+                    metric_best = metric
+                    best_tau = tau
+
+            return np.int64(best_tau)
+        if TYPE == "DER":
+            # Computation of derivatives of phase function
+            phase_function = np.unwrap(np.angle(y))
+            phase_derivative_1 = phase_function[1:] - phase_function[:-1]
+            phase_derivative_2 = np.abs(phase_derivative_1[1:] - phase_derivative_1[:-1])
+
+            sum_der_saved = -np.inf
+            save_i = 0
+            for i in range(0, R):
+                sum_der = np.sum(phase_derivative_2[i::R])  # Sum every R samples
+
+                if sum_der > sum_der_saved:
+                    sum_der_saved = sum_der
+                    save_i = i
+            return np.mod(save_i + 1, R)
 
     def demodulate(self, y):
         # """Non-coherent demodulator."""
