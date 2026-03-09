@@ -4,8 +4,10 @@ from student_fct import load_data, save_confusion_matrix
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.decomposition import PCA
 import numpy as np
 import pickle
+import matplotlib.pyplot as plt
 
 # Names of the models: amorium, bithynion, chios, dorystolon, ephesos, flaviopolis, gangra, halikarnassos, iconium, karthago, lebessos, mesembria, nicosia, ophis, philadelphia, quiza, rhodos, samos, tarsos
 
@@ -84,7 +86,8 @@ if MLP_amorium:
 MLP_bithynion = True
 if MLP_bithynion:
     GS_bithynion  = False
-    Gen_bithynion = True
+    PCA_bithynion = True
+    Gen_bithynion = False
 
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")]   # 5 classes, 111 samples per class
@@ -92,6 +95,38 @@ if MLP_bithynion:
 
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
     x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
+
+    if PCA_bithynion:
+        # n_pca = [350, 200, 150, 100, 50, 25, 10, 5]
+        n_pca = [40, 35, 30, 25, 20, 15]
+        hidden_layer_sizes = [(400, 400, 300, 200, 100, 50, 10), (300, 300, 200, 100, 50, 10), (200, 200, 100, 50, 10), (100, 100, 50, 10), (50, 50, 10), (20, 20, 10, 10, 5), (10, 10, 5, 5, 5)]
+        scores = []
+        params = []
+        for i in range(len(n_pca)):
+            pca = PCA(n_components=n_pca[i])
+            x_train_pca = pca.fit_transform(x_train)
+            x_test_pca = pca.transform(x_test)
+            for j in range(len(hidden_layer_sizes)):
+                print("Advance : ", i * len(hidden_layer_sizes) + j, " / ", len(n_pca) * len(hidden_layer_sizes))
+                model = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes[j], max_iter=500, random_state=42, activation="relu", learning_rate="constant")
+                model.fit(x_train_pca, y_train)
+                prediction = model.predict(x_test_pca)
+                score = accuracy_score(y_test, prediction)
+                scores.append(score)
+                params.append((n_pca[i], hidden_layer_sizes[j]))
+        pickle.dump((scores, params), open("PCA_bithynion_scores_vdd.pkl", "wb"))
+
+        # Plot the results
+        plt.figure(figsize=(10, 6))
+        plt.plot(range(len(scores)), scores, marker='o')
+        plt.title('MLP Accuracy with PCA on Bithynion Dataset')
+        plt.xlabel('Configuration Index')
+        plt.ylabel('Accuracy')
+        plt.xticks(range(len(scores)), [f"PCA: {p[0]}, Hidden Layers: {p[1]}" for p in params], rotation=90)
+        plt.grid()
+        plt.tight_layout()
+        plt.savefig("PCA_bithynion_scores_vdd.pdf")
+        plt.show()
 
     if Gen_bithynion:
         mlp = MLPClassifier(hidden_layer_sizes=(200, 200, 100, 50, 10), max_iter=500, random_state=42, activation="relu", learning_rate="constant")

@@ -1,6 +1,7 @@
 import json
 import pickle
 from pathlib import Path
+import time
 
 import click
 import requests
@@ -16,6 +17,23 @@ from .utils import payload_to_melvecs
 
 load_dotenv()
 
+global begin_time, models, predicted_probabilities, predicted_classes
+begin_time = 0 # Equivaut au 1 janvier 1970, 00:00:00 UTC, soit une date très ancienne, pour forcer l'initialisation des variables lors du premier appel à student_var_initialization().
+def student_var_initialization():
+    global begin_time, models, predicted_probabilities, predicted_classes
+    # Initialization of the begin time
+    begin_time = time.time()
+
+    # Load the models
+    models = ["MLP_amorium.pkl"]
+    for model in range(len(models)):
+        with open(models[model], "rb") as f:
+            models[model] = pickle.load(f)
+
+    # Initialization of the prediction probabilities
+    predicted_probabilities = [ [] for i in range(len(models))]
+    # Initialization of the predicted classes
+    predicted_classes = [ [] for i in range(len(models))]
 
 @click.command()
 @click.option(
@@ -96,27 +114,42 @@ def main(
             melvecs = payload_to_melvecs(payload, melvec_length, n_melvecs)
             logger.info(f"Parsed payload into Mel vectors: {melvecs}")
 
-            if 1: #m:
-                # Begin
-                with open(r"MLP_amorium.pkl", "rb") as f:
-                    model = pickle.load(f)
-                print("MELVEC SHAPE : ", melvecs.flatten().shape)
-                print("TYPE MELVEC : ", type(melvecs.flatten()))
-                melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
-                prediction = model.predict(melvecs_normalized.reshape(1, -1))
-                print("Woupie, la prediction est : ", prediction)
-                guess = prediction[0]
-                if prediction[0] == "crackling fire":
-                    guess = "fire"
+            ###########################################################
+            ### BEGIN STUDENT MODIFICATIONS ###########################
+            ###########################################################
+            melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
+            
+            for model in range(len(models)):
+                predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
+                predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
 
-                if submit and guess != "background":
-                    response = requests.post(
-                        f"{url}/lelec210x/leaderboard/submit/{key}/{guess}"
-                    )
+            if time.time() - begin_time > 6:
+                student_var_initialization()
 
-                    response_as_dict = json.loads(response.text)
+            predictions = []
+            for model in range(len(models)):
+                sum = np.zeros(predicted_probabilities[model][0].shape[1])
+                for i in range(predicted_probabilities[model]):
+                    sum += predicted_probabilities[model][i]
+                predictions.append(model.classes_[np.argmax(sum)])
+            guess = max(set(predictions), key=predictions.count)
 
-                    if response.status_code == 200:
-                        logger.info(response_as_dict)
-                    else:
-                        logger.error(response_as_dict)
+            # correction crackling fire -> fire
+            if guess == "crackling fire":
+                guess = "fire"
+
+            # Submit the guess to the leaderboard if required
+            if submit and guess != "background":
+                response = requests.post(
+                    f"{url}/lelec210x/leaderboard/submit/{key}/{guess}"
+                )
+
+                response_as_dict = json.loads(response.text)
+
+                if response.status_code == 200:
+                    logger.info(response_as_dict)
+                else:
+                    logger.error(response_as_dict)
+            ###########################################################
+            ### END STUDENT MODIFICATIONS #############################
+            ###########################################################
