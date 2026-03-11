@@ -83,7 +83,7 @@ if MLP_amorium:
         # for i in range(len(y_test)):
         #     print(f"True label: {y_test[i]}, Predicted label: {y_pred[i]}, Predicted probabilities: chainsaw: {probas[i][0]}, fire: {probas[i][1]}, fireworks: {probas[i][2]}, gunshot: {probas[i][3]}")
 
-MLP_bithynion = False # Clôturé le lundi 9 mars 2026 à 21h40
+MLP_bithynion = True # Clôturé le lundi 9 mars 2026 à 21h40
 if MLP_bithynion:
     """
     Model description:
@@ -91,13 +91,17 @@ if MLP_bithynion:
     Dataset: mcu13, vinikot, JBL Flip 5 - Auguste - spec_20_20 --> chainsaw, crackling fire, fireworks, gunshot, background
              mcu13, fisher, local speakers - spec_20_20 --> chainsaw, crackling fire, fireworks, gunshot, background
     Dataset équilibré
-    Application d'une PCA à 35 composants. Optimisation de l'architecture neuronale par
-    GridsearchCV. Meilleure architecture: (300, 300, 200, 100, 50)
+        - Objectif  : Etudier l'effet d'une PCA sur les performances du MLP et optimiser les hyperparamètres du MLP par GridSearchCV
+        - Résultats : si les dernières hidden layers sont trop petites (~10), le PCA augmente les performances
+                      si l'on corrige en augmentant la taille des dernières hidden layers, le PCA n'a plus d'influence sensible sur les performances
+        - Conclusion : le PCA n'est pas nécessaire pour ce dataset, il n'améliore pas les performances du MLP de manière significative, et il est plus simple de ne pas l'utiliser
+                       On garde donc un modèle MLP basique sans PCA, avec une architecture optimisée par GridSearchCV
+                       Meilleure architecture: (300, 300, 200, 100, 50)
     Modèle clôturé le lundi 9 mars 2026 à 21h40
     """
     GS_bithynion  = False
     PCA_bithynion = False
-    Gen_bithynion = False
+    Gen_bithynion = True
 
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")]   # 5 classes, 111 samples per class
