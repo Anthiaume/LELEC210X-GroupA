@@ -17,18 +17,25 @@ from .utils import payload_to_melvecs
 
 load_dotenv()
 
-global begin_time, models, predicted_probabilities, predicted_classes
+global begin_time, models, predicted_probabilities, predicted_classes, pca_models
 begin_time = 0 # Equivaut au 1 janvier 1970, 00:00:00 UTC, soit une date très ancienne, pour forcer l'initialisation des variables lors du premier appel à student_var_initialization().
+
 def student_var_initialization():
-    global begin_time, models, predicted_probabilities, predicted_classes
+    global begin_time, models, predicted_probabilities, predicted_classes, pca_models
     # Initialization of the begin time
     begin_time = time.time()
 
     # Load the models
-    models = ["MLP_amorium.pkl"]
+    models = ["MLP_bithynion.pkl", "KNN_albaniana.pkl"]
     for model in range(len(models)):
         with open(models[model], "rb") as f:
             models[model] = pickle.load(f)
+
+    # Load the PCA models
+    pca_models = ["PCA_albaniana.pkl"]
+    for i, model in enumerate(pca_models):
+        with open(model, "rb") as f:
+            pca_models[i] = pickle.load(f)
 
     # Initialization of the prediction probabilities
     predicted_probabilities = [ [] for i in range(len(models))]
@@ -118,13 +125,13 @@ def main(
             ### BEGIN STUDENT MODIFICATIONS ###########################
             ###########################################################
             melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
-            
-            for model in range(len(models)):
-                predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
-                predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
 
             if time.time() - begin_time > 6:
                 student_var_initialization()
+
+            for model in range(len(models)):
+                predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
+                predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
 
             predictions = []
             for model in range(len(models)):
