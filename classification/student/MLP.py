@@ -1,6 +1,6 @@
 from itertools import count
 
-from student_fct import load_data, save_confusion_matrix
+from student_fct import load_data, load_compacted_data, save_confusion_matrix
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -83,7 +83,7 @@ if MLP_amorium:
         # for i in range(len(y_test)):
         #     print(f"True label: {y_test[i]}, Predicted label: {y_pred[i]}, Predicted probabilities: chainsaw: {probas[i][0]}, fire: {probas[i][1]}, fireworks: {probas[i][2]}, gunshot: {probas[i][3]}")
 
-MLP_bithynion = True # Clôturé le lundi 9 mars 2026 à 21h40
+MLP_bithynion = False # Clôturé le lundi 9 mars 2026 à 21h40
 if MLP_bithynion:
     """
     Model description:
@@ -176,13 +176,26 @@ if MLP_bithynion:
         pickle.dump(mlp, open("MLP_bithynion.pkl", "wb"))
         print("Model saved as MLP_bithynion.pkl")
 
-MLP_chios = False
+MLP_chios = True
 if MLP_chios:
     records = [("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"), # chainsaw, crackling fire, fireworks, gunshot
                ("mcu13", "fisher", "local speakers - spec_20_20")]   # background
-    data, labels = load_data(records)
+    
+    for j in range(1, 4):
+        data, labels = load_compacted_data(records, n_samples_per_new_sample=j)
 
-    data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+        data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+        x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
+
+        mlp = MLPClassifier(hidden_layer_sizes=(300, 300, 200, 100, 50)	, max_iter=500, random_state=42, activation="relu", learning_rate="constant")
+        mlp.fit(x_train, y_train)
+        y_pred = mlp.predict(x_test)
+        score = accuracy_score(y_test, y_pred)
+        print(f"Test score: {score}")
+        # print("Confusion Matrix:")
+        #print(confusion_matrix(y_test, y_pred))
+        #save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_chios.pdf", show=True)
+
 
 # with open("hyperparameter_tuning bithynion 1.pkl", "rb") as f:
 #     hyperparameter_tuning = pickle.load(f)
