@@ -100,7 +100,88 @@ if KNN_albaniana:
         pickle.dump(pca, open("PCA_albaniana.pkl", "wb"))
         print("Model saved as KNN_albaniana.pkl")
 
-# grid_results_files = [f"hyperparameter_tuning albaniana {x} pca.pkl" for x in components]
+KNN_blariacum = True
+if KNN_blariacum:
+    GS_PCA_blariacum = False
+    Gen_blariacum = False
+    components = [15, 20, 25, 30, 35, 40, 45]
+
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),
+               ("mcu13", "sud11", "local speakers - spec_20_20")] # 5 classes, 122 samples per class
+    
+    if GS_PCA_blariacum:
+        for x in components:
+
+
+            data, labels = load_data(records)
+            le = LabelEncoder()
+            labels_encoded = le.fit_transform(labels)
+            data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+
+
+            x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+
+            # Apply PCA for dimensionality reduction if needed (e.g., to 50 components)
+            pca = PCA(n_components=x)
+            x_train = pca.fit_transform(x_train)
+            x_test = pca.transform(x_test)
+
+            parameters = {
+                'n_neighbors': [1, 2, 3],
+                'weights': ['uniform', 'distance'],
+                'metric': ['euclidean', 'manhattan']
+            }
+
+            hyperparameter_tuning = GridSearchCV(KNeighborsClassifier(), parameters, cv=5, n_jobs=-1)
+            hyperparameter_tuning.fit(x_train, y_train)
+            pickle.dump(hyperparameter_tuning, open(f"hyperparameter_tuning blariacum {x} pca.pkl", "wb"))
+
+    if Gen_blariacum:
+
+        # Load data
+        records = [("mcu13", "fisher", "local speakers - spec_20_20"),
+                    ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")]
+        data, labels = load_data(records)
+
+        # Encode labels
+        le = LabelEncoder()
+        labels_encoded = le.fit_transform(labels)
+
+        # Normalize data
+        data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+
+        # Train test split for visualization of results
+        x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=21, shuffle=True, stratify=labels_encoded)
+
+        # Apply PCA for dimensionality reduction for visualization
+        pca = PCA(n_components=25)
+        x_train = pca.fit_transform(x_train)
+        x_test = pca.transform(x_test)
+
+        # Define KNN model
+        knn_model = KNeighborsClassifier(n_neighbors=1, weights='distance', metric='euclidean')
+        
+        # Fit model for visualization and evaluation
+        knn_model.fit(x_train, y_train)
+        y_pred = knn_model.predict(x_test)
+        score = accuracy_score(y_test, y_pred)
+        print(f"Test score: {score}")
+        print("Confusion Matrix:")
+        print(confusion_matrix(y_test, y_pred))
+        save_confusion_matrix(knn_model, x_test, y_test, filename="confusion_matrix_albaniana.pdf", show=True)
+
+        # Save model on all the dataset
+        pca = PCA(n_components=25)
+        data_normalized = pca.fit_transform(data_normalized)
+        knn_model.fit(data_normalized, labels)
+        pickle.dump(knn_model, open("KNN_albaniana.pkl", "wb"))
+        pickle.dump(pca, open("PCA_albaniana.pkl", "wb"))
+        print("Model saved as KNN_albaniana.pkl")
+
+# components = [15, 20, 25, 30, 35, 40, 45]
+# grid_results_files = [f"hyperparameter_tuning blariacum {x} pca.pkl" for x in components]
 # all_results = []
 # pca_components = components
 # for file in grid_results_files:
