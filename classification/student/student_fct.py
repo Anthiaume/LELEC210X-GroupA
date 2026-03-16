@@ -38,6 +38,28 @@ def load_data(records):
 
     return data, labels
 
+def load_compacted_data(records, n_samples_per_new_sample):
+    data, labels = load_data(records)
+    n_labels = len(np.unique(labels))
+    n_samples_per_class = (data.shape[0] // n_labels) // n_samples_per_new_sample
+    new_data = [""] * (n_labels * n_samples_per_class)
+    new_labels = [""] * (n_labels * n_samples_per_class)
+
+    for i in range(n_labels):
+        class_data = data[labels == np.unique(labels)[i]]
+        class_labels = labels[labels == np.unique(labels)[i]]
+        for j in range(n_samples_per_class):
+            start_idx = j * n_samples_per_new_sample
+            end_idx = (j + 1) * n_samples_per_new_sample
+            new_data[i * n_samples_per_class + j] = np.concatenate(class_data[start_idx:end_idx], axis=0)
+            new_labels[i * n_samples_per_class + j] = class_labels[start_idx]
+
+    new_data = np.array(new_data)
+    new_labels = np.array(new_labels)
+
+    return new_data, new_labels
+
+        
 def save_confusion_matrix(model, x_test, y_test, filename="CONFUSION_MATRIX.pdf", show=True):
     # 1. Génération de la matrice
     disp = ConfusionMatrixDisplay.from_estimator(
