@@ -26,16 +26,16 @@ def student_var_initialization():
     begin_time = time.time()
 
     # Load the models
-    models = ["MLP_bithynion.pkl", "KNN_albaniana.pkl"]
+    models = ["MLP_bithynion.pkl"]#, "KNN_albaniana.pkl"]
     for model in range(len(models)):
         with open(models[model], "rb") as f:
             models[model] = pickle.load(f)
 
     # Load the PCA models
-    pca_models = ["PCA_albaniana.pkl"]
-    for i, model in enumerate(pca_models):
-        with open(model, "rb") as f:
-            pca_models[i] = pickle.load(f)
+    # pca_models = ["PCA_albaniana.pkl"]
+    # for i, model in enumerate(pca_models):
+    #     with open(model, "rb") as f:
+    #         pca_models[i] = pickle.load(f)
 
     # Initialization of the prediction probabilities
     predicted_probabilities = [ [] for i in range(len(models))]
@@ -104,6 +104,9 @@ def main(
     This way, you will directly receive the authentified packets from STDIN
     (standard input, i.e., the terminal).
     """
+
+    global begin_time, models, predicted_probabilities, predicted_classes, pca_models
+
     if submit:
         if key is None:
             raise click.UsageError("You must provide a key to submit guesses.")
@@ -136,15 +139,16 @@ def main(
             predictions = []
             for model in range(len(models)):
                 sum = np.zeros(predicted_probabilities[model][0].shape[1])
-                for i in range(predicted_probabilities[model]):
-                    sum += predicted_probabilities[model][i]
-                predictions.append(model.classes_[np.argmax(sum)])
-            guess = max(set(predictions), key=predictions.count)
+                for i in range(len(predicted_probabilities[model])):
+                    sum += predicted_probabilities[model][i].reshape(5)
+                predictions.append(models[model].classes_[np.argmax(sum)])
+            guess = str(max(set(predictions), key=predictions.count))
 
             # correction crackling fire -> fire
             if guess == "crackling fire":
                 guess = "fire"
-
+            print("GUESS = |", guess, "|", sep="")
+            print(type(guess))
             # Submit the guess to the leaderboard if required
             if submit and guess != "background":
                 response = requests.post(

@@ -9,7 +9,7 @@ from scipy.special import erfc
 
 from .chain import Chain
 
-TYPE = "GARDNER"  # Type of STO estimation to use in the simulation (ML or corr)
+TYPE = "ML"  # Type of STO estimation to use in the simulation (ML or corr)
 
 
 def add_delay(chain: Chain, x: np.ndarray, tau: float) -> tuple[np.ndarray, int]:
@@ -91,6 +91,13 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
     )  # Preamble false detection (found in noise)
 
     # Transmitted signals that are independent of the payload bits
+
+    #########################################################################
+    chain.preamble = chain.Viterbi_code_m2(chain.preamble)
+    chain.sync_word = chain.Viterbi_code_m2(chain.sync_word)
+    
+    #########################################################################
+
     x_pr = chain.modulate(chain.preamble)  # Modulated signal containing preamble
     x_sync = chain.modulate(chain.sync_word)  # Modulated signal containing sync_word
     hdr_len_byte = (len(chain.preamble) + len(chain.sync_word)) // 8
@@ -108,10 +115,19 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
     rng = np.random.default_rng(seed)
 
     # For loop on the number of packets to send
+    print(chain.n_packets)
+    i=0
     for _ in range(chain.n_packets):
+        print(i)
+        i+=1
         # Random generation of payload bits
         bits = rng.integers(2, size=chain.payload_len)
 
+        #########################################################
+        bits = chain.Viterbi_code_m2(bits)
+        # R1, R0, symb_R1, symb_R0 = chain.poly2trellis(gn, gd)
+        # bits = 
+        #########################################################
         # Transmitted signal
         x_pay = chain.modulate(bits)  # Modulated signal with payload
         x = np.concatenate((x_noise, x_pr, x_sync, x_pay, np.zeros(chain.osr_tx)))
@@ -140,6 +156,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
 
         # For loop on the SNRs
         for k, EsN0_dB in enumerate(EsN0s_dB):
+            print(k)
             # Add noise
             EsN0 = 10 ** (EsN0_dB / 10.0)
             SNR_input = EsN0 / chain.osr_rx
@@ -171,7 +188,6 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                     np.nan,
                     np.nan,
                 )
-
             else:  # Found a preamble, can demodulate packet
                 # Preamble metrics
                 if (
@@ -211,11 +227,12 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                         y_sync[: hdr_len_byte * 8 * chain.osr_rx], TYPE, x_pr
                     )
 
-                y_sync = y_sync[tau_hat:]
-
+                y_sync = y_sync[tau_hat:]    
+                # print("viterbi") 
+                y_sync = chain.viterbi_decoder(y_sync, 0o7, 0o5, 2)
+                # print("viterbi") 
                 ## Demodulation and deframing stage
                 bits_hat = chain.demodulate(y_sync)
-
                 if (
                     chain.ideal_sto_estimation and chain.ideal_preamble_detect
                 ):  # In this case, also assume perfect frame syncrhonization
@@ -231,7 +248,6 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                         )
                     )
                     start_frame = np.argmax(v) + 1
-
                 bits_hat_pay = bits_hat[
                     start_frame : start_frame + chain.payload_len
                 ]  # Demodulated payload bits
@@ -445,7 +461,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
 
         # Écriture
         with open(full_path, "w") as f:
-            f.write(f"# METHOD: {sto_method} | PAYLOAD: {p_len} | PACKETS: {n_pkts} | FREQ_DEV: {chain.freq_dev}\n")
+            f.write(f"# METHOD: {sto_method} | PAYLOAD: {p_len} | PACKETS: {n_pkts} | FREQ_DEV: {chain.freq_dev} | Viterbi\n")
             f.write("# EsN0_dB\tBER\tPER\tRMSE_cfo\tRMSE_sto\n")
             np.savetxt(f, save_var, delimiter="\t", fmt="%.8e")
         

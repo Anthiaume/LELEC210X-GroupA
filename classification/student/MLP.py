@@ -28,6 +28,7 @@ if MLP_amorium:
     records = [("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"), # chainsaw, crackling fire, fireworks, gunshot
                ("mcu13", "fisher", "local speakers - spec_20_20")       ] # background
     data, labels = load_data(records)
+    print(labels)
 
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
     x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
@@ -106,6 +107,7 @@ if MLP_bithynion:
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")]   # 5 classes, 111 samples per class
     data, labels = load_data(records)
+    print(labels)
 
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
     x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)

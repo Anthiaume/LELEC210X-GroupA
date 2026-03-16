@@ -1,7 +1,7 @@
 # ruff: noqa: N806
 import numpy as np
 
-BIT_RATE = 100e3
+BIT_RATE = 50e3
 PREAMBLE = np.array([int(bit) for bit in f"{0xAAAAAAAA:0>32b}"])
 SYNC_WORD = np.array([int(bit) for bit in f"{0x3E2A54B7:0>32b}"])
 
@@ -171,7 +171,33 @@ class Chain:
         """
 
         raise NotImplementedError
+    
+    def Viterbi_code_m2(self, bits : np.array) -> np.array:
 
+        raise NotImplementedError
+    
+    def viterbi_decode(self, received, g1, g2, m):
+        """
+        Décodage Viterbi pour code convolutif R=1/2, mémoire m
+        received: liste de bits reçus [b0, b1, b2, ...]
+        g1, g2: générateurs en octal
+        m: mémoire du code
+        """
+        raise NotImplementedError
+    
+    def int_to_bits(self, n, width):
+        raise NotImplementedError
+
+    def xor_bits(self, bits):
+        raise NotImplementedError
+    def number2binary(self, x0,length):
+        raise NotImplementedError
+    def binary2number(self, x):
+        raise NotImplementedError
+    def poly2trellis(self, gn,gd):
+        raise NotImplementedError
+    def viterbi_decoder(self, R1,R0,symb_R1,symb_R0,len_b,x_tilde):
+        raise NotImplementedError
 
 class BasicChain(Chain):
     name = "Basic Tx/Rx chain"
@@ -265,13 +291,6 @@ class BasicChain(Chain):
 
         if TYPE == "GARDNER":
             # Computation of Gardner timing error
-            # y_early = y[::R]  # Early samples (start of each symbol)
-            # y_late = y[R // 2 :: R]  # Late samples (middle of each symbol)
-            # y_mid = y[R // 4 :: R]  # Mid samples (quarter of symbol)
-
-            # timing_error = np.real((y_early - y_late) * np.conj(y_mid))
-            # tau_est = np.mean(timing_error) / np.mean(np.abs(y_mid) ** 2) * (R / 4)
-            # return int(np.round(tau_est)) % R
             mu = 0.0                 # phase fractionnaire
             i = 0                    # index dans le signal
             out = []                 # symboles récupérés
@@ -336,7 +355,8 @@ class BasicChain(Chain):
                 segment = y[tau:tau+L]
 
                 # Noncoherent ML-like metric (phase marginalized)
-                corr = np.sum(segment * np.conj(s_ref))
+                # corr = np.sum(segment * np.conj(s_ref))
+                corr = np.correlate(segment, s_ref, mode='valid')[0]  # Correlation linéaire
                 metric = (np.abs(corr)**2) / np.sum(np.abs(s_ref)**2)  # Normalized energy of correlation
 
                 if metric > metric_best:
@@ -366,23 +386,6 @@ class BasicChain(Chain):
         # nb_syms = len(y) // R  # Number of CPFSK symbols in y
         fd = self.freq_dev  # Frequency deviation, Delta_f
         B = self.bit_rate  # B=1/T
-
-        # # Group symbols together, in a matrix. Each row contains the R samples over one symbol period
-        # y = np.resize(y, (nb_syms, R))
-
-        # ph = 2 * np.pi * fd * (np.arange(R) / R) / B  # Phase of reference waveform
-        # s_0  = np.exp(-1j * ph)  # Reference waveform for bit 0
-        # s_1  = np.exp(1j * ph)  # Reference waveform for bit 1
-
-        # bits_hat = np.zeros(nb_syms, dtype=int)
-        # for k in range(nb_syms):
-        #     r_0 = np.abs(np.sum(y[k,:] * s_0))  # Correlation with s_0
-        #     r_1 = np.abs(np.sum(y[k,:] * s_1))  # Correlation with s_1
-        #     if(r_1 < r_0):
-        #         bits_hat[k] = 1
-        #     else:
-        #         bits_hat[k] = 0      
-        # return bits_hat
         """
         Démodulateur non-cohérent vectorisé et ultra-rapide (FSK).
         """
@@ -402,3 +405,294 @@ class BasicChain(Chain):
         bits_hat = (r1 < r0).astype(np.uint8)
 
         return bits_hat
+
+    def richardson_extrapolation(estimates, hs, p):
+        """
+        estimates : valeurs E(h_i)
+        hs : pas correspondants
+        p : ordre de l'erreur dominante
+        """
+        n = len(estimates)
+
+        A = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                A[i, j] = hs[i]**(p + j)
+
+        b = np.array(estimates)
+
+        coeffs = np.linalg.solve(A, b)
+        return coeffs[0]
+    
+    # def Viterbi_code(self, bits):
+    #     datas = np.zeros((len(bits), 2))
+    #     datas[0, 0] = (bits[0])%2
+    #     datas[0, 1] = bits[0]
+    #     datas[1, 0] = (bits[0] + bits[1])%2
+    #     datas[1, 1] = bits[0]
+    #     datas[2, 0] = (bits[0] + bits[1] + bits[2])%2
+    #     datas[2, 1] = (bits[0] + bits[2])%2
+    #     datas[3, 0] = (bits[0] + bits[1] + bits[2] + bits[3])%2
+    #     datas[3, 1] = (bits[0] + bits[1] + bits[3])%2
+    #     datas[4, 0] = (bits[1] + bits[2] + bits[3] + bits[4])%2
+    #     datas[4, 1] = (bits[1] + bits[2] + bits[4])%2
+    #     datas[5, 0] = (bits[2] + bits[3] + bits[4] + bits[5])%2
+    #     datas[5, 1] = (bits[0] + bits[2] + bits[3] + bits[5])%2
+    #     # datas[6, 0] = bits[0] + bits[3] + bits[4] + bits[5] + bits[6]
+    #     # datas[6, 1] = bits[0] + bits[1] + bits[3] + bits[4] + bits[6]
+
+    #     for i in range(6, len(bits)):
+    #         datas[i,0] = (bits[i]+bits[i-1]+bits[i-2]+bits[i-3]+bits[i-6]) % 2
+    #         datas[i,1] = (bits[i]+bits[i-2]+bits[i-3]+bits[i-5]+bits[i-6]) % 2
+
+    #     bits_Viterbi = np.zeros(2*len(bits))
+    #     for i in range(len(bits)):
+    #         bits_Viterbi[i] = datas[i, 0]
+    #         bits_Viterbi[i+1] = datas[i, 1]
+    #     return bits_Viterbi
+
+
+
+    # def Viterbi_code_m2(self, bits):
+    #     """
+    #     Encodage convolutif R=1/2, mémoire m=2 (K=3)
+    #     bits: tableau 1D des bits à encoder
+    #     Retourne bits encodés (séquence 2x plus longue)
+    #     """
+    #     m = 2
+    #     K = m + 1
+    #     n = len(bits)
+    #     datas = np.zeros((n, 2), dtype=int)
+        
+    #     # Générateurs classiques m=2, R=1/2
+    #     # g1=111b -> 7 octal, g2=101b -> 5 octal
+    #     g1_bits = [1, 1, 1]
+    #     g2_bits = [1, 0, 1]
+        
+    #     # Encodage bit par bit
+    #     for i in range(n):
+    #         # récupérer les K bits du registre (0 si i-j <0)
+    #         reg_bits = [bits[i - j] if i - j >= 0 else 0 for j in range(K)]
+            
+    #         # calcul des sorties modulo 2
+    #         out1 = sum([b & g for b, g in zip(reg_bits, g1_bits)]) % 2
+    #         out2 = sum([b & g for b, g in zip(reg_bits, g2_bits)]) % 2
+            
+    #         datas[i, 0] = out1
+    #         datas[i, 1] = out2
+        
+    #     # Construire la séquence codée finale (alternance des sorties)
+    #     bits_Viterbi = np.zeros(2 * n, dtype=int)
+    #     for i in range(n):
+    #         bits_Viterbi[2*i] = datas[i, 0]
+    #         bits_Viterbi[2*i + 1] = datas[i, 1]
+        
+    #     return bits_Viterbi
+    
+
+    # def int_to_bits(self, n, width):
+    #     return [int(b) for b in format(n, f'0{width}b')]
+
+    # def xor_bits(self, bits):
+    #     result = 0
+    #     for b in bits:
+    #         result ^= b
+    #     return result
+        
+    # def viterbi_decode(self, received, g1, g2, m):
+    #     """
+    #     Décodage Viterbi pour code convolutif R=1/2, mémoire m
+    #     received: liste de bits reçus [b0, b1, b2, ...]
+    #     g1, g2: générateurs en octal
+    #     m: mémoire du code
+    #     """
+    #     K = m + 1
+    #     n_states = 2 ** m
+    #     path_metric = [float('inf')] * n_states
+    #     path_metric[0] = 0
+    #     paths = [[] for _ in range(n_states)]
+
+    #     # Préparer les générateurs en binaire
+    #     g1_bits = self.int_to_bits(g1, K)
+    #     g2_bits = self.int_to_bits(g2, K)
+
+    #     n_steps = len(received) // 2  # 2 bits par étape
+
+    #     for t in range(n_steps):
+    #         rec_pair = received[2*t : 2*t+2]
+    #         new_metric = [float('inf')] * n_states
+    #         new_paths = [[] for _ in range(n_states)]
+
+    #         for state in range(n_states):
+    #             for bit_in in [0,1]:
+    #                 prev_state = ((state >> 1) | (bit_in << (m-1))) & (n_states-1)
+                    
+    #                 # Générer les bits codés pour cette transition
+    #                 reg_bits = self.int_to_bits(prev_state, m)
+    #                 reg_bits = [bit_in] + reg_bits  # registre complet K bits
+    #                 out1 = self.xor_bits([b & g for b,g in zip(reg_bits, g1_bits)])
+    #                 out2 = self.xor_bits([b & g for b,g in zip(reg_bits, g2_bits)])
+    #                 metric = path_metric[prev_state] + (out1 != rec_pair[0]) + (out2 != rec_pair[1])
+
+    #                 if metric < new_metric[state]:
+    #                     new_metric[state] = metric
+    #                     new_paths[state] = paths[prev_state] + [bit_in]
+
+    #         path_metric = new_metric
+    #         paths = new_paths
+
+    #     # Trouver le chemin minimal
+    #     min_state = path_metric.index(min(path_metric))
+    #     decoded_bits = paths[min_state]  # bits estimés envoyés
+    #     reconstructed_coded_bits = []
+    #     state = 0
+    #     for bit in decoded_bits:
+    #         reg_bits = [bit] + self.int_to_bits(state, m)
+    #         out1 = self.xor_bits([b & g for b,g in zip(reg_bits, g1_bits)])
+    #         out2 = self.xor_bits([b & g for b,g in zip(reg_bits, g2_bits)])
+    #         reconstructed_coded_bits.extend([out1, out2])
+    #         state = ((state >> 1) | (bit << (m-1))) & (2**m-1)
+    #     return np.array(reconstructed_coded_bits)
+
+    @jit(nopython=True,error_model="numpy")
+    def number2binary(x0,length):
+        binary_array = np.zeros((length,))
+    
+        x = x0
+        i = 0
+    
+        while x > 1 and i < length:
+            binary_array[i] = x % 2
+            x = int(x / 2)
+            i = i + 1
+    
+        if x > 0 and i < length:
+            binary_array[i] = 1
+    
+        return binary_array[::-1]
+    
+    def binary2number(self, x):
+        out = 0
+        for i in x:
+            out = 2*out + i
+        return out
+    
+    def poly2trellis(self, gn,gd):
+        M = max(len(gn),len(gd)) - 1
+        nb_states = 2**M
+    
+        alpha = np.zeros((M+1,))
+        beta = np.zeros((M+1,))
+    
+        alpha[:len(gn)] = gn
+        beta[:len(gd)] = gd
+
+        R1 = np.zeros((nb_states,),dtype=np.int32)
+        R0 = np.zeros((nb_states,),dtype=np.int32)
+    
+        out_R1 = np.zeros((nb_states,2),dtype=np.int32)
+        out_R0 = np.zeros((nb_states,2),dtype=np.int32)
+    
+        out_R1[:,0] = 1
+    
+        for i in range(nb_states):
+            states = np.zeros((M+1,))
+            states[:M] = self.number2binary(i,M)[::-1]
+        
+            y_1 = (alpha[0] + states[0]) % 2
+            y_0 = states[0]
+        
+            new_states_1 = (alpha[1:] + beta[1:]*y_1 + states[1:]) % 2
+            new_states_0 = (beta[1:]*y_0 + states[1:]) % 2
+        
+            R1[i] = self.binary2number(new_states_1[::-1])
+            R0[i] = self.binary2number(new_states_0[::-1])
+        
+            out_R1[i,1] = int(y_1)
+            out_R0[i,1] = int(y_0)
+    
+        return R1,R0,out_R1,out_R0
+
+
+
+    def viterbi_decoder(self, R1,R0,symb_R1,symb_R0,len_b,x_tilde):
+        def dist(a,b):
+            return np.abs(a-b)**2
+    
+        N_b = int(len(x_tilde)/len_b)
+    
+        x_tilde_b = np.reshape(x_tilde,(N_b,len_b))
+        u_hat_b = np.zeros(x_tilde_b.shape,dtype=np.int32)
+    
+        nb_states = len(R1)
+
+        for i in range(N_b):          
+            x_tilde_i  = x_tilde_b[i,:]
+            u_hat_i = u_hat_b[i,:]
+        
+            bits = np.zeros((nb_states,len_b))
+            weights = np.inf*np.ones((nb_states,))
+            weights[0] = 0
+        
+            new_states = np.zeros((2,nb_states))
+            new_weights = np.zeros((2,nb_states))
+            new_bits = np.zeros((2,nb_states,len_b))  
+        
+            for j in range(len_b):
+                for k in range(nb_states):
+                    new_states[1,k] = R1[k]
+                    new_states[0,k] = R0[k]
+                    new_weights[1,k] = weights[k] + dist(x_tilde_i[j],symb_R1[k])
+                    new_weights[0,k] = weights[k] + dist(x_tilde_i[j],symb_R0[k])      
+                    new_bits[1,k,:] = bits[k,:]
+                    new_bits[0,k,:] = bits[k,:]
+                    new_bits[1,k,j] = 1
+                
+                for k in range(nb_states):
+                    idx_0_filled = False
+                    for l in range(nb_states):
+                        if new_states[0,l] == k:
+                            if idx_0_filled:
+                                idx_10 = 0
+                                idx_11 = l
+                            else:
+                                idx_00 = 0
+                                idx_01 = l
+                                idx_0_filled = True
+                            
+                        if new_states[1,l] == k:
+                            if idx_0_filled:
+                                idx_10 = 1
+                                idx_11 = l
+                            else:
+                                idx_00 = 1
+                                idx_01 = l
+                                idx_0_filled = True
+                
+                    if new_weights[idx_00,idx_01] <= new_weights[idx_10,idx_11]:
+                        weights[k] = new_weights[idx_00,idx_01]
+                        bits[k,:] = new_bits[idx_00,idx_01,:]
+                    else:
+                        weights[k] = new_weights[idx_10,idx_11]
+                        bits[k,:] = new_bits[idx_10,idx_11,:]
+
+            final_weight = np.inf
+            for k in range(nb_states):
+                if weights[k] < final_weight:
+                    final_weight = weights[k]
+                    u_hat_i[:] = bits[k,:]
+    
+        u_hat = np.reshape(u_hat_b,(u_hat_b.size,))
+        return u_hat
+
+    @jit(nopython=True,error_model="numpy")
+    def interleaver(x,pattern):
+        Nb = int(len(x)/len(pattern))
+        x_matrix = np.reshape(x,(Nb,len(pattern)))
+        y_matrix = x_matrix[:,pattern-1]
+        y = np.reshape(y_matrix,(len(x),))
+        return y
+
+
+
+        
