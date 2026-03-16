@@ -50,25 +50,56 @@ def cfo_estimation(y, B, R, Fdev, N):
     return cfo_est
 
 
-def sto_estimation(y, B, R, Fdev):
+# def sto_estimation(y, B, R, Fdev):
+#     """
+#     Estimate symbol timing (fractional) based on phase shifts
+#     """
+#     phase_function = np.unwrap(np.angle(y))
+#     phase_derivative_sign = phase_function[1:] - phase_function[:-1]
+#     sign_derivative = np.abs(phase_derivative_sign[1:] - phase_derivative_sign[:-1])
+
+#     sum_der_saved = -np.inf
+#     save_i = 0
+
+#     for i in range(0, R):
+#         sum_der = np.sum(sign_derivative[i::R])
+
+#         if sum_der > sum_der_saved:
+#             sum_der_saved = sum_der
+#             save_i = i
+
+#     return np.mod(save_i + 1, R)
+
+
+
+def sto_estimation(y, B, R, Fdev, preamble):
     """
     Estimate symbol timing (fractional) based on phase shifts
     """
-    phase_function = np.unwrap(np.angle(y))
-    phase_derivative_sign = phase_function[1:] - phase_function[:-1]
-    sign_derivative = np.abs(phase_derivative_sign[1:] - phase_derivative_sign[:-1])
+    L = len(preamble)
 
-    sum_der_saved = -np.inf
-    save_i = 0
+    metric_best = -np.inf
+    best_tau = 0
 
-    for i in range(0, R):
-        sum_der = np.sum(sign_derivative[i::R])
+    s_ref = preamble
 
-        if sum_der > sum_der_saved:
-            sum_der_saved = sum_der
-            save_i = i
+    for tau in range(R):
 
-    return np.mod(save_i + 1, R)
+        if tau + L > len(y):
+            break
+
+        segment = y[tau:tau+L]
+
+        # Noncoherent ML-like metric (phase marginalized)
+        # corr = np.sum(segment * np.conj(s_ref))
+        corr = np.correlate(segment, s_ref, mode='valid')[0]  # Correlation linéaire
+        metric = (np.abs(corr)**2) / np.sum(np.abs(s_ref)**2)  # Normalized energy of correlation
+
+        if metric > metric_best:
+            metric_best = metric
+            best_tau = tau
+
+    return np.int64(best_tau)
 
 
 
@@ -153,7 +184,7 @@ class synchronization(gr.basic_block):
             y_cfo = np.exp(-1j * 2 * np.pi * self.cfo * t) * y
             self.t0 = t[-1]
 
-            sto = sto_estimation(y_cfo, self.drate, self.osr, self.fdev)
+            sto = sto_estimation(y_cfo, self.drate, self.osr, self.fdev, y)
 
             self.init_sto = sto
             self.power_est   = 0
