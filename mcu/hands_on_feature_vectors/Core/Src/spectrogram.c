@@ -64,7 +64,8 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	//           --> Pointwise product
 	//           Complexity: O(<SAMPLES_PER_MELVEC>)
 	//           Number of cycles: <SAMPLES_PER_MELVEC>
-	arm_mult_q15(samples, hamming_window, buf, SAMPLES_PER_MELVEC);
+	//arm_mult_q15(samples, hamming_window, buf, SAMPLES_PER_MELVEC);
+	arm_mult_q15(samples, hamming_window, samples, SAMPLES_PER_MELVEC);
 
 	// STEP 2  : Discrete Fourier Transform
 	//           --> In-place Fast Fourier Transform (FFT) on a real signal
@@ -73,6 +74,7 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	//           Number of cycles: <TODO>
 
 	// Since the FFT is a recursive algorithm, the values are rescaled in the function to ensure that overflow cannot happen.
+	/*
 	arm_rfft_instance_q15 rfft_inst;
 
 	arm_rfft_init_q15(&rfft_inst, SAMPLES_PER_MELVEC, 0, 1);
@@ -139,5 +141,7 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	arm_mat_init_q15(&melvec_inst, MELVEC_LENGTH,          1,                      melvec);
 
 	arm_mat_mult_fast_q15(&hz2mel_inst, &fftmag_inst, &melvec_inst, buf_tmp);
+	*/
+
 }
 

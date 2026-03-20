@@ -25,6 +25,8 @@
 /* USER CODE END 0 */
 
 UART_HandleTypeDef hlpuart1;
+DMA_HandleTypeDef hdma_lpuart_rx;
+DMA_HandleTypeDef hdma_lpuart_tx;
 
 /* LPUART1 init function */
 
@@ -93,6 +95,41 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Alternate = GPIO_AF8_LPUART1;
     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
+    /* LPUART1 DMA Init */
+    /* LPUART_RX Init */
+    hdma_lpuart_rx.Instance = DMA2_Channel7;
+    hdma_lpuart_rx.Init.Request = DMA_REQUEST_4;
+    hdma_lpuart_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_lpuart_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_lpuart_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_lpuart_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_lpuart_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_lpuart_rx.Init.Mode = DMA_CIRCULAR;
+    hdma_lpuart_rx.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_lpuart_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(uartHandle,hdmarx,hdma_lpuart_rx);
+
+    /* LPUART_TX Init */
+    hdma_lpuart_tx.Instance = DMA2_Channel6;
+    hdma_lpuart_tx.Init.Request = DMA_REQUEST_4;
+    hdma_lpuart_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_lpuart_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_lpuart_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_lpuart_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_lpuart_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_lpuart_tx.Init.Mode = DMA_NORMAL;
+    hdma_lpuart_tx.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_lpuart_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(uartHandle,hdmatx,hdma_lpuart_tx);
+
   /* USER CODE BEGIN LPUART1_MspInit 1 */
 
   /* USER CODE END LPUART1_MspInit 1 */
@@ -116,6 +153,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     */
     HAL_GPIO_DeInit(GPIOG, STLK_RX_Pin|STLK_TX_Pin);
 
+    /* LPUART1 DMA DeInit */
+    HAL_DMA_DeInit(uartHandle->hdmarx);
+    HAL_DMA_DeInit(uartHandle->hdmatx);
   /* USER CODE BEGIN LPUART1_MspDeInit 1 */
 
   /* USER CODE END LPUART1_MspDeInit 1 */
