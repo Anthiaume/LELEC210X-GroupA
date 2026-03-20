@@ -60,13 +60,36 @@ volatile int bounce = 0;
 volatile uint16_t ADCBuffer[2*SAMPLES_PER_MELVEC]; /* ADC write buffer (via DMA) */
 volatile uint16_t* ADCDblBuffer[2] = {&ADCBuffer[0], &ADCBuffer[SAMPLES_PER_MELVEC]};
 
-static volatile uint8_t cur_melvec = 0;
 
+
+//START UART VARIABLES
+
+
+uint16_t UARTBuffer[2 * SAMPLES_PER_MELVEC];
+
+uint16_t* UARTDblBuffer[2] = {
+    &UARTBuffer[0],
+    &UARTBuffer[SAMPLES_PER_MELVEC]
+};
+//uint16_t safe_copy_1[SAMPLES_PER_MELVEC+1];
+//uint16_t safe_copy_2[SAMPLES_PER_MELVEC+1];
+uint16_t safe_copy[SAMPLES_PER_MELVEC*N_MELVECS];
+//END UART VARIABLES
+
+
+
+static volatile uint8_t cur_melvec = 0;
+static volatile uint8_t cur_melvec_UART = 0;
+static volatile uint8_t write_counter=0;
+static volatile uint8_t buffer_locked=0;
+//static volatile u_int8_t half_flag=0;
+static volatile u_int8_t full_flag=0;
 static q15_t *mel_vectors[N_MELVECS];
 // Contiguous array in memory
 static q15_t mel_vectors_flat[N_MELVECS * MELVEC_LENGTH];
 
-char hex_encoded_buffer[sizeof(q15_t) * 2 * N_MELVECS * MELVEC_LENGTH + 1];
+//char hex_encoded_buffer[sizeof(q15_t) * 2 * N_MELVECS * MELVEC_LENGTH + 1];
+char hex_encoded_buffer[2 * sizeof(uint16_t) * SAMPLES_PER_MELVEC * N_MELVECS + 1];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -77,6 +100,10 @@ void print_buffer(volatile uint16_t *buffer, size_t len);
 uint32_t get_signal_power(uint16_t *buffer, size_t len);
 void start_cycle_count();
 void stop_cycle_count(char *s);
+
+
+
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -111,6 +138,55 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	DEBUG_PRINT("All DMA.\r\n");
 }
 
+//START UART CODE
+
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == LPUART1)
+	{
+    Spectrogram_Format((q15_t*)UARTDblBuffer[0]);
+    //Spectrogram_Compute((q15_t*)UARTDblBuffer[0], mel_vectors_flat[cur_melvec_UART]);
+    if (!buffer_locked && cur_melvec_UART<N_MELVECS){
+    	memcpy(&safe_copy[cur_melvec_UART*SAMPLES_PER_MELVEC],UARTDblBuffer[0],SAMPLES_PER_MELVEC*sizeof(uint16_t));
+    	//memcpy(&safe_copy[cur_melvec_UART*SAMPLES_PER_MELVEC],mel_vectors_flat[cur_melvec_UART],SAMPLES_PER_MELVEC*sizeof(uint16_t));
+    	cur_melvec_UART++;
+    }
+
+
+
+
+
+	}
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{	if(huart->Instance == LPUART1){
+	Spectrogram_Format((q15_t*)UARTDblBuffer[1]);
+	//Spectrogram_Compute((q15_t*)UARTDblBuffer[1], mel_vectors[cur_melvec_UART]);
+	//Spectrogram_Compute((q15_t*)UARTDblBuffer[1], mel_vectors_flat[cur_melvec_UART]);
+	if (!buffer_locked && cur_melvec_UART<N_MELVECS){
+
+		memcpy(&safe_copy[cur_melvec_UART*SAMPLES_PER_MELVEC],UARTDblBuffer[1],SAMPLES_PER_MELVEC*sizeof(uint16_t));
+		//memcpy(&safe_copy[cur_melvec_UART*SAMPLES_PER_MELVEC],mel_vectors_flat[cur_melvec_UART],SAMPLES_PER_MELVEC*sizeof(uint16_t));
+		cur_melvec_UART++;
+	}
+
+
+
+    if (cur_melvec_UART == N_MELVECS)
+            {
+                //print_buffer(mel_vectors_flat, N_MELVECS * MELVEC_LENGTH);
+                buffer_locked=1;
+                full_flag=1;
+            }
+
+
+	}
+}
+
+//END UART CODE
+
+
 // Starts the cycle counter
 void start_cycle_count() {
 	uint32_t prim = __get_PRIMASK();
@@ -133,9 +209,9 @@ void start_cycle_count() {
 void stop_cycle_count(char *s) {
 	uint32_t res = DWT->CYCCNT; // Read the cycle counter
 	counting_cycles = 0;
-	printf("[PERF] ");
-	printf(s);
-	printf(" %lu cycles.\r\n", res);
+	//printf("[PERF] ");
+	//printf(s);
+	//printf(" %lu cycles.\r\n", res);
 }
 
 void hex_encode(char* s, const uint8_t* buf, size_t len) {
@@ -148,7 +224,8 @@ void hex_encode(char* s, const uint8_t* buf, size_t len) {
 
 void print_buffer(volatile uint16_t *buffer, size_t len) {
 	hex_encode(hex_encoded_buffer, (uint8_t*)buffer, sizeof(uint16_t) * len);
-	printf("DF:HEX:%s\r\n", hex_encoded_buffer);
+	//printf("DF:HEX:%s\r\n", hex_encoded_buffer);
+	printf("After Format%s\r\n",hex_encoded_buffer);
 }
 
 /* USER CODE END 0 */
@@ -191,6 +268,9 @@ int main(void)
   MX_TIM3_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_UART_Receive_DMA(&hlpuart1,
+                       (uint8_t*)UARTBuffer,
+                       sizeof(UARTBuffer));
   RetargetInit(&hlpuart1);
   printf("Hello world!\r\n");
   state=0;
@@ -204,6 +284,26 @@ int main(void)
 	HAL_Delay(500);
 	HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
 	HAL_Delay(500);
+	/*
+	if (half_flag){
+		memcpy(&safe_copy_1[1],
+				               UARTDblBuffer[0],
+				               sizeof(uint16_t)*SAMPLES_PER_MELVEC);
+		safe_copy_1[0]=(uint16_t) cur_melvec_2;
+		//printf("After format");
+		cur_melvec_2=cur_melvec_2+2;
+		print_buffer(safe_copy_1,SAMPLES_PER_MELVEC+1);
+		half_flag=0;
+	}
+	*/
+	if(full_flag){
+
+
+		print_buffer(safe_copy,SAMPLES_PER_MELVEC*N_MELVECS);
+		cur_melvec_UART = 0;
+		buffer_locked = 0; //allow writing again
+		full_flag=0;
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
