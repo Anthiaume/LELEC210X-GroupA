@@ -178,56 +178,225 @@ if MLP_bithynion:
         pickle.dump(mlp, open("MLP_bithynion.pkl", "wb"))
         print("Model saved as MLP_bithynion.pkl")
 
-MLP_chios = True
+MLP_chios = False # Clôturé le lundi 23 mars 2026 à 1h20
 if MLP_chios:
     records = [("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"), # chainsaw, crackling fire, fireworks, gunshot
                ("mcu13", "fisher", "local speakers - spec_20_20"),
                ("mcu13", "sud5", "local speakers - spec_20_20"),
-               ("mcu13", "sud11", "local speakers - spec_20_20")]   # background
-    
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+    compacting_levels = [1, 2, 3, 4, 5]
+    score_testing     = []
     for j in range(1, 6):
         data, labels = load_compacted_data(records, n_samples_per_new_sample=j)
-
+        print(f"Shapes {j} level of compacting:", data.shape, labels.shape)
         data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
         x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
 
+        # Validation set
+        mlp = MLPClassifier(hidden_layer_sizes=(300, 300, 200, 100, 50)	, max_iter=500, random_state=42, activation="relu", learning_rate="constant")
+        mlp.fit(x_train, y_train)
+        y_pred = mlp.predict(x_test)
+        score = accuracy_score(y_test, y_pred)
+        print(f"Test score with compacted data {j} samples per sample: {score}")
+        score_testing.append(score)
+
+        pickle.dump(mlp, open(f"MLP_chios_compacted_{j}.pkl", "wb"))
+        # print("Confusion Matrix:")
+        #print(confusion_matrix(y_test, y_pred))
+        #save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_chios.pdf", show=True)
+    label_size = 19
+    ticks_size = 15
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(compacting_levels, score_testing, color = 'blue', lw=2, marker='o', markersize=8)
+    ax.grid()
+    ax.set_xlabel('Number of compacted melspectrograms', fontsize=label_size)
+    ax.set_ylabel('Accuracy', fontsize=label_size)
+    #ax.set_xlim(0, 15)
+    ax.set_xticks(compacting_levels)
+    ax.tick_params(axis='both', which='major', labelsize=ticks_size)
+    plt.tight_layout()
+    plt.savefig('MLP_chios_compacted.pdf')
+    plt.show()
+
+MLP_dorystolon = False # Clôturé le lundi 23 mars 2026 à 1h20
+if MLP_dorystolon:
+    Gen_dorystolon = False
+    GS_dorystolon  = False
+
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+
+    data, labels = load_data(records)
+    data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+    x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
+
+    if GS_dorystolon:
+        print("Starting GridSearchCV for Dorystolon dataset...")
+        parameters = {
+            'hidden_layer_sizes': [(300, 300, 200, 100, 50), (300, 300, 200, 200, 100, 50), (300, 300, 200, 200, 100)],#(400, 400, 300, 200, 100, 50), (300, 300, 200, 100, 50), (200, 200, 100, 50), (300, 300, 200, 200, 100, 50), (300, 300, 200, 200, 100, 50)],
+            'max_iter': [500], # Pas d'influence sensible sur les résultats
+            'random_state': [42],
+            "activation": ["relu"], # relu est clairement le meilleur
+            "learning_rate": ["constant"], # pas de différence entre constant et adaptive, on laisse le paramètre par défaut
+            "alpha": [0.0001, 0.001, 0.01],
+            "batch_size": ["auto", len(labels)]
+        }
+
+        hyperparameter_tuning = GridSearchCV(MLPClassifier(), parameters, cv=5, n_jobs=-1)
+        hyperparameter_tuning.fit(x_train, y_train)
+        pickle.dump(hyperparameter_tuning, open("hyperparameter_tuning dorystolon.pkl", "wb"))
+
+
+    if Gen_dorystolon:
         mlp = MLPClassifier(hidden_layer_sizes=(300, 300, 200, 100, 50)	, max_iter=500, random_state=42, activation="relu", learning_rate="constant")
         mlp.fit(x_train, y_train)
         y_pred = mlp.predict(x_test)
         score = accuracy_score(y_test, y_pred)
         print(f"Test score: {score}")
-        # print("Confusion Matrix:")
-        #print(confusion_matrix(y_test, y_pred))
-        #save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_chios.pdf", show=True)
+        print("Confusion Matrix:")
+        print(confusion_matrix(y_test, y_pred))
+        save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_dorystolon.pdf", show=True)
 
-MLP_dorystolon = False
-if MLP_dorystolon:
-    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
-               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
-               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
-               ("mcu13", "sud11", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
-    
-    data, labels = load_data(records)
-    data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
-    x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
-    mlp = MLPClassifier(hidden_layer_sizes=(300, 300, 200, 100, 50)	, max_iter=500, random_state=42, activation="relu", learning_rate="constant")
-    mlp.fit(x_train, y_train)
-    y_pred = mlp.predict(x_test)
-    score = accuracy_score(y_test, y_pred)
-    print(f"Test score: {score}")
-    print("Confusion Matrix:")
-    print(confusion_matrix(y_test, y_pred))
-    save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_dorystolon.pdf", show=True)
-    
-# with open("hyperparameter_tuning bithynion 1.pkl", "rb") as f:
+MLP_ephesos = False
+if MLP_ephesos:
+    print("Model MLP_ephesos not implemented yet")
+# with open("hyperparameter_tuning dorystolon.pkl", "rb") as f:
 #     hyperparameter_tuning = pickle.load(f)
 
 # # Save all the mean_fit_time, param_activation, param_hidden_layer_sizes, param_learning_rate, param_max_iter ranked according to the mean_test_score in a md table
 # results = hyperparameter_tuning.cv_results_
 # sorted_indices = np.argsort(results['mean_test_score'])[::-1]  # Sort by mean_test_score in descending order
 
-# with open("hyperparameter_results.md", "w") as f:
-#     f.write("| mean_fit_time | param_activation | param_hidden_layer_sizes | param_learning_rate | param_max_iter | mean_test_score |\n")
-#     f.write("| --- | --- | --- | --- | --- | --- |\n")
+# with open("hyperparameter_results_dorystolon.md", "w") as f:
+#     f.write("| mean_fit_time | param_activation | param_hidden_layer_sizes | param_learning_rate | param_max_iter | param_alpha | mean_test_score |\n")
+#     f.write("| --- | --- | --- | --- | --- | --- | --- |\n")
 #     for i in sorted_indices:
-#         f.write(f"| {results['mean_fit_time'][i]} | {results['param_activation'][i]} | {results['param_hidden_layer_sizes'][i]} | {results['param_learning_rate'][i]} | {results['param_max_iter'][i]} | {results['mean_test_score'][i]} |\n")
+#         f.write(f"| {results['mean_fit_time'][i]} | {results['param_activation'][i]} | {results['param_hidden_layer_sizes'][i]} | {results['param_learning_rate'][i]} | {results['param_max_iter'][i]} | {results['param_alpha'][i]} | {results['mean_test_score'][i]} |\n")# with open("hyperparameter_tuning bithynion 1.pkl", "rb") as f:
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
+
+records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+            ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+            ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+            ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+            ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+
+data, labels = load_data(records)
+data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
+
+
+
+# --- Paramètres du meilleur modèle trouvé par GridSearch ---
+best_params = {
+    'hidden_layer_sizes': (300, 300, 200, 100, 50),
+    'activation': 'relu',
+    'alpha': 1e-4,
+    'batch_size': 'auto',
+    'learning_rate': 'constant',
+    'random_state': 42,
+}
+
+N_EPOCHS = 500  # Nombre total d'itérations à tracer
+
+
+
+# --- Initialisation du MLP avec warm_start ---
+mlp = MLPClassifier(
+    **best_params,
+    max_iter=1,          # 1 epoch à la fois
+    warm_start=True,     # conserve les poids entre les appels à fit()
+    n_iter_no_change=N_EPOCHS,  # désactive l'early stopping interne
+    tol=0.0,
+)
+
+
+train_accs = []
+val_accs   = []
+
+for epoch in range(N_EPOCHS):
+    mlp.fit(x_train, y_train)
+    
+    # Accuracy sur le train
+    train_accs.append(mlp.score(x_train, y_train))
+    
+    # Accuracy sur le test (validation)
+    val_accs.append(mlp.score(x_test, y_test))
+    
+    if (epoch + 1) % 50 == 0:
+        print(f"Epoch {epoch+1}/{N_EPOCHS} — train acc: {train_accs[-1]:.3f} | val acc: {val_accs[-1]:.3f}")
+
+train_losses = []
+val_losses   = []
+
+# --- Initialisation du MLP avec warm_start ---
+mlp = MLPClassifier(
+    **best_params,
+    max_iter=1,          # 1 epoch à la fois
+    warm_start=True,     # conserve les poids entre les appels à fit()
+    n_iter_no_change=N_EPOCHS,  # désactive l'early stopping interne
+    tol=0.0,
+)
+
+
+for epoch in range(N_EPOCHS):
+    mlp.fit(x_train, y_train)
+    
+    # Training loss (log-loss, déjà calculé en interne)
+    train_losses.append(mlp.loss_)
+    
+    # Validation loss : log-loss manuel sur x_test
+    y_prob = mlp.predict_proba(x_test)
+    # Clip pour éviter log(0)
+    y_prob = np.clip(y_prob, 1e-15, 1 - 1e-15)
+    # One-hot encode y_test
+    classes = mlp.classes_
+    y_test_oh = np.zeros_like(y_prob)
+    for i, label in enumerate(y_test):
+        y_test_oh[i, np.where(classes == label)[0][0]] = 1
+    val_loss = -np.mean(np.sum(y_test_oh * np.log(y_prob), axis=1))
+    val_losses.append(val_loss)
+    
+    if (epoch + 1) % 50 == 0:
+        print(f"Epoch {epoch+1}/{N_EPOCHS} — train loss: {train_losses[-1]:.4f} | val loss: {val_losses[-1]:.4f}")
+
+
+
+
+
+
+
+
+
+
+
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+ax1.plot([a * 100 for a in train_accs], color='steelblue', linewidth=2, label='Train')
+ax1.plot([a * 100 for a in val_accs],   color='coral',    linewidth=2, linestyle='--', label='Validation')
+ax1.set_title('Accuracy')
+ax1.set_ylabel('%')
+ax1.set_xlabel('Epoch')
+ax1.set_ylim(0, 105)
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+ax2.plot(train_losses, color='steelblue', linewidth=2, label='Train')
+ax2.plot(val_losses,   color='coral',    linewidth=2, linestyle='--', label='Validation')
+ax2.set_title('Loss (log-loss)')
+ax2.set_xlabel('Epoch')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.suptitle('MLP Dorystolon — Training curves', fontsize=13)
+plt.tight_layout()
+plt.savefig('training_curves_dorystolon.png', dpi=150)
+plt.show()

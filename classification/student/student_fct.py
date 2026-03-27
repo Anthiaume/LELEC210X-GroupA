@@ -27,7 +27,7 @@ def load_data(records):
 
     for folder in folderpaths:
         mypath = folder
-        files_in_directory = [f for f in listdir(mypath) if (isfile(join(mypath, f)))]
+        files_in_directory = [f for f in listdir(mypath) if (isfile(join(mypath, f)) and f.endswith(".pkl"))]
         for file in files_in_directory:
             with open (os.path.join(mypath, file), "rb") as f:
                 data.append(pickle.load(f))

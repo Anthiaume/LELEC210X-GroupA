@@ -72,4 +72,5 @@ if __name__ == "__main__":
             plt.tight_layout()
             plt.savefig(f"Melspectrograms - {TYPE} - part {plots // 16}.pdf")
             plots += 16
+            plt.close()
 

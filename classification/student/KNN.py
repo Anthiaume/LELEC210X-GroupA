@@ -100,16 +100,32 @@ if KNN_albaniana:
         pickle.dump(pca, open("PCA_albaniana.pkl", "wb"))
         print("Model saved as KNN_albaniana.pkl")
 
-KNN_blariacum = True
+KNN_blariacum = False # Modèle clôturé le dimanche 22 mars 2026 à 21h48
 if KNN_blariacum:
+    """
+    Model description:
+    Basic KNN model with 5 classes
+    Dataset: mcu13, vinikot, JBL Flip 5 - Auguste - spec_20_20 --> chainsaw, crackling fire, fireworks, gunshot, background
+             mcu13, fisher, local speakers - spec_20_20 --> chainsaw, crackling fire, fireworks, gunshot, background
+             mcu13, sud5, local speakers - spec_20_20 --> chainsaw, crackling fire, fireworks, gunshot, background
+             mcu13, sud11, local speakers - spec_20_20 - Jonathan --> chainsaw, crackling fire, fireworks, gunshot, background
+             mcu13, sud12, local speakers - spec_20_20 - Raphael --> chainsaw, crackling fire, fireworks, gunshot, background
+    Dataset équilibré
+        - Objectif  : Evaluer les performances d'un KNN sur un dataset plus complexe, avec 5 classes et 122 samples par classe, et optimiser les
+                      hyperparamètres du KNN par GridSearchCV
+        - Résultats : le KNN atteint une performance de 0.72 sur le test set, avec une architecture optimisée par GridSearchCV
+        - Conclusion : le KNN perd en performance quand le dataset devient plus complexe. On va donc garder uniquement le MLP qui lui
+                       est plus robuste à la complexité du dataset.
+        """
     GS_PCA_blariacum = False
-    Gen_blariacum = False
+    Gen_blariacum = True
     components = [15, 20, 25, 30, 35, 40, 45]
 
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
                ("mcu13", "sud5", "local speakers - spec_20_20"),
-               ("mcu13", "sud11", "local speakers - spec_20_20")] # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud12", "local speakers - spec_20_20 - Raphael")] # 5 classes, 122 samples per class
     
     if GS_PCA_blariacum:
         for x in components:
@@ -129,7 +145,7 @@ if KNN_blariacum:
             x_test = pca.transform(x_test)
 
             parameters = {
-                'n_neighbors': [1, 2, 3],
+                'n_neighbors': [1, 2, 3, 5, 10],
                 'weights': ['uniform', 'distance'],
                 'metric': ['euclidean', 'manhattan']
             }
@@ -139,29 +155,19 @@ if KNN_blariacum:
             pickle.dump(hyperparameter_tuning, open(f"hyperparameter_tuning blariacum {x} pca.pkl", "wb"))
 
     if Gen_blariacum:
-
-        # Load data
-        records = [("mcu13", "fisher", "local speakers - spec_20_20"),
-                    ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20")]
         data, labels = load_data(records)
-
-        # Encode labels
-        le = LabelEncoder()
-        labels_encoded = le.fit_transform(labels)
-
-        # Normalize data
         data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
 
         # Train test split for visualization of results
-        x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=21, shuffle=True, stratify=labels_encoded)
+        x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=21, shuffle=True, stratify=labels)
 
         # Apply PCA for dimensionality reduction for visualization
-        pca = PCA(n_components=25)
+        pca = PCA(n_components=20)
         x_train = pca.fit_transform(x_train)
         x_test = pca.transform(x_test)
 
         # Define KNN model
-        knn_model = KNeighborsClassifier(n_neighbors=1, weights='distance', metric='euclidean')
+        knn_model = KNeighborsClassifier(n_neighbors=5, weights='distance', metric='euclidean')
         
         # Fit model for visualization and evaluation
         knn_model.fit(x_train, y_train)
@@ -170,15 +176,16 @@ if KNN_blariacum:
         print(f"Test score: {score}")
         print("Confusion Matrix:")
         print(confusion_matrix(y_test, y_pred))
-        save_confusion_matrix(knn_model, x_test, y_test, filename="confusion_matrix_albaniana.pdf", show=True)
+        save_confusion_matrix(knn_model, x_test, y_test, filename="confusion_matrix_blariacum.pdf", show=True)
 
         # Save model on all the dataset
-        pca = PCA(n_components=25)
+        pca = PCA(n_components=20)
+        knn_model = KNeighborsClassifier(n_neighbors=5, weights='distance', metric='euclidean')
         data_normalized = pca.fit_transform(data_normalized)
         knn_model.fit(data_normalized, labels)
-        pickle.dump(knn_model, open("KNN_albaniana.pkl", "wb"))
-        pickle.dump(pca, open("PCA_albaniana.pkl", "wb"))
-        print("Model saved as KNN_albaniana.pkl")
+        pickle.dump(knn_model, open("KNN_blariacum.pkl", "wb"))
+        pickle.dump(pca, open("PCA_blariacum.pkl", "wb"))
+        print("Model saved as KNN_blariacum.pkl")
 
 # components = [15, 20, 25, 30, 35, 40, 45]
 # grid_results_files = [f"hyperparameter_tuning blariacum {x} pca.pkl" for x in components]
@@ -195,7 +202,7 @@ if KNN_blariacum:
 #         sorted_results.append((pca_components[i], mean_score, std_score, params))
 # # Sort the results by mean_test_score in descending order and write to a markdown file with all pca components results sorted by mean_test_score in descending order
 
-# with open("KNN_albaniana_results.md", "w") as f:
+# with open("KNN_blariacum_results.md", "w") as f:
 #     f.write("| PCA Components | Mean Test Score | Std Test Score | Neighbors | Metric | Weights |\n")
 #     f.write("| --- | --- | --- | --- | --- | --- |\n")
 #     sorted_results.sort(key=lambda x: x[1], reverse=True)  # Sort by mean_test_score in descending order
