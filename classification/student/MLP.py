@@ -1,13 +1,17 @@
 from itertools import count
 
-from student_fct import load_data, load_compacted_data, save_confusion_matrix
+from student_fct import load_data, load_compacted_data, save_confusion_matrix, TorchMLP
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
+from sklearn.preprocessing import LabelEncoder
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.decomposition import PCA
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import time
 
 # Names of the models: amorium, bithynion, chios, dorystolon, ephesos, flaviopolis, gangra, halikarnassos, iconium, karthago, lebessos, mesembria, nicosia, ophis, philadelphia, quiza, rhodos, samos, tarsos
 
@@ -263,140 +267,62 @@ if MLP_dorystolon:
 
 MLP_ephesos = False
 if MLP_ephesos:
-    print("Model MLP_ephesos not implemented yet")
-# with open("hyperparameter_tuning dorystolon.pkl", "rb") as f:
-#     hyperparameter_tuning = pickle.load(f)
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
 
-# # Save all the mean_fit_time, param_activation, param_hidden_layer_sizes, param_learning_rate, param_max_iter ranked according to the mean_test_score in a md table
-# results = hyperparameter_tuning.cv_results_
-# sorted_indices = np.argsort(results['mean_test_score'])[::-1]  # Sort by mean_test_score in descending order
+    GS_ephesos  = True
+    Gen_ephesos = False
 
-# with open("hyperparameter_results_dorystolon.md", "w") as f:
-#     f.write("| mean_fit_time | param_activation | param_hidden_layer_sizes | param_learning_rate | param_max_iter | param_alpha | mean_test_score |\n")
-#     f.write("| --- | --- | --- | --- | --- | --- | --- |\n")
-#     for i in sorted_indices:
-#         f.write(f"| {results['mean_fit_time'][i]} | {results['param_activation'][i]} | {results['param_hidden_layer_sizes'][i]} | {results['param_learning_rate'][i]} | {results['param_max_iter'][i]} | {results['param_alpha'][i]} | {results['mean_test_score'][i]} |\n")# with open("hyperparameter_tuning bithynion 1.pkl", "rb") as f:
+    data, labels = load_data(records)
+    le = LabelEncoder()
+    labels_encoded = le.fit_transform(labels)
+    MLP_ephesos_classes = le.classes_
+    data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+    x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+    print("Data loaded and preprocessed for Ephesos dataset. Starting training...")
 
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import train_test_split
+    if GS_ephesos:
+        param_grid = {
+            'hidden_layers_sizes': [(600, 300, 100)],
+            "activation": [nn.ReLU], # relu est clairement le meilleur
+            "IO": [(400, 5)],
+            'num_epochs': [500],
+            "batch_size": [len(labels_encoded)],
+            "plot_loss": [False],
+            "loss_filename": [None],
+            "verbose": [False],
+            "learning_rate": [1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
+        }
 
-records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
-            ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
-            ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
-            ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
-            ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+        GS_MLP_ephesos = TorchMLP()
+        GS_MLP_ephesos.GridSearch(x_train, y_train, param_grid, cv=3, verbose=False)
 
-data, labels = load_data(records)
-data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
-x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels, test_size=0.3, random_state=42, shuffle=True, stratify=labels)
+    if Gen_ephesos:
+        print(f"\n\n\n{"#"*90 + "\n"}Gen_ephesos:\n\nTraining MLP on Ephesos dataset with PyTorch implementation...")
 
+        duration = time.time()
+        mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(400, 5))
+        mlp.fit(x_train, y_train, x_val=x_test, y_val=y_test, num_epochs=300, batch_size=len(labels_encoded), plot_loss=False, verbose=True, filename="LOSS_CURVES_ephesos_pytorch.pdf")
+        duration = time.time() - duration
+        train_acc = mlp.score(x_train, y_train)
+        test_acc  = mlp.score(x_test, y_test)
+        print(f"Accuracy train : {train_acc:.4f}")
+        print(f"Accuracy test  : {test_acc:.4f}" )
+        mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_ephesos_classes, show=False, filename="confusion_matrix_ephesos_pytorch.pdf")
+        pickle.dump(mlp, open("MLP_ephesos_pytorch.pkl", "wb"))
 
-
-# --- Paramètres du meilleur modèle trouvé par GridSearch ---
-best_params = {
-    'hidden_layer_sizes': (300, 300, 200, 100, 50),
-    'activation': 'relu',
-    'alpha': 1e-4,
-    'batch_size': 'auto',
-    'learning_rate': 'constant',
-    'random_state': 42,
-}
-
-N_EPOCHS = 500  # Nombre total d'itérations à tracer
-
-
-
-# --- Initialisation du MLP avec warm_start ---
-mlp = MLPClassifier(
-    **best_params,
-    max_iter=1,          # 1 epoch à la fois
-    warm_start=True,     # conserve les poids entre les appels à fit()
-    n_iter_no_change=N_EPOCHS,  # désactive l'early stopping interne
-    tol=0.0,
-)
-
-
-train_accs = []
-val_accs   = []
-
-for epoch in range(N_EPOCHS):
-    mlp.fit(x_train, y_train)
-    
-    # Accuracy sur le train
-    train_accs.append(mlp.score(x_train, y_train))
-    
-    # Accuracy sur le test (validation)
-    val_accs.append(mlp.score(x_test, y_test))
-    
-    if (epoch + 1) % 50 == 0:
-        print(f"Epoch {epoch+1}/{N_EPOCHS} — train acc: {train_accs[-1]:.3f} | val acc: {val_accs[-1]:.3f}")
-
-train_losses = []
-val_losses   = []
-
-# --- Initialisation du MLP avec warm_start ---
-mlp = MLPClassifier(
-    **best_params,
-    max_iter=1,          # 1 epoch à la fois
-    warm_start=True,     # conserve les poids entre les appels à fit()
-    n_iter_no_change=N_EPOCHS,  # désactive l'early stopping interne
-    tol=0.0,
-)
-
-
-for epoch in range(N_EPOCHS):
-    mlp.fit(x_train, y_train)
-    
-    # Training loss (log-loss, déjà calculé en interne)
-    train_losses.append(mlp.loss_)
-    
-    # Validation loss : log-loss manuel sur x_test
-    y_prob = mlp.predict_proba(x_test)
-    # Clip pour éviter log(0)
-    y_prob = np.clip(y_prob, 1e-15, 1 - 1e-15)
-    # One-hot encode y_test
-    classes = mlp.classes_
-    y_test_oh = np.zeros_like(y_prob)
-    for i, label in enumerate(y_test):
-        y_test_oh[i, np.where(classes == label)[0][0]] = 1
-    val_loss = -np.mean(np.sum(y_test_oh * np.log(y_prob), axis=1))
-    val_losses.append(val_loss)
-    
-    if (epoch + 1) % 50 == 0:
-        print(f"Epoch {epoch+1}/{N_EPOCHS} — train loss: {train_losses[-1]:.4f} | val loss: {val_losses[-1]:.4f}")
+        print(f"Training time: {duration:.2f} seconds")
+        print(f"Model trained and confusion matrix saved for Ephesos dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
 
 
 
 
-
-
-
-
-
-
-
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-
-ax1.plot([a * 100 for a in train_accs], color='steelblue', linewidth=2, label='Train')
-ax1.plot([a * 100 for a in val_accs],   color='coral',    linewidth=2, linestyle='--', label='Validation')
-ax1.set_title('Accuracy')
-ax1.set_ylabel('%')
-ax1.set_xlabel('Epoch')
-ax1.set_ylim(0, 105)
-ax1.legend()
-ax1.grid(True, alpha=0.3)
-
-ax2.plot(train_losses, color='steelblue', linewidth=2, label='Train')
-ax2.plot(val_losses,   color='coral',    linewidth=2, linestyle='--', label='Validation')
-ax2.set_title('Loss (log-loss)')
-ax2.set_xlabel('Epoch')
-ax2.legend()
-ax2.grid(True, alpha=0.3)
-
-plt.suptitle('MLP Dorystolon — Training curves', fontsize=13)
-plt.tight_layout()
-plt.savefig('training_curves_dorystolon.png', dpi=150)
-plt.show()
+with open("ephesos_GS_Mon Mar 30 17_53_29 2026.pkl", "rb") as f:
+    hyperparameter_tuning = pickle.load(f)
+# trier le dictionnaire hyperparameter_tuning selon "mean_score"
+# hyperparameter_tuning = sorted(hyperparameter_tuning, key=lambda x: hyperparameter_tuning["mean_score"], reverse=True)
+for element in hyperparameter_tuning:
+    print(f"Mean score: {element['mean_score']:.4f}, learning rate: {element['params']['learning_rate']}")#, Params: {element['params']}")
