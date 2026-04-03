@@ -8,6 +8,8 @@ from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDis
 import torch
 import torch.nn as nn
 import time
+import random
+
 
 def load_data(records):
     """
@@ -95,9 +97,127 @@ def save_confusion_matrix(model, x_test, y_test, filename="CONFUSION_MATRIX.pdf"
     if show:
         plt.show()
 
+def plot_specgram(
+    specgram,
+    ax,
+    is_mel=False,
+    title=None,
+    xlabel="Time [s]",
+    ylabel="Frequency [Hz]",
+    cmap="jet",
+    cb=True,
+    tf=None,
+    invert=True,
+):
+    """
+    Plot a spectrogram (2D matrix) in a chosen axis of a figure.
+    Inputs:
+        - specgram = spectrogram (2D array)
+        - ax       = current axis in figure
+        - title
+        - xlabel
+        - ylabel
+        - cmap
+        - cb       = show colorbar if True
+        - tf       = final time in xaxis of specgram
+    """
+    if tf is None:
+        tf = specgram.shape[1]
+
+    if is_mel:
+        ylabel = "Frequency [Mel]"
+        im = ax.imshow(
+            specgram, cmap=cmap, aspect="auto", extent=[0, tf, specgram.shape[0], 0]
+        )
+    else:
+        im = ax.imshow(
+            specgram,
+            cmap=cmap,
+            aspect="auto",
+            extent=[0, tf, int(specgram.size / tf), 0],
+        )
+    if invert:
+        ax.invert_yaxis()
+    fig = plt.gcf()
+    if cb:
+        fig.colorbar(im, ax=ax)
+    # cbar.set_label('log scale', rotation=270)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    return None
+
+def add_background(data_normalized, labels, attenuation_dB_range=(-20, -15)):
+    """"
+    Description: Cette fonction ajoute un bruit de fond (background) à chaque échantillon utile du dataset.
+                 Très important de passer cette fonction sur des échantillons normalisés (ex: MEL spectrogrammes) pour que l'atténuation en dB soit cohérente.
+    Inputs:
+        - data: numpy array de forme (n_samples, n_features) contenant les échantillons du dataset
+        - labels: numpy array de forme (n_samples,) contenant les labels correspondants à chaque échantillon
+        - attenuation_dB_range: tuple (min_dB, max_dB) spécifiant la plage de valeurs d'atténuation en décibels à appliquer au bruit de fond avant de l'ajouter aux échantillons utiles. Par exemple, (-20, -15) signifie que le bruit de fond sera atténué entre 20 dB et 15 dB avant d'être ajouté.
+    Outputs:
+        - new_data: numpy array de forme (n_samples, n_features) contenant les échantillons du dataset après l'ajout du bruit de fond
+        - new_labels: numpy array de forme (n_samples,) contenant les labels correspondants à chaque échantillon dans new_data (identiques à labels)
+    """
+    
+    def plot3(original, noise, combined):
+        N_MELVECS = 20
+        MELVEC_LENGTH = 20
+
+        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+        # Plot original
+        plot_specgram(
+            original.reshape((N_MELVECS, MELVEC_LENGTH)).T,
+            ax=axes[0],
+            is_mel=True,
+            title=f"MEL Spectrogram : original",
+            xlabel="Mel vector",
+        )
+
+        # Plot noise        
+        plot_specgram(
+            noise.reshape((N_MELVECS, MELVEC_LENGTH)).T,
+            ax=axes[1],
+            is_mel=True,
+            title=f"MEL Spectrogram : background noise",
+            xlabel="Mel vector",
+        )
+
+        # Plot combined
+        plot_specgram(
+            combined.reshape((N_MELVECS, MELVEC_LENGTH)).T,
+            ax=axes[2],
+            is_mel=True,
+            title=f"MEL Spectrogram : combined",
+            xlabel="Mel vector",
+        )
+        plt.tight_layout()
+        plt.show()  
+        plt.close()
+
+    background_data = data_normalized[labels == "background"]
+    background_labels = labels[labels == "background"]
+    usefull_data = data_normalized[labels != "background"]
+    usefull_labels = labels[labels != "background"]
+
+    for sample in range(usefull_data.shape[0]):
+        background_index = random.randint(0, background_data.shape[0] - 1)
+
+        attenuation_dB = np.random.uniform(*attenuation_dB_range)
+        attenuation_factor = 10 ** (attenuation_dB / 20)
+
+        copy_to_plot = usefull_data[sample,:].copy()
+
+        usefull_data[sample,:] += (attenuation_factor * background_data[background_index,:].astype(np.float64)).astype(usefull_data.dtype)
+
+        # plot3(copy_to_plot, background_data[background_index,:], usefull_data[sample,:])
+
+    return np.concatenate((usefull_data, background_data)), np.concatenate((usefull_labels, background_labels))
+
 class TorchMLP(nn.Module):
     def __init__(self, hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO = (400, 5), num_epochs=500, batch_size=None,
-                 plot_loss=False, loss_filename=None, verbose=True, x_val=None, y_val=None, learning_rate=1e-6):
+                 plot_loss=False, loss_filename=None, verbose=True, x_val=None, y_val=None, learning_rate=1e-6, dropout_rate=0):
 
         # Appel du constructeur de la classe parente (nn.Module)
         super(TorchMLP, self).__init__()
@@ -111,22 +231,25 @@ class TorchMLP(nn.Module):
         self.x_val = x_val
         self.y_val = y_val
         self.learning_rate = learning_rate
+        self.dropout_rate = dropout_rate
         self.num_classes = IO[1]
 
         # Create a sequential model
         self.model = nn.Sequential()
 
-        # Create the hidden layers and add them to the model
-        for layer in range(len(hidden_layers_sizes)+1):
+        # Add the input layer and the first hidden layer, along with the activation function and dropout
+        self.model.add_module("input", nn.Linear(IO[0], hidden_layers_sizes[0]))
+        self.model.add_module(f"act_input", activation())
+        self.model.add_module(f"dropout_input", nn.Dropout(p=self.dropout_rate))
 
-            # Add the input layer and the first hidden layer
-            if layer == 0:
-                self.model.add_module("input", nn.Linear(IO[0], hidden_layers_sizes[0]))
-            
-            # Add hidden layers and activation functions
-            if layer < len(hidden_layers_sizes):
-                self.model.add_module(f"act{layer+1}", activation())
-                self.model.add_module(f"dense{layer+1}", nn.Linear(hidden_layers_sizes[layer], (hidden_layers_sizes[layer+1] if layer+1 < len(hidden_layers_sizes) else IO[1])))
+        # Create the hidden layers and add them to the model
+        for layer in range(len(hidden_layers_sizes)-1):
+            self.model.add_module(f"dense{layer+1}", nn.Linear(hidden_layers_sizes[layer], hidden_layers_sizes[layer+1]))
+            self.model.add_module(f"act{layer+1}", activation())
+            self.model.add_module(f"dropout{layer+1}", nn.Dropout(p=self.dropout_rate))
+        
+        # Add the output layer (without activation, since we'll use CrossEntropyLoss which applies softmax internally)
+        self.model.add_module("output", nn.Linear(hidden_layers_sizes[-1], IO[1]))
 
     def forward(self, x):
         """
@@ -311,7 +434,6 @@ class TorchMLP(nn.Module):
             y_train = y_train.numpy()
 
         n_samples = x_train.shape[0]
-        print(n_samples)
 
         # Placeholder for best parameters and best score
         best_params = None

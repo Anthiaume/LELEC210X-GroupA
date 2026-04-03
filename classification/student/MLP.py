@@ -1,6 +1,6 @@
 from itertools import count
 
-from student_fct import load_data, load_compacted_data, save_confusion_matrix, TorchMLP
+from student_fct import load_data, load_compacted_data, save_confusion_matrix, add_background, TorchMLP
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neural_network import MLPClassifier
@@ -265,7 +265,7 @@ if MLP_dorystolon:
         print(confusion_matrix(y_test, y_pred))
         save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_dorystolon.pdf", show=True)
 
-MLP_ephesos = False
+MLP_ephesos = True
 if MLP_ephesos:
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
@@ -273,16 +273,22 @@ if MLP_ephesos:
                ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
                ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
 
-    GS_ephesos  = True
-    Gen_ephesos = False
+    GS_ephesos  = False
+    Gen_ephesos = True
 
+    # Load and preprocess data
+
+    data_load_duration = time.time()
     data, labels = load_data(records)
     le = LabelEncoder()
     labels_encoded = le.fit_transform(labels)
     MLP_ephesos_classes = le.classes_
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+    # add_background(data_normalized=data_normalized, labels=labels, attenuation_dB_range=(-20, -15))
     x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
-    print("Data loaded and preprocessed for Ephesos dataset. Starting training...")
+
+    print("Data loaded and preprocessed for Ephesos dataset, duration: {:.2f} seconds.".format(time.time() - data_load_duration))
+
 
     if GS_ephesos:
         param_grid = {
@@ -294,7 +300,8 @@ if MLP_ephesos:
             "plot_loss": [False],
             "loss_filename": [None],
             "verbose": [False],
-            "learning_rate": [1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
+            "learning_rate": [1e-2, 1e-3, 1e-4],
+            "dropout_rate": [0, 0.25, 0.5]
         }
 
         GS_MLP_ephesos = TorchMLP()
@@ -304,14 +311,17 @@ if MLP_ephesos:
         print(f"\n\n\n{"#"*90 + "\n"}Gen_ephesos:\n\nTraining MLP on Ephesos dataset with PyTorch implementation...")
 
         duration = time.time()
-        mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(400, 5))
-        mlp.fit(x_train, y_train, x_val=x_test, y_val=y_test, num_epochs=300, batch_size=len(labels_encoded), plot_loss=False, verbose=True, filename="LOSS_CURVES_ephesos_pytorch.pdf")
+        mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(400, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                       learning_rate=1e-3, dropout_rate=0.25,
+                       x_val=x_test, y_val=y_test, plot_loss=True, verbose=True,
+                       loss_filename="LOSS_CURVES_ephesos_pytorch.pdf")
+        mlp.fit(x_train, y_train)
         duration = time.time() - duration
         train_acc = mlp.score(x_train, y_train)
         test_acc  = mlp.score(x_test, y_test)
         print(f"Accuracy train : {train_acc:.4f}")
         print(f"Accuracy test  : {test_acc:.4f}" )
-        mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_ephesos_classes, show=False, filename="confusion_matrix_ephesos_pytorch.pdf")
+        mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_ephesos_classes, show=True, filename="confusion_matrix_ephesos_pytorch.pdf")
         pickle.dump(mlp, open("MLP_ephesos_pytorch.pkl", "wb"))
 
         print(f"Training time: {duration:.2f} seconds")
@@ -320,9 +330,9 @@ if MLP_ephesos:
 
 
 
-with open("ephesos_GS_Mon Mar 30 17_53_29 2026.pkl", "rb") as f:
+with open("ephesos_GS_Wed Apr  1 15_43_20 2026.pkl", "rb") as f:
     hyperparameter_tuning = pickle.load(f)
 # trier le dictionnaire hyperparameter_tuning selon "mean_score"
 # hyperparameter_tuning = sorted(hyperparameter_tuning, key=lambda x: hyperparameter_tuning["mean_score"], reverse=True)
 for element in hyperparameter_tuning:
-    print(f"Mean score: {element['mean_score']:.4f}, learning rate: {element['params']['learning_rate']}")#, Params: {element['params']}")
+    print(f"Mean score: {element['mean_score']:.4f}, learning rate: {element['params']['learning_rate']}, dropout rate: {element['params']['dropout_rate']}")#, Params: {element['params']}")
