@@ -26,7 +26,7 @@ def student_var_initialization():
     begin_time = time.time()
 
     # Load the models
-    models = ["MLP_bithynion.pkl"]#, "KNN_albaniana.pkl"]
+    models = ["MLP_ephesos_pytorch.pkl", "MLP_flaviopolis_pytorch.pkl"]
     for model in range(len(models)):
         with open(models[model], "rb") as f:
             models[model] = pickle.load(f)
@@ -129,11 +129,7 @@ def main(
             ###########################################################
             save = True
             if save:
-                TYPE = "gunshot" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
-                mypath = os.getcwd()#os.path.join(SPEAKER)
-                onlyfiles = [f  for f in listdir(mypath) if (isfile(join(mypath, f)) and f.endswith(".pkl") and f.startswith(TYPE))]
-                maximum = max([int(f.split('_')[1].strip('.pkl')) for f in onlyfiles if f.startswith(TYPE) and f.endswith(".pkl")] , default=0)
-                pickle.dump(mel_vec, open(f"{TYPE}_{maximum+1}.pkl", "wb"))
+                pickle.dump(melvecs, open(f"{time.ctime()}.pkl", "wb"))
 
             melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
 
@@ -141,6 +137,11 @@ def main(
                 student_var_initialization()
 
             for model in range(len(models)):
+                if model == "MLP_flaviopolis_pytorch.pkl":
+                    melvecs_normalized_f = melvecs_normalized.reshape(1, -1)**0.3
+                    predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
+                    predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
+        
                 predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
                 predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
 
