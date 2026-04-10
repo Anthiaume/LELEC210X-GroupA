@@ -14,7 +14,7 @@ from leaderboard.utils import get_url
 import numpy as np
 
 from .utils import payload_to_melvecs
-
+from student_fct import suppress_low_frequencies
 load_dotenv()
 
 global begin_time, models, predicted_probabilities, predicted_classes, pca_models
@@ -26,7 +26,7 @@ def student_var_initialization():
     begin_time = time.time()
 
     # Load the models
-    models = ["MLP_ephesos_pytorch.pkl", "MLP_flaviopolis_pytorch.pkl"]
+    models = ["MLP_ephesos_pytorch.pkl", "MLP_flaviopolis_pytorch.pkl", "MLP_gangra_pytorch.pkl"]
     for model in range(len(models)):
         with open(models[model], "rb") as f:
             models[model] = pickle.load(f)
@@ -139,11 +139,16 @@ def main(
             for model in range(len(models)):
                 if model == "MLP_flaviopolis_pytorch.pkl":
                     melvecs_normalized_f = melvecs_normalized.reshape(1, -1)**0.3
+                    predicted_classes[model].append(models[model].predict(melvecs_normalized_f)[0])
+                    predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized_f)) 
+                elif model == "MLP_gangra_pytorch.pkl":
+                    melvecs_normalized_g = melvecs_normalized.reshape(1, -1)**0.6
+                    melvecs_normalized_g = suppress_low_frequencies(melvecs_normalized_g, n_melvecs_to_suppress=7)
+                    predicted_classes[model].append(models[model].predict(melvecs_normalized_g)[0])
+                    predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized_g))
+                elif model == "MLP_ephesos_pytorch.pkl":
                     predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
                     predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
-        
-                predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
-                predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
 
             predictions = []
             for model in range(len(models)):

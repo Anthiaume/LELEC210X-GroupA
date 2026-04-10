@@ -196,10 +196,10 @@ def add_background(data_normalized, labels, attenuation_dB_range=(-20, -15)):
         plt.show()  
         plt.close()
 
-    background_data = data_normalized[labels == "background"]
-    background_labels = labels[labels == "background"]
-    usefull_data = data_normalized[labels != "background"]
-    usefull_labels = labels[labels != "background"]
+    background_data = data_normalized[labels == 0]
+    background_labels = labels[labels == 0]
+    usefull_data = data_normalized[labels != 0]
+    usefull_labels = labels[labels != 0]
 
     for sample in range(usefull_data.shape[0]):
         background_index = random.randint(0, background_data.shape[0] - 1)
@@ -212,7 +212,6 @@ def add_background(data_normalized, labels, attenuation_dB_range=(-20, -15)):
         usefull_data[sample,:] += (attenuation_factor * background_data[background_index,:].astype(np.float64)).astype(usefull_data.dtype)
 
         # plot3(copy_to_plot, background_data[background_index,:], usefull_data[sample,:])
-
     return np.concatenate((usefull_data, background_data)), np.concatenate((usefull_labels, background_labels))
 
 def suppress_low_frequencies(data, n_melvecs_to_suppress=10):

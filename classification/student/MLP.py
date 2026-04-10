@@ -265,7 +265,7 @@ if MLP_dorystolon:
         print(confusion_matrix(y_test, y_pred))
         save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_dorystolon.pdf", show=True)
 
-MLP_ephesos = True# Idée: minimiser l'overfitting
+MLP_ephesos = False# Idée: minimiser l'overfitting
 if MLP_ephesos:
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
@@ -285,7 +285,9 @@ if MLP_ephesos:
     MLP_ephesos_classes = le.classes_
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
     data_normalized = data_normalized
-    add_background(data_normalized=data_normalized, labels=labels, attenuation_dB_range=(-20, -15))
+
+    data_normalized, labels_encoded = add_background(data_normalized=data_normalized, labels=labels_encoded, attenuation_dB_range=(-20, -15))
+
     x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
 
     print("Data loaded and preprocessed for Ephesos dataset, duration: {:.2f} seconds.".format(time.time() - data_load_duration))
@@ -324,9 +326,8 @@ if MLP_ephesos:
         print(f"Accuracy test  : {test_acc:.4f}" )
         mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_ephesos_classes, show=True, filename="confusion_matrix_ephesos_pytorch.pdf")
         mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(400, 5),  num_epochs=150, batch_size=len(labels_encoded),
-                       learning_rate=1e-3, dropout_rate=0.25,
-                       x_val=x_test, y_val=y_test, plot_loss=True, verbose=True,
-                       loss_filename="LOSS_CURVES_ephesos_pytorch.pdf")
+                       learning_rate=1e-3, dropout_rate=0.25, plot_loss=True, verbose=True,
+                       loss_filename=None)
         mlp.fit(data_normalized, labels_encoded)
         pickle.dump(mlp, open("MLP_ephesos_pytorch.pkl", "wb"))
 
@@ -370,10 +371,10 @@ if MLP_flaviopolis:
 
         # Add background in the training data with random attenuation between -20 and -15 dB
         if bool_add_background:
-            add_background(data_normalized=data_normalized_HF, labels=labels, attenuation_dB_range=(-20, -15))
-            add_background(data_normalized=data_HF_normalized, labels=labels, attenuation_dB_range=(-20, -15))
+            data_normalized_HF, labels_e = add_background(data_normalized=data_normalized_HF, labels=labels_encoded, attenuation_dB_range=(-20, -15))
+            data_HF_normalized, labels_e = add_background(data_normalized=data_HF_normalized, labels=labels_encoded, attenuation_dB_range=(-20, -15))
 
-        return data_normalized_HF, data_HF_normalized, labels_encoded
+        return data_normalized_HF, data_HF_normalized, labels_e
 
 
     print("Data loaded and preprocessed for Flaviopolis dataset, duration: {:.2f} seconds.".format(time.time() - data_load_duration))
@@ -500,7 +501,7 @@ if MLP_flaviopolis:
 
         n_melvecs_to_suppress_list = [0]#, 3, 5, 7, 9]
         
-        exposant_list = [0.3]#, 0.5, 0.7, 0.9, 1, 1.5]
+        exposant_list = [1]#, 0.5, 0.7, 0.9, 1, 1.5]
 
         for n_melvecs_to_suppress in n_melvecs_to_suppress_list:
             for exposant in exposant_list:
@@ -528,16 +529,92 @@ if MLP_flaviopolis:
                 print(f"Accuracy test  : {test_acc:.4f}" )
                 print(f"Difference train - test accuracy: {diff_acc:.4f}")
                 mlp.save_confusion_matrix(x_test_N_HF, y_test_N_HF, class_names=MLP_flaviopolis_classes, show=True, filename="confusion_matrix_flaviopolis_pytorch.pdf")
-                mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
-                    learning_rate=1e-3, dropout_rate=0.25,
-                    x_val=x_test_N_HF, y_val=y_test_N_HF, plot_loss=False, verbose=True,
-                    loss_filename=None)
+                mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                    learning_rate=1e-3, dropout_rate=0.25, plot_loss=False, verbose=True, loss_filename=None)
                 mlp.fit(data_normalized_HF, labels_encoded)
                 pickle.dump(mlp, open("MLP_flaviopolis_pytorch.pkl", "wb"))
 
                 print(f"Training time: {duration:.2f} seconds")
                 print(f"Model trained and confusion matrix saved for Flaviopolis dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
-    
+
+MLP_gangra = False
+if MLP_gangra:
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+
+    Gen_gangra = True
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data_load_duration = time.time()
+    data, labels = load_data(records)
+
+    # Encode labels
+    le = LabelEncoder()
+    labels_encoded = le.fit_transform(labels)
+    MLP_gangra_classes = le.classes_
+
+    def load_data_gangra(n_melvecs_to_suppress=10, bool_add_background=False):
+        # Normalize data
+        data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+        data_HF = suppress_low_frequencies(data=data, n_melvecs_to_suppress=n_melvecs_to_suppress)
+
+        # Suppress low frequencies in the data
+        data_normalized_HF = suppress_low_frequencies(data=data_normalized, n_melvecs_to_suppress=n_melvecs_to_suppress)
+        data_HF_normalized = data_HF / np.linalg.norm(data, axis=1, keepdims=True)
+
+        # Add background in the training data with random attenuation between -20 and -15 dB
+        if bool_add_background:
+            data_normalized_HF, labels_e = add_background(data_normalized=data_normalized_HF, labels=labels_encoded, attenuation_dB_range=(-20, -15))
+            data_HF_normalized, labels_e = add_background(data_normalized=data_HF_normalized, labels=labels_encoded, attenuation_dB_range=(-20, -15))
+
+        return data_normalized_HF, data_HF_normalized, labels_e
+
+    print("Data loaded and preprocessed for Gangra dataset, duration: {:.2f} seconds.".format(time.time() - data_load_duration))
+
+    if Gen_gangra:
+
+        n_melvecs_to_suppress_list = [7]#, 3, 5, 7, 9]
+        
+        exposant_list = [0.6]#, 0.5, 0.7, 0.9, 1, 1.5]
+
+        for n_melvecs_to_suppress in n_melvecs_to_suppress_list:
+            for exposant in exposant_list:
+                inputs = 400 - n_melvecs_to_suppress * 20
+                data_normalized_HF, data_HF_normalized, labels_encoded = load_data_gangra(n_melvecs_to_suppress=n_melvecs_to_suppress, bool_add_background=True)
+
+                data_normalized_HF = data_normalized_HF ** exposant
+                # Split data into training and testing sets
+                x_train_N_HF, x_test_N_HF, y_train_N_HF, y_test_N_HF = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+                # x_train_HF_N, x_test_HF_N, y_train_HF_N, y_test_HF_N = train_test_split(data_HF_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+
+                print(f"\n\n\n{"#"*90 + "\n"}Gen_gangra:\n\nTraining MLP on Gangra dataset with PyTorch implementation...")
+
+                duration = time.time()
+                mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                            learning_rate=1e-3, dropout_rate=0.25,
+                            x_val=x_test_N_HF, y_val=y_test_N_HF, plot_loss=False, verbose=True,
+                            loss_filename=None)
+                mlp.fit(x_train_N_HF, y_train_N_HF)
+                duration = time.time() - duration
+                train_acc = mlp.score(x_train_N_HF, y_train_N_HF)
+                test_acc  = mlp.score(x_test_N_HF, y_test_N_HF)
+                diff_acc = train_acc - test_acc
+                print(f"Accuracy train : {train_acc:.4f}")
+                print(f"Accuracy test  : {test_acc:.4f}" )
+                print(f"Difference train - test accuracy: {diff_acc:.4f}")
+                mlp.save_confusion_matrix(x_test_N_HF, y_test_N_HF, class_names=MLP_gangra_classes, show=True, filename="confusion_matrix_gangra_pytorch.pdf")
+                mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=200, batch_size=len(labels_encoded),
+                    learning_rate=1e-3, dropout_rate=0.5, plot_loss=False, verbose=True, loss_filename=None)
+                mlp.fit(data_normalized_HF, labels_encoded)
+                pickle.dump(mlp, open("MLP_gangra_pytorch.pkl", "wb"))
+
+                print(f"Training time: {duration:.2f} seconds")
+                print(f"Model trained and confusion matrix saved for Gangra dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
 
 # with open("ephesos_GS_Fri Apr 10 12_26_07 2026.pkl", "rb") as f:
 #     hyperparameter_tuning = pickle.load(f)
