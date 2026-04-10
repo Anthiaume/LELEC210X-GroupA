@@ -207,13 +207,46 @@ def add_background(data_normalized, labels, attenuation_dB_range=(-20, -15)):
         attenuation_dB = np.random.uniform(*attenuation_dB_range)
         attenuation_factor = 10 ** (attenuation_dB / 20)
 
-        copy_to_plot = usefull_data[sample,:].copy()
+        # copy_to_plot = usefull_data[sample,:].copy()
 
         usefull_data[sample,:] += (attenuation_factor * background_data[background_index,:].astype(np.float64)).astype(usefull_data.dtype)
 
         # plot3(copy_to_plot, background_data[background_index,:], usefull_data[sample,:])
 
     return np.concatenate((usefull_data, background_data)), np.concatenate((usefull_labels, background_labels))
+
+def suppress_low_frequencies(data, n_melvecs_to_suppress=10):
+    """
+    Description: Cette fonction supprime les n_melvecs_to_suppress premiers melvecs (les plus basses fréquences) de chaque échantillon du dataset.
+    Inputs:
+        - data: numpy array de forme (n_samples, n_features) contenant les échantillons du dataset
+        - n_melvecs_to_suppress: int spécifiant le nombre de melvecs à supprimer à partir du début de chaque échantillon. Par exemple, si n_melvecs_to_suppress=10, les 10 premiers melvecs (correspondant aux fréquences les plus basses) seront supprimés de chaque échantillon.
+    Outputs:
+        - new_data: numpy array de forme (n_samples, n_features - n_melvecs_to_suppress) contenant les échantillons du dataset après la suppression des melvecs
+   
+    Description of melspectrograms frequencies location:
+    - Melspectrograms saved in shape (400,) correspond to 20 melvectors of length 20 (20*20=400)
+    - The first 10 mel values of each melvector correspond to the lowest frequencies
+    - The last 10 mel values of each melvector correspond to the highest frequencies
+    Example:
+    >>> melvec.shape
+    (400,)
+    >>> print("Low frequencies:")
+    >>> print(melvec[0:10], melvec[20:30], melvec[40:50], melvec[60:70], melvec[80:90], melvec[100:110], melvec[120:130], melvec[140:150], melvec[160:170], melvec[180:190], ...)
+    
+    >>> print("High frequencies:")
+    >>> print(melvec[10:20], melvec[30:40], melvec[50:60], melvec[70:80], melvec[90:100], melvec[110:120], melvec[130:140], melvec[150:160], melvec[170:180], melvec[190:200], ...)
+    
+    --> Goal: suppress and delete the low frequencies (the first 10 mel values of each melvector) and keep only the high frequencies (the last 10 mel values of each melvector)
+    """
+
+    # Masque pour chaque ligne
+    mask = np.ones((data.shape[0], 400), dtype=bool)
+    mask[:, np.r_[0:400:20][:, None] + np.arange(n_melvecs_to_suppress)] = False
+
+    # Résultat : tableau de taille (x, 200)
+    data = data[mask].reshape(data.shape[0], -1)
+    return data
 
 class TorchMLP(nn.Module):
     def __init__(self, hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO = (400, 5), num_epochs=500, batch_size=None,
@@ -364,6 +397,7 @@ class TorchMLP(nn.Module):
                 plt.savefig(self.loss_filename, bbox_inches='tight')
             if self.plot_loss:
                 plt.show()
+            plt.close()
          
     def score(self, x, y):
         self.eval()  # Désactive dropout etc.
@@ -412,6 +446,7 @@ class TorchMLP(nn.Module):
         plt.savefig(filename, bbox_inches='tight')
         if show:
             plt.show()
+        plt.close()
 
     def GridSearch(self, x_train, y_train, param_grid, cv=5, verbose=True):
         """

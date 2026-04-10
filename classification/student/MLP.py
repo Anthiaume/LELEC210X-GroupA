@@ -1,6 +1,6 @@
 from itertools import count
 
-from student_fct import load_data, load_compacted_data, save_confusion_matrix, add_background, TorchMLP
+from student_fct import load_data, load_compacted_data, save_confusion_matrix, add_background, suppress_low_frequencies, TorchMLP
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neural_network import MLPClassifier
@@ -265,7 +265,7 @@ if MLP_dorystolon:
         print(confusion_matrix(y_test, y_pred))
         save_confusion_matrix(mlp, x_test, y_test, filename="confusion_matrix_dorystolon.pdf", show=True)
 
-MLP_ephesos = True
+MLP_ephesos = True# Idée: minimiser l'overfitting
 if MLP_ephesos:
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
@@ -284,7 +284,8 @@ if MLP_ephesos:
     labels_encoded = le.fit_transform(labels)
     MLP_ephesos_classes = le.classes_
     data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
-    # add_background(data_normalized=data_normalized, labels=labels, attenuation_dB_range=(-20, -15))
+    data_normalized = data_normalized
+    add_background(data_normalized=data_normalized, labels=labels, attenuation_dB_range=(-20, -15))
     x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
 
     print("Data loaded and preprocessed for Ephesos dataset, duration: {:.2f} seconds.".format(time.time() - data_load_duration))
@@ -292,16 +293,16 @@ if MLP_ephesos:
 
     if GS_ephesos:
         param_grid = {
-            'hidden_layers_sizes': [(600, 300, 100)],
+            'hidden_layers_sizes': [(600, 300, 100), [300, 300, 200, 100, 50], [600, 600, 300, 100]],
             "activation": [nn.ReLU], # relu est clairement le meilleur
             "IO": [(400, 5)],
-            'num_epochs': [500],
+            'num_epochs': [150],
             "batch_size": [len(labels_encoded)],
             "plot_loss": [False],
             "loss_filename": [None],
             "verbose": [False],
-            "learning_rate": [1e-2, 1e-3, 1e-4],
-            "dropout_rate": [0, 0.25, 0.5]
+            "learning_rate": [1e-3],
+            "dropout_rate": [0.25]
         }
 
         GS_MLP_ephesos = TorchMLP()
@@ -311,7 +312,7 @@ if MLP_ephesos:
         print(f"\n\n\n{"#"*90 + "\n"}Gen_ephesos:\n\nTraining MLP on Ephesos dataset with PyTorch implementation...")
 
         duration = time.time()
-        mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(400, 5),  num_epochs=150, batch_size=len(labels_encoded),
+        mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(400, 5),  num_epochs=150, batch_size=len(labels_encoded),
                        learning_rate=1e-3, dropout_rate=0.25,
                        x_val=x_test, y_val=y_test, plot_loss=True, verbose=True,
                        loss_filename="LOSS_CURVES_ephesos_pytorch.pdf")
@@ -322,17 +323,225 @@ if MLP_ephesos:
         print(f"Accuracy train : {train_acc:.4f}")
         print(f"Accuracy test  : {test_acc:.4f}" )
         mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_ephesos_classes, show=True, filename="confusion_matrix_ephesos_pytorch.pdf")
+        mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(400, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                       learning_rate=1e-3, dropout_rate=0.25,
+                       x_val=x_test, y_val=y_test, plot_loss=True, verbose=True,
+                       loss_filename="LOSS_CURVES_ephesos_pytorch.pdf")
+        mlp.fit(data_normalized, labels_encoded)
         pickle.dump(mlp, open("MLP_ephesos_pytorch.pkl", "wb"))
 
         print(f"Training time: {duration:.2f} seconds")
         print(f"Model trained and confusion matrix saved for Ephesos dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
 
+# TODO: enregistrer les spectrogrammes entrants lors de la démo
+# TODO: changer la méthode de prédiction pour la démo
+
+MLP_flaviopolis = False # Clôturé le vendredi 10 avril à 12h43
+if MLP_flaviopolis:
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+
+    Freq_step_flaviopolis = False
+    Gen_flaviopolis = True
+    Exp_step_flaviopolis = False
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data_load_duration = time.time()
+    data, labels = load_data(records)
+
+    # Encode labels
+    le = LabelEncoder()
+    labels_encoded = le.fit_transform(labels)
+    MLP_flaviopolis_classes = le.classes_
+
+    def load_data_flaviopolis(n_melvecs_to_suppress=10, bool_add_background=False):
+        # Normalize data
+        data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+        data_HF = suppress_low_frequencies(data=data, n_melvecs_to_suppress=n_melvecs_to_suppress)
+
+        # Suppress low frequencies in the data
+        data_normalized_HF = suppress_low_frequencies(data=data_normalized, n_melvecs_to_suppress=n_melvecs_to_suppress)
+        data_HF_normalized = data_HF / np.linalg.norm(data, axis=1, keepdims=True)
+
+        # Add background in the training data with random attenuation between -20 and -15 dB
+        if bool_add_background:
+            add_background(data_normalized=data_normalized_HF, labels=labels, attenuation_dB_range=(-20, -15))
+            add_background(data_normalized=data_HF_normalized, labels=labels, attenuation_dB_range=(-20, -15))
+
+        return data_normalized_HF, data_HF_normalized, labels_encoded
 
 
+    print("Data loaded and preprocessed for Flaviopolis dataset, duration: {:.2f} seconds.".format(time.time() - data_load_duration))
 
-with open("ephesos_GS_Wed Apr  1 15_43_20 2026.pkl", "rb") as f:
-    hyperparameter_tuning = pickle.load(f)
-# trier le dictionnaire hyperparameter_tuning selon "mean_score"
-# hyperparameter_tuning = sorted(hyperparameter_tuning, key=lambda x: hyperparameter_tuning["mean_score"], reverse=True)
-for element in hyperparameter_tuning:
-    print(f"Mean score: {element['mean_score']:.4f}, learning rate: {element['params']['learning_rate']}, dropout rate: {element['params']['dropout_rate']}")#, Params: {element['params']}")
+    if Freq_step_flaviopolis:
+
+        n_melvecs_to_suppress_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15]
+        N_HF_train = []
+        N_HF_test  = []
+        HF_N_train = []
+        HF_N_test  = []
+        
+        for n_melvecs_to_suppress in n_melvecs_to_suppress_list:
+            data_normalized_HF, data_HF_normalized, labels_encoded = load_data_flaviopolis(n_melvecs_to_suppress=n_melvecs_to_suppress, bool_add_background=False)
+            x_train_N_HF, x_test_N_HF, y_train_N_HF, y_test_N_HF = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+            x_train_HF_N, x_test_HF_N, y_train_HF_N, y_test_HF_N = train_test_split(data_HF_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+
+            n_inputs = 400 - n_melvecs_to_suppress * 20
+            
+            # N_HF
+            duration = time.time()
+            mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(n_inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                        learning_rate=1e-3, dropout_rate=0.25,
+                        x_val=x_test_N_HF, y_val=y_test_N_HF, plot_loss=False, verbose=True,
+                        loss_filename="LOSS_CURVES_ephesos_pytorch.pdf")
+            mlp.fit(x_train_N_HF, y_train_N_HF)
+            duration = time.time() - duration
+            train_acc = mlp.score(x_train_N_HF, y_train_N_HF)
+            test_acc  = mlp.score(x_test_N_HF, y_test_N_HF)
+            print(f"Accuracy train : {train_acc:.4f}")
+            print(f"Accuracy test  : {test_acc:.4f}" )
+            mlp.save_confusion_matrix(x_test_N_HF, y_test_N_HF, class_names=MLP_ephesos_classes, show=False, filename=f"confusion_matrix_ephesos_pytorch_N_HF_{n_melvecs_to_suppress}.pdf")
+            N_HF_train.append(train_acc)
+            N_HF_test.append(test_acc)
+            print(f"Training time: {duration:.2f} seconds")
+
+            # HF_N
+            mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(n_inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                        learning_rate=1e-3, dropout_rate=0.25,
+                        x_val=x_test_HF_N, y_val=y_test_HF_N, plot_loss=False, verbose=True,
+                        loss_filename=None)
+            mlp.fit(x_train_HF_N, y_train_HF_N)
+            train_acc = mlp.score(x_train_HF_N, y_train_HF_N)
+            test_acc  = mlp.score(x_test_HF_N, y_test_HF_N)
+            print(f"Accuracy train : {train_acc:.4f}")
+            print(f"Accuracy test  : {test_acc:.4f}" )
+            mlp.save_confusion_matrix(x_test_HF_N, y_test_HF_N, class_names=MLP_ephesos_classes, show=False, filename=f"confusion_matrix_ephesos_pytorch_HF_N_{n_melvecs_to_suppress}.pdf")
+            HF_N_train.append(train_acc)
+            HF_N_test.append(test_acc)
+            print(f"Training time: {duration:.2f} seconds")
+        # Plot the results
+        label_size = 19
+        ticks_size = 15
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.plot(n_melvecs_to_suppress_list, N_HF_train, color = 'blue', lw=2, marker='o', markersize=8, label="N_HF train")
+        ax.plot(n_melvecs_to_suppress_list, N_HF_test, color = 'green', lw=2, marker='o', markersize=8, label="N_HF test")
+        ax.plot(n_melvecs_to_suppress_list, HF_N_train, color = 'orange', lw=2, marker='o', markersize=8, label="HF_N train")
+        ax.plot(n_melvecs_to_suppress_list, HF_N_test, color = 'red', lw=2, marker='o', markersize=8, label="HF_N test")
+        ax.grid()
+        ax.set_xlabel('Number of compacted melspectrograms', fontsize=label_size)
+        ax.set_ylabel('Accuracy', fontsize=label_size)
+        ax.set_xticks(n_melvecs_to_suppress_list)
+        ax.tick_params(axis='both', which='major', labelsize=ticks_size)
+        ax.legend(fontsize=label_size)
+        plt.tight_layout()
+        plt.savefig('MLP_flaviopolis_freq_step.pdf')
+        plt.show()
+
+        pickle.dump((n_melvecs_to_suppress_list, N_HF_train, N_HF_test, HF_N_train, HF_N_test), open("MLP_flaviopolis_freq_step_results.pkl", "wb"))
+
+    if Exp_step_flaviopolis:
+
+
+        exp_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.2, 1.5, 1.7, 2.0]
+        exp_train = []
+        exp_test  = []
+        n_melvecs_to_suppress = 7
+
+        for exposant in exp_list:
+            data_normalized_HF, data_HF_normalized, labels_encoded = load_data_flaviopolis(n_melvecs_to_suppress=n_melvecs_to_suppress, bool_add_background=False)
+            
+            data_normalized_HF = data_normalized_HF ** exposant
+
+            x_train_N_HF, x_test_N_HF, y_train_N_HF, y_test_N_HF = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+
+            n_inputs = 400 - n_melvecs_to_suppress * 20
+            
+            # N_HF
+            duration = time.time()
+            mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(n_inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                        learning_rate=1e-3, dropout_rate=0.25,
+                        x_val=x_test_N_HF, y_val=y_test_N_HF, plot_loss=False, verbose=True,
+                        loss_filename=None)
+            mlp.fit(x_train_N_HF, y_train_N_HF)
+            duration = time.time() - duration
+            train_acc = mlp.score(x_train_N_HF, y_train_N_HF)
+            test_acc  = mlp.score(x_test_N_HF, y_test_N_HF)
+            print(f"Accuracy train : {train_acc:.4f}")
+            print(f"Accuracy test  : {test_acc:.4f}" )
+            # mlp.save_confusion_matrix(x_test_N_HF, y_test_N_HF, class_names=MLP_flaviopolis_classes, show=False, filename=f"confusion_matrix_flaviopolis_pytorch_N_HF_{n_melvecs_to_suppress}.pdf")
+            exp_train.append(train_acc)
+            exp_test.append(test_acc)
+            print(f"Training time: {duration:.2f} seconds")
+
+        # Plot the results
+        label_size = 19
+        ticks_size = 15
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.plot(exp_list, exp_train, color = 'blue', lw=2, marker='o', markersize=8, label="Exp train")
+        ax.plot(exp_list, exp_test, color = 'green', lw=2, marker='o', markersize=8, label="Exp test")
+        ax.grid()
+        ax.set_xlabel("Exponent", fontsize=label_size)
+        ax.set_ylabel('Accuracy', fontsize=label_size)
+        ax.set_xticks(exp_list)
+        ax.tick_params(axis='both', which='major', labelsize=ticks_size)
+        ax.legend(fontsize=label_size)
+        plt.tight_layout()
+        plt.savefig('MLP_flaviopolis_exp_step.pdf')
+        plt.show()
+
+        pickle.dump((exp_list, exp_train, exp_test), open("MLP_flaviopolis_exp_step_results.pkl", "wb"))
+
+    if Gen_flaviopolis:
+
+        n_melvecs_to_suppress_list = [0]#, 3, 5, 7, 9]
+        
+        exposant_list = [0.3]#, 0.5, 0.7, 0.9, 1, 1.5]
+
+        for n_melvecs_to_suppress in n_melvecs_to_suppress_list:
+            for exposant in exposant_list:
+                inputs = 400 - n_melvecs_to_suppress * 20
+                data_normalized_HF, data_HF_normalized, labels_encoded = load_data_flaviopolis(n_melvecs_to_suppress=n_melvecs_to_suppress, bool_add_background=True)
+
+                data_normalized_HF = data_normalized_HF ** exposant
+                # Split data into training and testing sets
+                x_train_N_HF, x_test_N_HF, y_train_N_HF, y_test_N_HF = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+                # x_train_HF_N, x_test_HF_N, y_train_HF_N, y_test_HF_N = train_test_split(data_HF_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
+
+                print(f"\n\n\n{"#"*90 + "\n"}Gen_flaviopolis:\n\nTraining MLP on Flaviopolis dataset with PyTorch implementation...")
+
+                duration = time.time()
+                mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                            learning_rate=1e-3, dropout_rate=0.25,
+                            x_val=x_test_N_HF, y_val=y_test_N_HF, plot_loss=False, verbose=True,
+                            loss_filename=None)
+                mlp.fit(x_train_N_HF, y_train_N_HF)
+                duration = time.time() - duration
+                train_acc = mlp.score(x_train_N_HF, y_train_N_HF)
+                test_acc  = mlp.score(x_test_N_HF, y_test_N_HF)
+                diff_acc = train_acc - test_acc
+                print(f"Accuracy train : {train_acc:.4f}")
+                print(f"Accuracy test  : {test_acc:.4f}" )
+                print(f"Difference train - test accuracy: {diff_acc:.4f}")
+                mlp.save_confusion_matrix(x_test_N_HF, y_test_N_HF, class_names=MLP_flaviopolis_classes, show=True, filename="confusion_matrix_flaviopolis_pytorch.pdf")
+                mlp = TorchMLP(hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=150, batch_size=len(labels_encoded),
+                    learning_rate=1e-3, dropout_rate=0.25,
+                    x_val=x_test_N_HF, y_val=y_test_N_HF, plot_loss=False, verbose=True,
+                    loss_filename=None)
+                mlp.fit(data_normalized_HF, labels_encoded)
+                pickle.dump(mlp, open("MLP_flaviopolis_pytorch.pkl", "wb"))
+
+                print(f"Training time: {duration:.2f} seconds")
+                print(f"Model trained and confusion matrix saved for Flaviopolis dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
+    
+
+# with open("ephesos_GS_Fri Apr 10 12_26_07 2026.pkl", "rb") as f:
+#     hyperparameter_tuning = pickle.load(f)
+# # trier le dictionnaire hyperparameter_tuning selon "mean_score"
+# # hyperparameter_tuning = sorted(hyperparameter_tuning, key=lambda x: hyperparameter_tuning["mean_score"], reverse=True)
+# for element in hyperparameter_tuning:
+#     print(f"Mean score: {element['mean_score']:.4f}, learning rate: {element['params']['learning_rate']}, dropout rate: {element['params']['dropout_rate']}, hidden layers sizes: {element['params']['hidden_layers_sizes']}")#, Params: {element['params']}")

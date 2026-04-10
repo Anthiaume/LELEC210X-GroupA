@@ -127,6 +127,14 @@ def main(
             ###########################################################
             ### BEGIN STUDENT MODIFICATIONS ###########################
             ###########################################################
+            save = True
+            if save:
+                TYPE = "gunshot" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
+                mypath = os.getcwd()#os.path.join(SPEAKER)
+                onlyfiles = [f  for f in listdir(mypath) if (isfile(join(mypath, f)) and f.endswith(".pkl") and f.startswith(TYPE))]
+                maximum = max([int(f.split('_')[1].strip('.pkl')) for f in onlyfiles if f.startswith(TYPE) and f.endswith(".pkl")] , default=0)
+                pickle.dump(mel_vec, open(f"{TYPE}_{maximum+1}.pkl", "wb"))
+
             melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
 
             if time.time() - begin_time > 6:
