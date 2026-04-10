@@ -146,5 +146,19 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	arm_mat_init_q15(&fftmag_inst, SAMPLES_PER_MELVEC/2, 1, buf);
 	arm_mat_init_q15(&melvec_inst, MELVEC_LENGTH, 1, melvec);
 	arm_mat_mult_fast_q15(&hz2mel_inst, &fftmag_inst, &melvec_inst, buf_tmp);
+
+	// for (int m = 0; m < MELVEC_LENGTH; m++){
+    // q31_t acc = 0;
+
+    // for (int k = 0; k < 256; k++)
+    // {
+    //   if(hz2mel_mat[256*m+k] != 0) // Since the matrix is very sparse, we can save a lot of computations by skipping the zero elements
+	//   {
+	// 	acc += (q31_t) hz2mel_mat[256*m+k] * (q31_t) buf[k];
+	//   }
+    // }
+
+    // melvec[m] = acc>>15;
+	// }
 	stop_cycle_count("Print Matrix multiplication");
 }

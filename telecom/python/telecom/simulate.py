@@ -10,6 +10,7 @@ from scipy.special import erfc
 from .chain import Chain
 
 TYPE = "ML"  # Type of STO estimation to use in the simulation (ML or corr)
+PPD_algo = "DUALCORR"  # Algorithm to use for preamble detection (corr or dynamic_ppd)
 
 
 def add_delay(chain: Chain, x: np.ndarray, tau: float) -> tuple[np.ndarray, int]:
@@ -93,8 +94,8 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
     # Transmitted signals that are independent of the payload bits
 
     #########################################################################
-    chain.preamble = chain.Viterbi_code_m2(chain.preamble)
-    chain.sync_word = chain.Viterbi_code_m2(chain.sync_word)
+    # chain.preamble = chain.Viterbi_code_m2(chain.preamble)
+    # chain.sync_word = chain.Viterbi_code_m2(chain.sync_word)
     
     #########################################################################
 
@@ -115,7 +116,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
     rng = np.random.default_rng(seed)
 
     # For loop on the number of packets to send
-    print(chain.n_packets)
+    # print(chain.n_packets)
     i=0
     for _ in range(chain.n_packets):
         print(i)
@@ -124,7 +125,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
         bits = rng.integers(2, size=chain.payload_len)
 
         #########################################################
-        bits = chain.Viterbi_code_m2(bits)
+        # bits = chain.Viterbi_code_m2(bits)
         # R1, R0, symb_R1, symb_R0 = chain.poly2trellis(gn, gd)
         # bits = 
         #########################################################
@@ -155,8 +156,9 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
         )  # Normalized complex normal vector CN(0, 1)
 
         # For loop on the SNRs
+
         for k, EsN0_dB in enumerate(EsN0s_dB):
-            print(k)
+            # print(k)
             # Add noise
             EsN0 = 10 ** (EsN0_dB / 10.0)
             SNR_input = EsN0 / chain.osr_rx
@@ -174,7 +176,9 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                 detect_idx = start_idx
             else:
                 if chain.use_dynamic_ppd:
-                    detect_idx = chain.preamble_detect_ppd(y_filt)
+                    detect_idx = chain.preamble_detect_ppd(y_filt, x_pr, PPD_algo)
+                    # print(f"PPD detection index: {detect_idx}")
+                  
                 else:
                     detect_idx = chain.preamble_detect(y_filt)
 
@@ -200,7 +204,6 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                 ):  # Misdetection of preamble (found in packet)
                     preamble_misdetect[k] += 1
                     preamble_error = True
-
                 y_detect = y_filt[detect_idx:]
                 ## Synchronization stage
                 # CFO estimation and correction
@@ -221,7 +224,9 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                     ):  # In this case, starting index of preamble already contains sto
                         tau_hat = 0
                     else:
-                        tau_hat = sto_idx
+                        tau_hat = chain.sto_estimation(
+                        y_sync[: hdr_len_byte * 8 * chain.osr_rx], TYPE, x_pr
+                    )
                 else:
                     tau_hat = chain.sto_estimation(
                         y_sync[: hdr_len_byte * 8 * chain.osr_rx], TYPE, x_pr
@@ -229,7 +234,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
 
                 y_sync = y_sync[tau_hat:]    
                 # print("viterbi") 
-                y_sync = chain.viterbi_decoder(y_sync, 0o7, 0o5, 2)
+                # y_sync = chain.viterbi_decoder(y_sync, 0o7, 0o5, 2)
                 # print("viterbi") 
                 ## Demodulation and deframing stage
                 bits_hat = chain.demodulate(y_sync)
@@ -255,22 +260,34 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
                 ## Computing performance metrics
                 if len(bits) == len(bits_hat_pay) and not preamble_error:
                     errors = bits ^ bits_hat_pay
-
+                    if np.sum(errors) > 0:
+                        print(f"Errors: {np.sum(errors)} / {len(bits)}")
+                        print(f"EsN0_dB: {EsN0_dB}", preamble_error)
                 else:  # if the number of demodulated symbols is incorrect
                     errors = 0.5 * np.ones(len(bits))  # flag all bits as wrong
+                    if(detect_idx < start_idx - 4 * R) : # False detection of preamble (found in noise)
+                        errors = np.zeros(len(bits))  # flag all bits as correct, since the preamble was not found and thus no demodulation was done
+                    print(f"EsN0_dB: {EsN0_dB}", preamble_error)
             # end if preamble
-            bit_errors[k] += np.sum(errors)
-            packet_errors[k] += 1 if any(errors) else 0
-            cfo_err[k] += (cfo - cfo_hat) ** 2
-            sto_err[k] += (
-                (
-                    start_idx
-                    + len(chain.preamble) * chain.osr_rx
-                    + len(chain.sync_word) * chain.osr_rx
-                )
-                / (R * B)
-                - (detect_idx + np.int64(tau_hat) + start_frame * chain.osr_rx) / (R * B)
-            ) ** 2
+            if(not np.isnan(detect_idx)):
+                bit_errors[k] += np.sum(errors)
+                packet_errors[k] += 1 if any(errors) else 0
+                cfo_err[k] += (cfo - cfo_hat) ** 2
+                print(f"start_idx - detect_idx: {start_idx - detect_idx}")
+                sto_err[k] += (
+                    (
+                        start_idx
+                        + len(chain.preamble) * chain.osr_rx
+                        + len(chain.sync_word) * chain.osr_rx
+                    )
+                    / (R * B)
+                    - (detect_idx + np.int64(tau_hat) + start_frame * chain.osr_rx) / (R * B)
+                ) ** 2
+            else:
+                bit_errors[k] += chain.payload_len/2
+                packet_errors[k] += 1
+                cfo_err[k] += np.nan
+                sto_err[k] += np.nan
 
     # === Lecture de toutes les simulations ===
     sim_data_list = []
@@ -302,6 +319,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
     fig, ax = plt.subplots(1, 2, constrained_layout=True, figsize=(10, 4))
     fig_bis, ax_bis = plt.subplots(1, 2, constrained_layout=True, figsize=(10, 4))
 
+    payload_len_sim = 0
     for i, (header, data) in enumerate(sim_data_list):
         EsN0s = data[:, 0]
         BERs = data[:, 1]
@@ -326,6 +344,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
        
         if m_payload and m_packets:
            payload_len_sim = int(m_payload.group(1))
+           payload_len_sim2 = payload_len_sim
            label = f"{m_payload.group(1)} bits, {m_packets.group(1)} pkts"
 
         color = colors[i % len(colors)]
@@ -453,7 +472,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
         target_dir.mkdir(parents=True, exist_ok=True) 
 
         # Nom du fichier
-        filename = f"sim_{sto_method}_len{p_len}_pkts{n_pkts}_freqdev{chain.freq_dev}.csv"
+        filename = f"sim_{sto_method}_len{p_len}_pkts{n_pkts}_freqdev{chain.freq_dev}_ppd{PPD_algo}_ppd{chain.use_dynamic_ppd}.csv"
         full_path = target_dir / filename
 
         # On prépare les données
@@ -461,7 +480,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
 
         # Écriture
         with open(full_path, "w") as f:
-            f.write(f"# METHOD: {sto_method} | PAYLOAD: {p_len} | PACKETS: {n_pkts} | FREQ_DEV: {chain.freq_dev} | Viterbi\n")
+            f.write(f"# METHOD: {sto_method} | PAYLOAD: {p_len} | PACKETS: {n_pkts} | FREQ_DEV: {chain.freq_dev} | PPD: {chain.use_dynamic_ppd}\n")
             f.write("# EsN0_dB\tBER\tPER\tRMSE_cfo\tRMSE_sto\n")
             np.savetxt(f, save_var, delimiter="\t", fmt="%.8e")
         
@@ -508,7 +527,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
 
             # Chargement des données (en sautant les commentaires)
             data = np.loadtxt(path)
-            print(data)
+            # print(data)
             snr_dB   = data[:, 0]
             ber      = data[:, 1]
             per      = data[:, 2]
@@ -526,7 +545,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
             # 3. Plot RMSE STO
             axes[2].semilogy(snr_dB, rmse_sto, marker=markers[i % 5], 
                             linestyle=styles.get(method, "-"), label=label)
-            
+    
         axes[0].plot(EsN0_th, 1 - (1 - BER_th_noncoh) ** payload_len_sim, "k-.", label="AWGN Th. FSK non-coh.")
         axes[1].plot(EsN0_th, 1 - (1 - BER_th_noncoh) ** payload_len_sim, "k-.", label="AWGN Th. FSK non-coh.")
 

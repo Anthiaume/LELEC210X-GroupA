@@ -1,7 +1,10 @@
 # ruff: noqa: N806
-import numpy as np
+from tracemalloc import start
 
-BIT_RATE = 50e3
+import numpy as np
+import scipy.signal as signal
+
+BIT_RATE = 100e3
 PREAMBLE = np.array([int(bit) for bit in f"{0xAAAAAAAA:0>32b}"])
 SYNC_WORD = np.array([int(bit) for bit in f"{0x3E2A54B7:0>32b}"])
 
@@ -60,7 +63,7 @@ class Chain:
     payload_len: int = 800  # Number of bits per packet
 
     # Simulation parameters
-    n_packets: int = 2000  # Number of sent packets
+    n_packets: int = 200  # Number of sent packets
 
     # Channel parameters
     sto_val: float = 2
@@ -115,8 +118,8 @@ class Chain:
         return x
 
     # Rx methods
-    ideal_preamble_detect: bool = True
-    use_dynamic_ppd: bool = False
+    ideal_preamble_detect: bool = False
+    use_dynamic_ppd: bool = True
 
     def preamble_detect(self, y: np.array) -> int | None:
         """
@@ -138,7 +141,7 @@ class Chain:
         """
         raise NotImplementedError
 
-    ideal_cfo_estimation: bool = False
+    ideal_cfo_estimation: bool = True
 
     #ideal_cfo_estimation: bool = False
 
@@ -151,7 +154,7 @@ class Chain:
         """
         raise NotImplementedError
 
-    ideal_sto_estimation: bool = False
+    ideal_sto_estimation: bool = True
 
     def sto_estimation(self, y: np.array, TYPE) -> float:
         """
@@ -204,36 +207,114 @@ class BasicChain(Chain):
 
     cfo_val, sto_val = np.nan, np.nan  # CFO and STO are random
 
-    ideal_preamble_detect = True
+    ideal_preamble_detect = False
 
     use_dynamic_ppd = True
 
-    def preamble_detect_ppd(self, y):
+
+
+
+
+    def preamble_detect_ppd(self, y, x_pr, PPD_algo="DEFAULT"):
         """Detect a preamble computing the received energy (average on a window)."""
-        long_term_sum_W = 256
-        short_term_sum_W = 32
+        R = self.osr_rx
+        fd = self.freq_dev
+        B = self.bit_rate
+        if PPD_algo == "DEFAULT":
+            long_term_sum_W = 256
+            short_term_sum_W = 32
 
-        K = 5 * (short_term_sum_W / long_term_sum_W)
+            K = 2.3 * (short_term_sum_W / long_term_sum_W)
 
-        long_window = np.ones(long_term_sum_W)
-        short_window = np.ones(short_term_sum_W)
+            long_window = np.ones(long_term_sum_W)
+            short_window = np.ones(short_term_sum_W)
+            yabs = (np.abs(y))**2  # Energy of the received signal (squared magnitude)
+            ylen = len(y)
+            
+            long_sum = np.convolve(yabs, long_window, mode="valid")
+            short_sum = np.convolve(yabs, short_window, mode="valid")
+            offset = long_term_sum_W - short_term_sum_W
+            short_sum_aligned = short_sum[offset : offset + len(long_sum)]
 
-        yabs = np.abs(y)
-        ylen = len(y)
-        long_sum = np.convolve(yabs, long_window, mode="full")
-        short_sum = np.convolve(yabs, short_window, mode="full")
+            detection = short_sum_aligned > (long_sum * K)
+            detected_indices = np.where(detection)[0]
+            first_idx = (
+                (detected_indices[0] + long_term_sum_W + short_term_sum_W-40)
+                if detected_indices.size > 0
+                else None
+            )
+            return first_idx
+        
+        elif(PPD_algo == "DUALCORR"): 
+            long_term_sum_W = 256*2
+            short_term_sum_W = 32
 
-        long_sum = long_sum[long_term_sum_W:ylen]
-        short_sum = short_sum[long_term_sum_W + short_term_sum_W - 1 :]
+            K = 2.3 * (short_term_sum_W / long_term_sum_W)
 
-        detection = short_sum > (long_sum * K)
-        detected_indices = np.where(detection)[0]
-        first_idx = (
-            (detected_indices[0] + long_term_sum_W + short_term_sum_W)
-            if detected_indices.size > 0
-            else None
-        )
-        return first_idx
+            long_window = np.ones(long_term_sum_W)
+            short_window = np.ones(short_term_sum_W)
+            yabs = (np.abs(y))**2  # Energy of the received signal (squared magnitude)
+            ylen = len(y)
+            
+            long_sum = np.convolve(yabs, long_window, mode="valid")
+            short_sum = np.convolve(yabs, short_window, mode="valid")
+            offset = long_term_sum_W - short_term_sum_W
+            short_sum_aligned = short_sum[offset : offset + len(long_sum)]
+
+            detection = short_sum_aligned > (long_sum * K)
+            detected_indices = np.where(detection)[0]
+
+            # --- Correlation-based preamble detection ---
+            if(detected_indices.size == 0):
+                return None
+            start = detected_indices[0] + long_term_sum_W + short_term_sum_W
+            end   = start + 256   # marge de sécurité
+            y_shifted = np.concatenate([np.zeros(2*self.osr_rx), y])
+            corr_signal = np.abs(signal.correlate(y_shifted[start:end], x_pr[::64//self.osr_rx], mode='full'))
+            n_peaks = 1  # nombre de pics
+            idx = np.argpartition(corr_signal, -n_peaks)[-n_peaks:]   # indices des n plus grands
+            top_values = corr_signal[idx]                 # valeurs correspondantes
+            Decision_variable = np.mean(top_values)              # moyenne des n plus grands
+            idx_first_peak = idx[np.argmax(top_values)]  # index du pic le plus grand
+
+            noise_zone = yabs[:long_term_sum_W]  # Zone supposée sans signal pour estimer le bruit
+            sigma2 = np.median(noise_zone)
+            threshold = 5 * sigma2 * np.sqrt(256)  # Seuil basé sur l'énergie du bruit et la longueur du préambule
+            # pattern_detected = np.max(corr_signal) > threshold
+            pattern_detected = Decision_variable > threshold
+
+
+            # --- Final index ---
+            if detected_indices.size > 0 and pattern_detected:
+                first_idx = detected_indices[0] + long_term_sum_W + short_term_sum_W -40
+            else:
+                first_idx = None
+
+            return first_idx
+        else:
+            corr = np.correlate(y, x_pr, mode='valid')
+
+            # Détecter le pic
+            start_index = np.argmax(np.abs(corr)**2)
+            print("Préambule détecté à l'échantillon :", start_index)
+
+            yabs = (np.abs(y))**2  # Energy of the received signal (squared magnitude)
+            noise_zone = yabs[:256]  # Zone supposée sans signal pour estimer le bruit
+            sigma2 = np.median(noise_zone)
+            threshold = 5 * sigma2 * np.sqrt(256)  # Seuil basé sur l'énergie du bruit et la longueur du préambule
+            pattern_detected = np.max(np.abs(corr)**2) > threshold
+
+
+            # --- Final index ---
+            if pattern_detected:
+                first_idx = start_index
+            else:
+                first_idx = None
+
+            return first_idx
+
+        
+
 
     def preamble_detect(self, y):
         """Detect a preamble computing the received energy (average on a window)."""
@@ -247,7 +328,7 @@ class BasicChain(Chain):
 
         return None
 
-    ideal_cfo_estimation = False
+    ideal_cfo_estimation = True
 
     def cfo_estimation(self, y):
         # """Estimates CFO using Moose algorithm, on first samples of preamble."""
@@ -283,7 +364,7 @@ class BasicChain(Chain):
         # print("CFO estimation (Hz): ", cfo_est )
         return cfo_est
 
-    ideal_sto_estimation = False
+    ideal_sto_estimation = True
 
     def sto_estimation(self, y, TYPE="ML", preamble=None):
         """Estimates symbol timing (fractional) based on phase shifts."""
@@ -335,20 +416,19 @@ class BasicChain(Chain):
             tau_est = np.array(mu_hist) / sps
             tau_final = np.mean(tau_est[-100:])
 
-            print(tau_final)
+            # print(tau_final)
             return int(tau_final)  # Retourne la partie fractionnaire du timing offset
 
 
         if TYPE == "ML":
-            L = len(preamble)
 
             metric_best = -np.inf
             best_tau = 0
 
-            s_ref = preamble
+            s_ref = preamble[::self.osr_tx//R]  # Référence de préambule échantillonnée à la bonne fréquence
+            L = len(s_ref)
 
             for tau in range(R):
-
                 if tau + L > len(y):
                     break
 
@@ -554,7 +634,7 @@ class BasicChain(Chain):
     #         state = ((state >> 1) | (bit << (m-1))) & (2**m-1)
     #     return np.array(reconstructed_coded_bits)
 
-    @jit(nopython=True,error_model="numpy")
+    # @jit(nopython=True,error_model="numpy")
     def number2binary(x0,length):
         binary_array = np.zeros((length,))
     
@@ -685,7 +765,7 @@ class BasicChain(Chain):
         u_hat = np.reshape(u_hat_b,(u_hat_b.size,))
         return u_hat
 
-    @jit(nopython=True,error_model="numpy")
+    # @jit(nopython=True,error_model="numpy")
     def interleaver(x,pattern):
         Nb = int(len(x)/len(pattern))
         x_matrix = np.reshape(x,(Nb,len(pattern)))

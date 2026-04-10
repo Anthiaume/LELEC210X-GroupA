@@ -171,7 +171,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: 868e6
+    value: 860e6
   states:
     bus_sink: false
     bus_source: false
@@ -276,7 +276,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '100'
+    value: '800'
   states:
     bus_sink: false
     bus_source: false
@@ -428,7 +428,7 @@ blocks:
   id: fsk_synchronization
   parameters:
     Grx: rx_gain
-    N_Moose: N_Moose
+    N_Moose: '2'
     affinity: ''
     alias: ''
     comment: ''
@@ -465,19 +465,19 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    burst_len: 8*oversampling*(packet_len+1) + oversampling
+    burst_len: '100'
     comment: ''
-    enable: Enable_detection
+    enable: 'True'
     maxoutbuf: '0'
     minoutbuf: '0'
-    threshold: '0.9'
+    threshold: '0.5'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [392, 268.0]
+    coordinate: [432, 316.0]
     rotation: 0
-    state: true
+    state: enabled
 - name: limesdr_fpga_source_0
   id: limesdr_fpga_source
   parameters:
@@ -529,59 +529,6 @@ blocks:
     coordinate: [8, 148.0]
     rotation: 0
     state: true
-- name: low_pass_filter_0
-  id: low_pass_filter
-  parameters:
-    affinity: ''
-    alias: ''
-    beta: '6.76'
-    comment: ''
-    cutoff_freq: 150e3
-    decim: '1'
-    gain: '1'
-    interp: '1'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    samp_rate: samp_rate
-    type: fir_filter_ccf
-    width: 32e3
-    win: window.WIN_HAMMING
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [624, 324.0]
-    rotation: 0
-    state: enabled
-- name: qtgui_sink_x_0
-  id: qtgui_sink_x
-  parameters:
-    affinity: ''
-    alias: ''
-    bw: samp_rate
-    comment: ''
-    fc: '0'
-    fftsize: '1024'
-    gui_hint: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    name: SDR signal
-    plotconst: 'True'
-    plotfreq: 'True'
-    plottime: 'True'
-    plotwaterfall: 'True'
-    rate: '10'
-    showports: 'False'
-    showrf: 'False'
-    type: complex
-    wintype: window.WIN_BLACKMAN_hARRIS
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [392, 140.0]
-    rotation: 0
-    state: enabled
 - name: virtual_sink_0
   id: virtual_sink
   parameters:
@@ -621,17 +568,15 @@ blocks:
 connections:
 - [analog_noise_source_x_0, '0', blocks_add_xx_0, '1']
 - [blocks_add_xx_0, '0', limesdr_fpga_flag_detector_0, '0']
-- [blocks_add_xx_0, '0', qtgui_sink_x_0, '0']
 - [blocks_var_to_msg_0, msgout, fsk_synchronization_0, NoisePow]
 - [fsk_demodulation_0, '0', fsk_packet_parser_0, '0']
 - [fsk_packet_parser_0, '0', virtual_sink_0, '0']
 - [fsk_packet_parser_0, '0', zeromq_pub_sink_0, '0']
 - [fsk_synchronization_0, '0', fsk_demodulation_0, '0']
-- [limesdr_fpga_flag_detector_0, '0', low_pass_filter_0, '0']
+- [limesdr_fpga_flag_detector_0, '0', fsk_synchronization_0, '0']
 - [limesdr_fpga_flag_detector_0, SignalPow, fsk_synchronization_0, SignalPow]
 - [limesdr_fpga_source_0, '0', blocks_add_xx_0, '0']
-- [low_pass_filter_0, '0', fsk_synchronization_0, '0']
 
 metadata:
   file_format: 1
-  grc_version: 3.10.7.0
+  grc_version: 3.10.12.0

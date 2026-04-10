@@ -162,7 +162,7 @@ def main(
                 )
 
             ber = agg["biterror"] / (agg["count"] * num_bits)
-
+            # if simulation_output is not None:
             if simulation_output is not None:
                 data = np.loadtxt(simulation_output)
                 EsN0_db = data[:, 0]
