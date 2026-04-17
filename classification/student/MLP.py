@@ -552,7 +552,7 @@ if MLP_flaviopolis:
 
                 print(f"Model trained and confusion matrix saved for Flaviopolis dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
 
-MLP_gangra = False # Clôturé le vendredi 10 avril à 12h43
+MLP_gangra = 1 # Clôturé le vendredi 10 avril à 12h43
 if MLP_gangra:
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
@@ -566,12 +566,7 @@ if MLP_gangra:
 
     # Load data and labels
     data_load_duration = time.time()
-    data, labels = load_data(records)
-
-    # Encode labels
-    le = LabelEncoder()
-    labels_encoded = le.fit_transform(labels)
-    MLP_gangra_classes = le.classes_
+    data, labels, labels_encoded, MLP_gangra_classes  = load_data(records)
 
     def load_data_gangra(n_melvecs_to_suppress=10, bool_add_background=False):
         # Normalize data
@@ -631,7 +626,7 @@ if MLP_gangra:
                 print(f"Training time: {duration:.2f} seconds")
                 print(f"Model trained and confusion matrix saved for Gangra dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
 
-MLP_halikarnassos = True
+MLP_halikarnassos = 0
 if MLP_halikarnassos:
     """
     Objectifs :
@@ -643,11 +638,12 @@ if MLP_halikarnassos:
     
     """
 
-    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
-               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
-               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
-               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
-               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+    records = [("mcu13", "sud8", "local speakers - spec_20_20")]
+            #    ("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+            #    ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+            #    ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+            #    ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+            #    ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
 
     Gen_halikarnassos = True
 
@@ -685,17 +681,17 @@ if MLP_halikarnassos:
         print(f"\n\n\n{"#"*90 + "\n"}Gen_halikarnassos:\n\nTraining MLP on Halikarnassos dataset with PyTorch implementation...")
 
         # Params
-        model_name = "Halikarnassos_v1"
+        model_name = "Halikarnassos_dB_-20_-15"
         n_melvecs_to_suppress = 0
         exposant              = 0.5
-        bool_add_background   = True
-        n_epochs              = 1500
+        bool_add_background   = False
+        n_epochs              = 200
         hidden_layers_sizes = [600, 300, 100]
         activation = nn.ReLU
         bathch_size = len(labels_encoded)
         learning_rate = 1e-3
         dropout_rate = 0.5
-        attenuation_dB_range_list = [(-20, -15), (-15, -10), (-10, -5), (-5, 0), (0, 5)]
+        attenuation_dB_range_list = [(-20, -15)]
 
 
 
@@ -709,6 +705,7 @@ if MLP_halikarnassos:
         data_normalized_HF, labels_encoded = load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=n_melvecs_to_suppress,
                                                                      bool_add_background=bool_add_background,
                                                                      attenuation_dB_range_list=attenuation_dB_range_list)
+        
         data_normalized_HF = data_normalized_HF ** exposant
         x_train, x_test, y_train, y_test = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
 
@@ -736,39 +733,103 @@ if MLP_halikarnassos:
         mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_halikarnassos_classes, show=True, filename="confusion_matrix_halikarnassos_pytorch.pdf")
         
         # Save model results
+        # results = ModelResults(model_name = model_name,
+        #                        model=mlp,
+        #                        accuracy={"train": train_acc, "test": test_acc},
+        #                        confusion_matrix=mlp.get_confusion_matrix(x_test, y_test),
+        #                        classes=MLP_halikarnassos_classes,
+        #                        epochs=n_epochs,
+        #                        loss_curves={"train": train_losses, "test": test_losses},
+        #                        params={
+        #                             "hidden_layers_sizes": hidden_layers_sizes,
+        #                             "learning_rate": learning_rate,
+        #                             "dropout_rate": dropout_rate,
+        #                             "attenuation_dB_range_list": attenuation_dB_range_list,
+        #                             "exposant": exposant,
+        #                             "n_melvecs_to_suppress": n_melvecs_to_suppress,
+        #                             "bool_add_background": bool_add_background,
+        #                             "batch_size": bathch_size,
+        #                             "activation": activation.__name__ ,
+        #                             "IO": IO,
+        #                             "n_melvecs_to_suppress": n_melvecs_to_suppress,
+        #                             "n_epochs": n_epochs
+        #                        })
+        # results.save(f"results_{model_name}.pkl")
 
-        results = ModelResults(model_name = model_name,
-                               model=mlp,
-                               accuracy={"train": train_acc, "test": test_acc},
-                               confusion_matrix=mlp.get_confusion_matrix(x_test, y_test),
-                               classes=MLP_halikarnassos_classes,
-                               epochs=n_epochs,
-                               loss_curves={"train": train_losses, "test": test_losses},
-                               params={
-                                    "hidden_layers_sizes": hidden_layers_sizes,
-                                    "learning_rate": learning_rate,
-                                    "dropout_rate": dropout_rate,
-                                    "attenuation_dB_range_list": attenuation_dB_range_list,
-                                    "exposant": exposant,
-                                    "n_melvecs_to_suppress": n_melvecs_to_suppress,
-                                    "bool_add_background": bool_add_background,
-                                    "batch_size": bathch_size,
-                                    "activation": activation.__name__ ,
-                                    "IO": IO,
-                                    "n_melvecs_to_suppress": n_melvecs_to_suppress,
-                                    "n_epochs": n_epochs
-                               })
-        results.save(f"results_{model_name}.pkl")
         # Save model on all the dataset
-        # mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=200, batch_size=len(labels_encoded),
-        #     learning_rate=1e-3, dropout_rate=0.5, plot_loss=False, verbose=True, loss_filename=None)
-        # mlp.fit(data_normalized_HF, labels_encoded)
-        # pickle.dump(mlp, open("MLP_gangra_pytorch.pkl", "wb"))
+        duration = time.time()
+        mlp = TorchMLP(hidden_layers_sizes=hidden_layers_sizes, activation=activation, IO=IO,  num_epochs=n_epochs, batch_size=len(labels_encoded),
+            learning_rate=learning_rate, dropout_rate=dropout_rate, plot_loss=False, verbose=True, loss_filename=None)
+        mlp.fit(data_normalized_HF, labels_encoded)
+        duration = time.time() - duration
+        print(f"Training time on all the dataset: {duration//3600}h {duration//60%60:.2f}min {duration%60:.2f}s")
+        pickle.dump(mlp, open("MLP_halikarnassos_pytorch.pkl", "wb"))
 
-        # print(f"Model trained and confusion matrix saved for Gangra dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
-        # print(f"The model's classes are: {MLP_gangra_classes}")
+        print(f"Model trained and confusion matrix saved for Halikarnassos dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
+        print(f"The model's classes are: {MLP_halikarnassos_classes}")
 
-# ModelResults().load_and_display(filenames=["results_Halikarnassos_v1.pkl"])
+MLP_tests = 0
+if MLP_tests:
+    records = [("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data, labels, labels_encoded, MLP_classes = load_data(records)
+    print(MLP_classes)
+    # Function to load and preprocess data for Halikarnassos dataset, with options for frequency suppression and background addition
+    def load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=10, bool_add_background=False, attenuation_dB_range_list=((-20, -15))):
+        # Normalize data
+        data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+
+        # Suppress low frequencies in the data
+        data_normalized_HF = suppress_low_frequencies(data=data_normalized, n_melvecs_to_suppress=n_melvecs_to_suppress)
+
+        # Add background in the training data with random attenuation between -20 and -15 dB
+        if bool_add_background:
+
+            for attenuation_dB_range in attenuation_dB_range_list:
+                if attenuation_dB_range == attenuation_dB_range_list[0]:
+                    data_normalized_HF_background, labels_encoded_background = add_background(data_normalized=data_normalized_HF, labels=labels_encoded,
+                                                                      attenuation_dB_range=attenuation_dB_range)
+                else:
+                    new_data, new_labels = add_background(  data_normalized=data_normalized_HF, labels=labels_encoded,
+                                                            attenuation_dB_range=attenuation_dB_range)
+                    data_normalized_HF_background = np.concatenate((data_normalized_HF_background, new_data), axis=0)
+                    labels_encoded_background = np.concatenate((labels_encoded_background, new_labels), axis=0) 
+        return data_normalized_HF if not bool_add_background else data_normalized_HF_background, labels_encoded if not bool_add_background else labels_encoded_background
+
+
+    # Params
+    model_name = "Halikarnassos_dB_-20_-15"
+    n_melvecs_to_suppress = 0
+    exposant              = 0.5
+    bool_add_background   = False
+    attenuation_dB_range_list = [(-20, -15)]
+
+
+    # Load and preprocess data with specified parameters
+    data_normalized_HF, labels_encoded = load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=n_melvecs_to_suppress,
+                                                                    bool_add_background=bool_add_background,
+                                                                    attenuation_dB_range_list=attenuation_dB_range_list)
+    
+
+    data_normalized_HF = data_normalized_HF ** exposant
+
+    model = pickle.load(open("MLP_halikarnassos_pytorch.pkl", "rb"))
+
+    y_pred = model.predict(data_normalized_HF)
+
+    accuracy = np.mean(y_pred == labels_encoded)
+    print(f"Accuracy on the whole dataset: {accuracy:.4f}")
+
+
+# ModelResults().load_and_display(filenames=["results_Halikarnassos_dB_-20_-5.pkl",
+#                                            "results_Halikarnassos_dB_-20_0.pkl" ,
+#                                            "results_Halikarnassos_dB_-20_5.pkl" ,
+#                                            "results_Halikarnassos_dB_0_5.pkl"   ,
+#                                            "results_Halikarnassos_dB_-20_-15.pkl"  ],
+#                                 savename="Halikarnassos mausoleum.pdf")
 
 # with open("ephesos_GS_Mon Apr 13 01_53_50 2026.pkl", "rb") as f:
 #     hyperparameter_tuning = pickle.load(f)

@@ -7,6 +7,9 @@ import os
 from os import listdir
 from os.path import isfile, join
 
+# Ajoute le dossier contenant le script actuel au chemin de recherche
+sys.path.append(os.path.dirname(__file__))
+import student_fct
 import click
 import matplotlib
 import matplotlib.pyplot as plt
@@ -429,9 +432,10 @@ class GUIMELWindow(QMainWindow):
             self.current_feature_length = (
                 self.current_mel_length * self.current_mel_number
             )
-            self.classes = self.current_model_dict.get(
-                "classes", [f"Class {i}" for i in range(10)]
-            )
+            self.classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"] #self.current_model_dict.get(
+            #     "classes", [f"Class {i}" for i in range(10)]
+            # )
+
             self.num_classes = len(self.classes)
 
         # Verify the model parameters
@@ -542,12 +546,24 @@ class GUIMELWindow(QMainWindow):
                 ]
 
         # Classify the data
-        if self.current_model is not None:
+        if self.current_model is not None or True:
             # Take the lastest data
             data = self.historic_data[0]["data"]
+            data = data.reshape(1, -1)  # Reshape for the model
+            print("data shape : ", data.shape)
+            data = data / np.linalg.norm(data)  # Normalize the data
+            data = student_fct.suppress_low_frequencies(data, n_melvecs_to_suppress=7)
+            print("data norm : ", np.linalg.norm(data))
+            data = data ** 0.5
             # Classify the data
-            self.current_model: sklearn.base.BaseEstimator | None
-            class_proba = self.current_model.predict(data.reshape(1, -1))
+            # self.current_model: sklearn.base.BaseEstimator | None
+            # class_proba = self.current_model.predict(data.reshape(1, -1))
+            # Nounours
+            model = pickle.load(open("model.pkl", "rb"))
+            class_proba = model.predict_proba(data)
+            prediction = model.predict(data)
+            print("predicted class : ", prediction)
+            print("predicted class probabilities : ", class_proba)
             self.historic_data[0].update({"class_proba": class_proba[0]})
 
         # If auto_save
@@ -572,7 +588,7 @@ class GUIMELWindow(QMainWindow):
 
             save = False
             if save:
-                TYPE = "gunshot" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
+                TYPE = "fireworks" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
                 mypath = os.getcwd()#os.path.join(SPEAKER)
                 onlyfiles = [f  for f in listdir(mypath) if (isfile(join(mypath, f)) and f.endswith(".pkl") and f.startswith(TYPE))]
                 maximum = max([int(f.split('_')[1].strip('.pkl')) for f in onlyfiles if f.startswith(TYPE) and f.endswith(".pkl")] , default=0)
@@ -658,9 +674,10 @@ class GUIMELWindow(QMainWindow):
         self.class_ax.set_ylim(-0.05, 1.05)
         self.class_ax.autoscale(enable=False, axis="both")
 
-        self.classes = self.current_model_dict.get(
-            "classes", [f"Class {i}" for i in range(self.num_classes)]
-        )
+        self.classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
+        # self.current_model_dict.get(
+        #     "classes", [f"Class {i}" for i in range(self.num_classes)]
+        # )
         self.num_classes = len(self.classes)
         self.class_histogram = self.class_ax.hist(
             self.classes,

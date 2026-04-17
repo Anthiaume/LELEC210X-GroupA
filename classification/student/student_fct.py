@@ -2,6 +2,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import pickle
+from matplotlib import cm
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
@@ -320,11 +321,13 @@ class ModelResults:
         
         # Display Loss curves
         fig, ax = plt.subplots(figsize=(8, 5))
+        colors = ["steelblue", "tomato", "green", "orange", "purple", "cyan", "magenta", "yellow", "brown", "pink"]
         for d in data:
+            color = colors.pop(0)
             if d["loss_curves"] is not None and "train" in d["loss_curves"]:
-                ax.plot(np.arange(1, len(d["loss_curves"]["train"]) + 1), d["loss_curves"]["train"], label=f"{d['model_name']} Train Loss", linestyle='-', color=np.random.rand(3,))
+                ax.plot(np.arange(1, len(d["loss_curves"]["train"]) + 1), d["loss_curves"]["train"], label=f"{d['model_name']} Train Loss", color=color)
             if d["loss_curves"] is not None and "test" in d["loss_curves"]:
-                ax.plot(np.arange(1, len(d["loss_curves"]["test"]) + 1), d["loss_curves"]["test"], label=f"{d['model_name']} Test Loss", linestyle='--', color=np.random.rand(3,))
+                ax.plot(np.arange(1, len(d["loss_curves"]["test"]) + 1), d["loss_curves"]["test"], label=f"{d['model_name']} Test Loss", linestyle='--', color=color)
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
         ax.set_title("Loss Curves")
@@ -337,14 +340,21 @@ class ModelResults:
             plt.show()
         plt.close()
 
-        # Display Confusion Matrices
-        n_axes = len(data)
-        fig, axes = plt.subplots(1, n_axes, figsize=(6*n_axes, 5))
+        # Display Normalized Confusion Matrices
+        n_plots = len(data)
+        square = np.arange(1,10)**2
+        n_axes = int(n_plots**0.5) if n_plots in square else int(np.ceil(np.sqrt(n_plots)))
+        fig, axes = plt.subplots(n_axes, n_axes, figsize=(6*n_axes, 5*n_axes))
         axes = axes.flatten() if n_axes > 1 else [axes]
         for i, d in enumerate(data):
-            disp = ConfusionMatrixDisplay(confusion_matrix=d["confusion_matrix"], display_labels=d["classes"])
+            cm = d["confusion_matrix"].astype(float)
+            cm_normalized = cm / cm.sum(axis=1, keepdims=True) *100
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm_normalized, display_labels=d["classes"])
             disp.plot(cmap=plt.cm.Blues, ax=axes[i], colorbar=False)
-            axes[i].set_title(f"{d['model_name']} - Accuracy: {d['accuracy']['test']:.2f}")
+            disp.ax_.set_xticklabels(d['classes'], rotation=45, ha='right', rotation_mode='anchor')
+            axes[i].set_title(f"{d['model_name']} {d['confusion_matrix'].sum()} samples - Accuracy: {d['accuracy']['test']:.2f}")
+        for j in range(i+1, len(axes)):
+            fig.delaxes(axes[j])
         plt.tight_layout()
         if savename:
             plt.savefig(f"CONFUSION_MATRICES_COMPARISON_{savename}.pdf", bbox_inches='tight')
