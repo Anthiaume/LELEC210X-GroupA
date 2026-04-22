@@ -13,7 +13,7 @@ int StartADCAcq(int32_t n_bufs);
 int IsADCFinished(void);
 
 extern ADC_HandleTypeDef hadc1;
-#define N_SPECS 5
+#define N_SPECS 6
 static volatile double long_sum_energy[N_SPECS*N_MELVECS] = {0.0};
 
 #endif /* INC_ADC_DBLBUF_H_ */

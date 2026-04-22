@@ -107,16 +107,12 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	{
 		energy_sum += (double) buf[i] * (double) buf[i];
 	}
-	printf("Energy sum: %f\n", energy_sum);
+
 
 	// int K = 1.1; // Adjust this value based on your requirements
 	// double threshold = 2.23*10E8 * K; // Adjust this threshold based on your requirements
 	sending = energy_sum > Threshold;
-	if(energy_sum > Threshold) {
-		printf("Energy sum exceeds the threshold! Energy sum: %f, Threshold: %f\n", energy_sum, Threshold);
-	} else {
-		printf("Energy sum is below the threshold. Energy sum: %f, Threshold: %f\n", energy_sum, Threshold);
-	}
+
 	
 
 	// STEP 3.4: Denormalize the vector
@@ -140,25 +136,30 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 
 	// /!\ In order to avoid overflows completely the input signals should be scaled down. Scale down one of the input matrices by log2(numColsA) bits to avoid overflows,
 	// as a total of numColsA additions are computed internally for each output element. Because our hz2mel_mat matrix contains lots of zeros in its rows, this is not necessary.
-	start_cycle_count();
-	arm_matrix_instance_q15 hz2mel_inst, fftmag_inst, melvec_inst;
-	arm_mat_init_q15(&hz2mel_inst, MELVEC_LENGTH, SAMPLES_PER_MELVEC/2, hz2mel_mat);
-	arm_mat_init_q15(&fftmag_inst, SAMPLES_PER_MELVEC/2, 1, buf);
-	arm_mat_init_q15(&melvec_inst, MELVEC_LENGTH, 1, melvec);
-	arm_mat_mult_fast_q15(&hz2mel_inst, &fftmag_inst, &melvec_inst, buf_tmp);
+	
+	// arm_matrix_instance_q15 hz2mel_inst, fftmag_inst, melvec_inst;
+	// arm_mat_init_q15(&hz2mel_inst, MELVEC_LENGTH, SAMPLES_PER_MELVEC/2, hz2mel_mat);
+	// arm_mat_init_q15(&fftmag_inst, SAMPLES_PER_MELVEC/2, 1, buf);
+	// arm_mat_init_q15(&melvec_inst, MELVEC_LENGTH, 1, melvec);
+	// arm_mat_mult_fast_q15(&hz2mel_inst, &fftmag_inst, &melvec_inst, buf_tmp);
 
-	// for (int m = 0; m < MELVEC_LENGTH; m++){
-    // q31_t acc = 0;
 
-    // for (int k = 0; k < 256; k++)
-    // {
-    //   if(hz2mel_mat[256*m+k] != 0) // Since the matrix is very sparse, we can save a lot of computations by skipping the zero elements
-	//   {
-	// 	acc += (q31_t) hz2mel_mat[256*m+k] * (q31_t) buf[k];
-	//   }
-    // }
 
-    // melvec[m] = acc>>15;
-	// }
-	stop_cycle_count("Print Matrix multiplication");
+	int offset = 0;
+
+	for(int m=0; m<MEL_COUNT; m++)
+	{
+		q31_t acc = 0;
+
+		int start = mel_start[m];
+		int len   = mel_len[m];
+
+		for(int k=0; k<len; k++)
+		{
+			acc += (q31_t)mel_weights[offset + k] * buf[start + k];
+		}
+
+		melvec[m] = acc >> 15;
+		offset += len;
+	}
 }
