@@ -2,6 +2,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import pickle
+from matplotlib import cm
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
@@ -9,6 +10,7 @@ import torch
 import torch.nn as nn
 import time
 import random
+from sklearn.preprocessing import LabelEncoder
 
 
 def load_data(records):
@@ -20,6 +22,8 @@ def load_data(records):
     Output:
     - data: numpy array of melspectrograms
     - labels: numpy array of labels (e.g. "chainsaw", "crackling fire", "fireworks", "gunshot", "background")
+    - labels_encoded: numpy array of labels encodés (ex: 0, 1, 2, 3, 4)
+    - classes: numpy array des classes (ex: ["chainsaw", "crackling fire", "fireworks", "gunshot", "background"])
     """
     data = []
     labels = []
@@ -41,7 +45,11 @@ def load_data(records):
     data = np.array(data)
     labels = np.array(labels)
 
-    return data, labels
+    le = LabelEncoder()
+    labels_encoded = le.fit_transform(labels)
+    classes = le.classes_
+
+    return data, labels, labels_encoded, classes
 
 def load_compacted_data(records, n_samples_per_new_sample):
     data, labels = load_data(records)
@@ -84,6 +92,37 @@ def save_confusion_matrix(model, x_test, y_test, filename="CONFUSION_MATRIX.pdf"
 
     disp.ax_.set_yticks(ticks)
     disp.ax_.set_yticklabels(model.classes_)
+
+    # 3. Augmenter la taille des labels des axes
+    disp.ax_.set_xlabel('Predicted labels', fontsize=14, fontweight='bold')
+    disp.ax_.set_ylabel('True labels', fontsize=14, fontweight='bold')
+
+    # 4. Ajustement automatique pour ne pas couper les labels inclinés
+    plt.tight_layout()
+
+    # 5. Sauvegarde et affichage
+    plt.savefig(filename, bbox_inches='tight')
+    if show:
+        plt.show()
+
+def save_confusion_matrix_from_array(confusion_matrix=None, filename="CONFUSION_MATRIX.pdf", show=True, labels=None):
+    # 1. Génération de la matrice
+    disp = ConfusionMatrixDisplay(
+        confusion_matrix=confusion_matrix,
+        display_labels=labels,
+        )
+
+    disp.plot(cmap=plt.cm.Blues)
+
+    # 2. Ajustement des axes (Utilisation de .ax_)
+    ticks = range(len(labels))
+
+    # Correction : disp.ax_ au lieu de disp.ax
+    disp.ax_.set_xticks(ticks)
+    disp.ax_.set_xticklabels(labels, rotation=45, ha='right', rotation_mode='anchor')
+
+    disp.ax_.set_yticks(ticks)
+    disp.ax_.set_yticklabels(labels)
 
     # 3. Augmenter la taille des labels des axes
     disp.ax_.set_xlabel('Predicted labels', fontsize=14, fontweight='bold')
@@ -209,9 +248,12 @@ def add_background(data_normalized, labels, attenuation_dB_range=(-20, -15)):
 
         # copy_to_plot = usefull_data[sample,:].copy()
 
-        usefull_data[sample,:] += (attenuation_factor * background_data[background_index,:].astype(np.float64)).astype(usefull_data.dtype)
+        new_data = usefull_data[sample,:] + (attenuation_factor * background_data[background_index,:].astype(np.float64)).astype(usefull_data.dtype)
+        new_data_normalized = new_data / np.linalg.norm(new_data)
+        usefull_data[sample,:] = new_data_normalized
 
         # plot3(copy_to_plot, background_data[background_index,:], usefull_data[sample,:])
+
     return np.concatenate((usefull_data, background_data)), np.concatenate((usefull_labels, background_labels))
 
 def suppress_low_frequencies(data, n_melvecs_to_suppress=10):
@@ -219,7 +261,7 @@ def suppress_low_frequencies(data, n_melvecs_to_suppress=10):
     Description: Cette fonction supprime les n_melvecs_to_suppress premiers melvecs (les plus basses fréquences) de chaque échantillon du dataset.
     Inputs:
         - data: numpy array de forme (n_samples, n_features) contenant les échantillons du dataset
-        - n_melvecs_to_suppress: int spécifiant le nombre de melvecs à supprimer à partir du début de chaque échantillon. Par exemple, si n_melvecs_to_suppress=10, les 10 premiers melvecs (correspondant aux fréquences les plus basses) seront supprimés de chaque échantillon.
+        - n_melvecs_to_suppress: int spécifiant le nombre de melvalues à supprimer pour chaque melvector. Par exemple, si n_melvecs_to_suppress=10, cela signifie que les 10 premières melvalues de chaque melvector seront supprimées, ce qui correspond à la suppression des fréquences les plus basses. Note: dans un melvector de longueur 20, les 10 premières melvalues correspondent aux fréquences les plus basses et les 10 dernières melvalues correspondent aux fréquences les plus hautes.
     Outputs:
         - new_data: numpy array de forme (n_samples, n_features - n_melvecs_to_suppress) contenant les échantillons du dataset après la suppression des melvecs
    
@@ -246,6 +288,79 @@ def suppress_low_frequencies(data, n_melvecs_to_suppress=10):
     # Résultat : tableau de taille (x, 200)
     data = data[mask].reshape(data.shape[0], -1)
     return data
+
+class ModelResults:
+    def __init__(self, model_name=None, model=None, accuracy=None, confusion_matrix=None, classes=None, epochs=None, loss_curves=None, params=None):
+        self.model_name = model_name
+        self.model = model
+        self.confusion_matrix = confusion_matrix
+        self.classes = classes
+        self.epochs = epochs
+        self.accuracy = accuracy
+        self.loss_curves = loss_curves
+        self.params = params
+
+    def save(self, filename):
+        dict_to_save = {
+            "model_name": self.model_name,
+            "model": self.model,
+            "accuracy": self.accuracy,
+            "confusion_matrix": self.confusion_matrix,
+            "classes": self.classes,
+            "epochs": self.epochs,
+            "loss_curves": self.loss_curves,
+            "params": self.params
+        }
+        pickle.dump(dict_to_save, open(filename, "wb"))
+    
+    def load_and_display(self, filenames, savename=None, show=True):
+        data = []
+        for filename in filenames:
+            with open(filename, "rb") as f:
+                data.append(pickle.load(f))
+        
+        # Display Loss curves
+        fig, ax = plt.subplots(figsize=(8, 5))
+        colors = ["steelblue", "tomato", "green", "orange", "purple", "cyan", "magenta", "yellow", "brown", "pink"]
+        for d in data:
+            color = colors.pop(0)
+            if d["loss_curves"] is not None and "train" in d["loss_curves"]:
+                ax.plot(np.arange(1, len(d["loss_curves"]["train"]) + 1), d["loss_curves"]["train"], label=f"{d['model_name']} Train Loss", color=color)
+            if d["loss_curves"] is not None and "test" in d["loss_curves"]:
+                ax.plot(np.arange(1, len(d["loss_curves"]["test"]) + 1), d["loss_curves"]["test"], label=f"{d['model_name']} Test Loss", linestyle='--', color=color)
+        ax.set_xlabel("Epoch")
+        ax.set_ylabel("Loss")
+        ax.set_title("Loss Curves")
+        ax.legend()
+        ax.grid(True)
+        plt.tight_layout()
+        if savename:
+            plt.savefig(f"LOSS_CURVES_COMPARISON_{savename}.pdf", bbox_inches='tight')
+        if show:
+            plt.show()
+        plt.close()
+
+        # Display Normalized Confusion Matrices
+        n_plots = len(data)
+        square = np.arange(1,10)**2
+        n_axes = int(n_plots**0.5) if n_plots in square else int(np.ceil(np.sqrt(n_plots)))
+        fig, axes = plt.subplots(n_axes, n_axes, figsize=(6*n_axes, 5*n_axes))
+        axes = axes.flatten() if n_axes > 1 else [axes]
+        for i, d in enumerate(data):
+            cm = d["confusion_matrix"].astype(float)
+            cm_normalized = cm / cm.sum(axis=1, keepdims=True) *100
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm_normalized, display_labels=d["classes"])
+            disp.plot(cmap=plt.cm.Blues, ax=axes[i], colorbar=False)
+            disp.ax_.set_xticklabels(d['classes'], rotation=45, ha='right', rotation_mode='anchor')
+            axes[i].set_title(f"{d['model_name']} {d['confusion_matrix'].sum()} samples - Accuracy: {d['accuracy']['test']:.2f}")
+        for j in range(i+1, len(axes)):
+            fig.delaxes(axes[j])
+        plt.tight_layout()
+        if savename:
+            plt.savefig(f"CONFUSION_MATRICES_COMPARISON_{savename}.pdf", bbox_inches='tight')
+        if show:
+            plt.show()
+        plt.close()
 
 class TorchMLP(nn.Module):
     def __init__(self, hidden_layers_sizes=[300, 300, 200, 100, 50], activation=nn.ReLU, IO = (400, 5), num_epochs=500, batch_size=None,
@@ -292,15 +407,6 @@ class TorchMLP(nn.Module):
         """
         return self.model(x)
 
-    def predict_proba(self, x):
-        """
-        This method applies the softmax function to the output of the forward pass to get probabilities for each class.
-        Inputs - x: input tensor of shape (batch_size, input_features)
-        Outputs - probs: output tensor of shape (batch_size, num_classes) where each row sums to
-                  1 and represents the predicted probabilities for each class.
-        """
-        return torch.softmax(self(x), dim=1)
-    
     def fit(self, x_train, y_train):
         """
         This method trains the model using the provided training data (x_train, y_train) and optionally evaluates on
@@ -360,6 +466,7 @@ class TorchMLP(nn.Module):
                 loss = loss_fn(y_pred, y_batch)
                 optimizer.zero_grad()
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=1.0)  # Gradient clipping to prevent exploding gradients
                 optimizer.step()
 
                 epoch_loss += loss.item()
@@ -391,13 +498,25 @@ class TorchMLP(nn.Module):
             plt.ylabel("Loss")
             plt.title("Loss Curves")
             plt.legend()
+            plt.grid(True)
             plt.tight_layout()
             if self.loss_filename is not None:
                 plt.savefig(self.loss_filename, bbox_inches='tight')
             if self.plot_loss:
                 plt.show()
             plt.close()
-         
+        
+        return train_losses, val_losses
+    
+    def predict_proba(self, x):
+        """
+        This method applies the softmax function to the output of the forward pass to get probabilities for each class.
+        Inputs - x: input tensor of shape (batch_size, input_features)
+        Outputs - probs: output tensor of shape (batch_size, num_classes) where each row sums to
+                  1 and represents the predicted probabilities for each class.
+        """
+        return torch.softmax(self(x), dim=1)
+
     def score(self, x, y):
         self.eval()  # Désactive dropout etc.
         with torch.no_grad():  # Pas de gradient nécessaire
@@ -409,6 +528,28 @@ class TorchMLP(nn.Module):
             preds = self(x).argmax(dim=1)  # Classe prédite = argmax des logits
             accuracy = (preds == y).float().mean().item()
         return accuracy
+
+    def predict(self, x):
+        self.eval()
+        with torch.no_grad():
+            if not isinstance(x, torch.Tensor):
+                x = torch.tensor(x, dtype=torch.float32)
+            y_pred = self(x).argmax(dim=1).numpy()
+        return y_pred
+
+    def get_confusion_matrix(self, x, y):
+        self.eval()
+        with torch.no_grad():
+            if not isinstance(x, torch.Tensor):
+                x = torch.tensor(x, dtype=torch.float32)
+            if not isinstance(y, torch.Tensor):
+                y = torch.tensor(y, dtype=torch.long)
+
+            y_pred = self(x).argmax(dim=1).numpy()
+            y_true = y.numpy()
+
+        cm = confusion_matrix(y_true, y_pred)
+        return cm
 
     def save_confusion_matrix(self, x_test, y_test, class_names=None, filename="CONFUSION_MATRIX.pdf", show=True):
         self.eval()

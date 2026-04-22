@@ -1,0 +1,16 @@
+Fri Apr 10 16:02:20 2026	fire	fire
+Fri Apr 10 16:02:26 2026	fire	fire
+Fri Apr 10 16:02:32 2026	fire	fire
+Fri Apr 10 16:02:37 2026	fire	fire
+Fri Apr 10 16:02:43 2026	fire	fire
+Fri Apr 10 16:02:49 2026	fire	chainsaw
+Fri Apr 10 16:03:06 2026	fireworks	chainsaw
+Fri Apr 10 16:03:29 2026	fire	chainsaw
+Fri Apr 10 16:03:34 2026	fireworks	fireworks
+Fri Apr 10 16:03:46 2026	chainsaw	fireworks
+Fri Apr 10 16:04:15 2026	fire	unknown
+Fri Apr 10 16:04:21 2026	fire	gunshot
+Fri Apr 10 16:04:37 2026	fire	gunshot
+Fri Apr 10 16:04:43 2026	fireworks	gunshot
+Fri Apr 10 16:04:49 2026	fireworks	fire
+Fri Apr 10 16:05:06 2026	chainsaw	chainsaw
