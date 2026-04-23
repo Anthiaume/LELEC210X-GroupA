@@ -183,16 +183,12 @@ static void ADC_Callback(int buf_cplt) {
 		long_sum_energy[i] = long_sum_energy[i+1];
 	}
 	Threshold = 0.0;
-	printf("threshold sum: %f\n", Threshold);
 	long_sum_energy[N_SPECS*N_MELVECS-1] = energy_sum;
 	for(int i=0; i < N_SPECS*N_MELVECS; i++){
 		Threshold += long_sum_energy[i];
 	}
-	printf("threshold sum: %f\n", Threshold);
 	Threshold /= (N_SPECS*N_MELVECS);
 	Threshold *= 2; // Adjust this multiplier based on your requirements
-	printf("Updated Threshold: %f\n", Threshold);
-	printf("Sending: %d\n", sending);
 	if(sending){
 		go = 1;
 	}
@@ -200,12 +196,10 @@ static void ADC_Callback(int buf_cplt) {
 	cur_melvec++;
 	//stop_cycle_count("spectrogram");
 	ADCDataRdy[buf_cplt] = 0;
-	printf("go: %d\r\n", go);
 	if (rem_n_bufs == 0) {
 		if(go){
-			print_spectrogram();
+			// print_spectrogram();
 			send_spectrogram();
-			printf("Done sending packet\n");
 			go = 0;
 		}else{			DEBUG_PRINT("Not sending packet\r\n");
 		}
