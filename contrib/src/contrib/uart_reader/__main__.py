@@ -1,3 +1,5 @@
+MLP_classes = ["chainsaw", "fire", "fireworks", "gunshot"]
+
 import datetime
 import pathlib as pathl
 import sys
@@ -432,7 +434,7 @@ class GUIMELWindow(QMainWindow):
             self.current_feature_length = (
                 self.current_mel_length * self.current_mel_number
             )
-            self.classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"] #self.current_model_dict.get(
+            self.classes = MLP_classes #self.current_model_dict.get(
             #     "classes", [f"Class {i}" for i in range(10)]
             # )
 
@@ -552,19 +554,22 @@ class GUIMELWindow(QMainWindow):
             data = data.reshape(1, -1)  # Reshape for the model
             print("data shape : ", data.shape)
             data = data / np.linalg.norm(data)  # Normalize the data
-            data = student_fct.suppress_low_frequencies(data, n_melvecs_to_suppress=7)
+            data = student_fct.suppress_low_frequencies(data, n_melvecs_to_suppress=10)
             print("data norm : ", np.linalg.norm(data))
             data = data ** 0.5
             # Classify the data
             # self.current_model: sklearn.base.BaseEstimator | None
             # class_proba = self.current_model.predict(data.reshape(1, -1))
             # Nounours
-            model = pickle.load(open("model.pkl", "rb"))
-            class_proba = model.predict_proba(data)
-            prediction = model.predict(data)
-            print("predicted class : ", prediction)
-            print("predicted class probabilities : ", class_proba)
-            self.historic_data[0].update({"class_proba": class_proba[0]})
+            try:
+                model = pickle.load(open("model.pkl", "rb"))
+                class_proba = model.predict_proba(data)
+                prediction = model.predict(data)
+                print("predicted class : ", prediction)
+                print("predicted class probabilities : ", class_proba)
+                self.historic_data[0].update({"class_proba": class_proba[0]})
+            except:
+                print("J'aime les carbonnades flamandes.")
 
         # If auto_save
         if self.db.get_item("MEL Settings", "auto_save").value:
@@ -674,7 +679,7 @@ class GUIMELWindow(QMainWindow):
         self.class_ax.set_ylim(-0.05, 1.05)
         self.class_ax.autoscale(enable=False, axis="both")
 
-        self.classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
+        self.classes = MLP_classes
         # self.current_model_dict.get(
         #     "classes", [f"Class {i}" for i in range(self.num_classes)]
         # )
