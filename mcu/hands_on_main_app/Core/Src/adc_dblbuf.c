@@ -178,7 +178,9 @@ static void ADC_Callback(int buf_cplt) {
 	ADCDataRdy[buf_cplt] = 1;
 	//start_cycle_count();
 	Spectrogram_Format((q15_t *)ADCData[buf_cplt]);
-	Spectrogram_Compute((q15_t *)ADCData[buf_cplt], mel_vectors[cur_melvec]);
+	static arm_rfft_instance_q15 rfft_inst;
+	arm_rfft_init_q15(&rfft_inst, SAMPLES_PER_MELVEC, 0, 1);
+	Spectrogram_Compute((q15_t *)ADCData[buf_cplt], mel_vectors[cur_melvec], rfft_inst);
 	for(int i=0; i < N_SPECS*N_MELVECS-1; i++){
 		long_sum_energy[i] = long_sum_energy[i+1];
 	}

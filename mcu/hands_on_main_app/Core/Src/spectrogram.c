@@ -17,8 +17,8 @@ q15_t buf_fft[2*SAMPLES_PER_MELVEC  ]; // Double size (real|imag) buffer needed 
 q15_t buf_tmp[  SAMPLES_PER_MELVEC/2]; // Intermediate buffer for arm_mat_mult_fast_q15
 
 volatile bool sending = false;
-volatile double energy_sum = 0.0;
-volatile double Threshold = 0.0;
+volatile q31_t energy_sum = 0;
+volatile q31_t Threshold = 0;
 
 // Convert 12-bit DC ADC samples to Q1.15 fixed point signal and remove DC component
 void Spectrogram_Format(q15_t *buf)
@@ -45,13 +45,14 @@ void Spectrogram_Format(q15_t *buf)
 	// Since we use a signed representation, we should now center the value around zero, we can do this by substracting 2**14.
 	// Now the value of buf[i] is in [-2**14 , 2**14 - 1]
 
-	for(uint16_t i=0; i < SAMPLES_PER_MELVEC; i++) { // Remove DC component
-		buf[i] -= (1 << 14);
-	}
+	// for(uint16_t i=0; i < SAMPLES_PER_MELVEC; i++) { // Remove DC component
+	// 	buf[i] -= (1 << 14);
+	// }
+	arm_offset_q15(buf, -(1<<14), buf, SAMPLES_PER_MELVEC);
 }
 
 // Compute spectrogram of samples and transform into MEL vectors.
-void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
+void Spectrogram_Compute(q15_t *samples, q15_t *melvec, arm_rfft_instance_q15 rfft_inst)
 {
 	// STEP 1  : Windowing of input samples
 	//           --> Pointwise product
@@ -66,9 +67,9 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	//           Number of cycles: <TODO>
 
 	// Since the FFT is a recursive algorithm, the values are rescaled in the function to ensure that overflow cannot happen.
-	arm_rfft_instance_q15 rfft_inst;
+	// arm_rfft_instance_q15 rfft_inst;
 
-	arm_rfft_init_q15(&rfft_inst, SAMPLES_PER_MELVEC, 0, 1);
+	// arm_rfft_init_q15(&rfft_inst, SAMPLES_PER_MELVEC, 0, 1);
 
 	arm_rfft_q15(&rfft_inst, buf, buf_fft);
 
@@ -90,9 +91,11 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 	//           Complexity: O(N)
 	//           Number of cycles: <TODO>
 
+	q31_t inv_vmax = ((q31_t)1 << 30) / vmax;
 	for (int i=0; i < SAMPLES_PER_MELVEC; i++) // We don't use the second half of the symmetric spectrum
 	{
-		buf[i] = (q15_t) (((q31_t) buf_fft[i] << 15) /((q31_t)vmax));
+		// buf[i] = (q15_t) (((q31_t) buf_fft[i] << 15) /((q31_t)vmax));
+		buf[i] = (q15_t)((buf_fft[i] * inv_vmax) >> 15);
 	}
 
 	// STEP 3.3: Compute the complex magnitude
@@ -102,11 +105,8 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 
 	arm_cmplx_mag_q15(buf, buf, SAMPLES_PER_MELVEC/2);
 	// arm_cmplx_mag_squared_q15(buf, buf, SAMPLES_PER_MELVEC/2);
-	energy_sum = 0.0;
-	for (int i=0; i < SAMPLES_PER_MELVEC/2; i++)
-	{
-		energy_sum += (double) buf[i] * (double) buf[i];
-	}
+	energy_sum = 0;
+	arm_power_q15(buf, SAMPLES_PER_MELVEC/2, &energy_sum);
 
 
 	// int K = 1.1; // Adjust this value based on your requirements

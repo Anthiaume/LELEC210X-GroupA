@@ -98,18 +98,19 @@ void run(void)
 
 	while (1)
 	{
-	  while (!btn_press) {
-		  HAL_GPIO_WritePin(GPIOB, LD2_Pin, GPIO_PIN_SET);
-		  HAL_Delay(200);
-		  HAL_GPIO_WritePin(GPIOB, LD2_Pin, GPIO_PIN_RESET);
-		  HAL_Delay(200);
-	  }
-	  btn_press = 0;
+	HAL_PWREx_EnableLowPowerRunMode();
+	  // while (!btn_press) {
+		//   HAL_GPIO_WritePin(GPIOB, LD2_Pin, GPIO_PIN_SET);
+		//   HAL_Delay(200);
+		//   HAL_GPIO_WritePin(GPIOB, LD2_Pin, GPIO_PIN_RESET);
+		//   HAL_Delay(200);
+	  // }
+	  // btn_press = 0;
 #if (CONTINUOUS_ACQ == 1)
-	  while (!btn_press) {
-		  acquire_and_send_packet();
-	  }
-	  btn_press = 0;
+	  // while (!btn_press) {
+		acquire_and_send_packet();
+	  // }
+	  // btn_press = 0;
 #elif (CONTINUOUS_ACQ == 0)
 	  acquire_and_send_packet();
 #else
@@ -221,7 +222,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_5;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {

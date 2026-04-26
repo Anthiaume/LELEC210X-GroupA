@@ -4,6 +4,7 @@
 #include "main.h"
 #include "config.h"
 #include "arm_math.h"
+#include "spectrogram.h"
 
 // ADC parameters
 #define ADC_BUF_SIZE SAMPLES_PER_MELVEC
