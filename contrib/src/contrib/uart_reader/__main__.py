@@ -552,10 +552,9 @@ class GUIMELWindow(QMainWindow):
             # Take the lastest data
             data = self.historic_data[0]["data"]
             data = data.reshape(1, -1)  # Reshape for the model
-            print("data shape : ", data.shape)
+            
             data = data / np.linalg.norm(data)  # Normalize the data
             data = student_fct.suppress_low_frequencies(data, n_melvecs_to_suppress=10)
-            print("data norm : ", np.linalg.norm(data))
             data = data ** 0.5
             # Classify the data
             # self.current_model: sklearn.base.BaseEstimator | None

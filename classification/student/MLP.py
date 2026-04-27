@@ -1,6 +1,5 @@
 from itertools import count
-
-from student_fct import load_data, load_compacted_data, save_confusion_matrix, add_background, suppress_low_frequencies, TorchMLP, ModelResults
+from student_fct import *
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neural_network import MLPClassifier
@@ -313,7 +312,8 @@ if MLP_ephesos:
         GS_MLP_ephesos.GridSearch(x_train, y_train, param_grid, cv=3, verbose=False)
 
     if Gen_ephesos:
-        print(f"\n\n\n{"#"*90 + "\n"}Gen_ephesos:\n\nTraining MLP on Ephesos dataset with PyTorch implementation...")
+        string_bar = "#"*90 + "\n"
+        print(f"\n\n\n{string_bar}Gen_ephesos:\n\nTraining MLP on Ephesos dataset with PyTorch implementation...")
 
         # Train the model and measure the training time
         duration = time.time()
@@ -339,7 +339,7 @@ if MLP_ephesos:
         pickle.dump(mlp, open("MLP_ephesos_pytorch.pkl", "wb"))
 
         print(f"Training time: {duration:.2f} seconds")
-        print(f"Model trained and confusion matrix saved for Ephesos dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
+        print(f"Model trained and confusion matrix saved for Ephesos dataset with PyTorch implementation.{string_bar}\n\n\n")
 
 MLP_flaviopolis = False # Clôturé le vendredi 10 avril à 12h43
 if MLP_flaviopolis:
@@ -523,8 +523,8 @@ if MLP_flaviopolis:
                 data_normalized_HF = data_normalized_HF ** exposant
                 # Split data into training and testing sets
                 x_train_N_HF, x_test_N_HF, y_train_N_HF, y_test_N_HF = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
-
-                print(f"\n\n\n{"#"*90 + "\n"}Gen_flaviopolis:\n\nTraining MLP on Flaviopolis dataset with PyTorch implementation...")
+                string_bar = "#"*90 + "\n"
+                print(f"\n\n\n{string_bar}Gen_flaviopolis:\n\nTraining MLP on Flaviopolis dataset with PyTorch implementation...")
 
                 duration = time.time()
                 mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=500, batch_size=len(labels_encoded),
@@ -550,9 +550,9 @@ if MLP_flaviopolis:
                 mlp.fit(data_normalized_HF, labels_encoded)
                 pickle.dump(mlp, open("MLP_flaviopolis_pytorch.pkl", "wb"))
 
-                print(f"Model trained and confusion matrix saved for Flaviopolis dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
+                print(f"Model trained and confusion matrix saved for Flaviopolis dataset with PyTorch implementation.{string_bar}\n\n\n")
 
-MLP_gangra = 1 # Clôturé le vendredi 10 avril à 12h43
+MLP_gangra = False # Clôturé le vendredi 10 avril à 12h43
 if MLP_gangra:
     records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
                ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
@@ -584,6 +584,7 @@ if MLP_gangra:
 
         return data_normalized_HF, data_HF_normalized, labels_e
 
+    string_bar = "#"*90 + "\n"
     print("Data loaded and preprocessed for Gangra dataset, duration: {:.2f} seconds.".format(time.time() - data_load_duration))
 
     if Gen_gangra:
@@ -602,7 +603,7 @@ if MLP_gangra:
                 x_train_N_HF, x_test_N_HF, y_train_N_HF, y_test_N_HF = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
                 # x_train_HF_N, x_test_HF_N, y_train_HF_N, y_test_HF_N = train_test_split(data_HF_normalized, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
 
-                print(f"\n\n\n{"#"*90 + "\n"}Gen_gangra:\n\nTraining MLP on Gangra dataset with PyTorch implementation...")
+                print(f"\n\n\n{string_bar}Gen_gangra:\n\nTraining MLP on Gangra dataset with PyTorch implementation...")
 
                 duration = time.time()
                 mlp = TorchMLP(hidden_layers_sizes=[600, 300, 100], activation=nn.ReLU, IO=(inputs, 5),  num_epochs=1000, batch_size=len(labels_encoded),
@@ -624,9 +625,9 @@ if MLP_gangra:
                 pickle.dump(mlp, open("MLP_gangra_pytorch.pkl", "wb"))
 
                 print(f"Training time: {duration:.2f} seconds")
-                print(f"Model trained and confusion matrix saved for Gangra dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
+                print(f"Model trained and confusion matrix saved for Gangra dataset with PyTorch implementation.{string_bar}\n\n\n")
 
-MLP_halikarnassos = 0
+MLP_halikarnassos = False # Modèle de test général
 if MLP_halikarnassos:
     """
     Objectifs :
@@ -638,22 +639,24 @@ if MLP_halikarnassos:
     
     """
 
-    records = [("mcu13", "sud8", "local speakers - spec_20_20")]
-            #    ("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
-            #    ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
-            #    ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
-            #    ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
-            #    ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]         # 5 classes, 122 samples per class]
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael"),
+               ("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
 
     Gen_halikarnassos = True
 
     ### Load and preprocess data
 
     # Load data and labels
-    data, labels, labels_encoded, MLP_halikarnassos_classes = load_data(records)
+    data, labels, labels_encoded, MLP_halikarnassos_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
 
     # Function to load and preprocess data for Halikarnassos dataset, with options for frequency suppression and background addition
-    def load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=10, bool_add_background=False, attenuation_dB_range_list=((-20, -15))):
+    def load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=10, attenuation_dB_range=(-20, -15)):
+        bool_add_background = attenuation_dB_range is not None
+        
         # Normalize data
         data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
 
@@ -662,36 +665,28 @@ if MLP_halikarnassos:
 
         # Add background in the training data with random attenuation between -20 and -15 dB
         if bool_add_background:
+            data_normalized_HF_background, labels_encoded_background = add_background(data_normalized=data_normalized_HF, labels=labels_encoded,
+                                                                attenuation_dB_range=attenuation_dB_range)
 
-            for attenuation_dB_range in attenuation_dB_range_list:
-                if attenuation_dB_range == attenuation_dB_range_list[0]:
-                    data_normalized_HF_background, labels_encoded_background = add_background(data_normalized=data_normalized_HF, labels=labels_encoded,
-                                                                      attenuation_dB_range=attenuation_dB_range)
-                else:
-                    new_data, new_labels = add_background(  data_normalized=data_normalized_HF, labels=labels_encoded,
-                                                            attenuation_dB_range=attenuation_dB_range)
-                    data_normalized_HF_background = np.concatenate((data_normalized_HF_background, new_data), axis=0)
-                    labels_encoded_background = np.concatenate((labels_encoded_background, new_labels), axis=0) 
         return data_normalized_HF if not bool_add_background else data_normalized_HF_background, labels_encoded if not bool_add_background else labels_encoded_background
-
+    string_bar = "#"*90 + "\n"
 
 
     if Gen_halikarnassos:
 
-        print(f"\n\n\n{"#"*90 + "\n"}Gen_halikarnassos:\n\nTraining MLP on Halikarnassos dataset with PyTorch implementation...")
+        print(f"\n\n\n{string_bar}Gen_halikarnassos:\n\nTraining MLP on Halikarnassos dataset with PyTorch implementation...")
 
         # Params
-        model_name = "Halikarnassos_dB_-20_-15"
-        n_melvecs_to_suppress = 0
+        model_name = "Halikarnassos_dB_-20_0"
+        n_melvecs_to_suppress = 10
         exposant              = 0.5
-        bool_add_background   = False
-        n_epochs              = 200
+        n_epochs              = 100
         hidden_layers_sizes = [600, 300, 100]
         activation = nn.ReLU
         bathch_size = len(labels_encoded)
-        learning_rate = 1e-3
+        learning_rate = 1e-2
         dropout_rate = 0.5
-        attenuation_dB_range_list = [(-20, -15)]
+        attenuation_dB_range = None
 
 
 
@@ -702,9 +697,7 @@ if MLP_halikarnassos:
 
 
         # Load and preprocess data with specified parameters
-        data_normalized_HF, labels_encoded = load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=n_melvecs_to_suppress,
-                                                                     bool_add_background=bool_add_background,
-                                                                     attenuation_dB_range_list=attenuation_dB_range_list)
+        data_normalized_HF, labels_encoded = load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=n_melvecs_to_suppress, attenuation_dB_range=attenuation_dB_range)
         
         data_normalized_HF = data_normalized_HF ** exposant
         x_train, x_test, y_train, y_test = train_test_split(data_normalized_HF, labels_encoded, test_size=0.3, random_state=42, shuffle=True, stratify=labels_encoded)
@@ -733,28 +726,27 @@ if MLP_halikarnassos:
         mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_halikarnassos_classes, show=True, filename="confusion_matrix_halikarnassos_pytorch.pdf")
         
         # Save model results
-        # results = ModelResults(model_name = model_name,
-        #                        model=mlp,
-        #                        accuracy={"train": train_acc, "test": test_acc},
-        #                        confusion_matrix=mlp.get_confusion_matrix(x_test, y_test),
-        #                        classes=MLP_halikarnassos_classes,
-        #                        epochs=n_epochs,
-        #                        loss_curves={"train": train_losses, "test": test_losses},
-        #                        params={
-        #                             "hidden_layers_sizes": hidden_layers_sizes,
-        #                             "learning_rate": learning_rate,
-        #                             "dropout_rate": dropout_rate,
-        #                             "attenuation_dB_range_list": attenuation_dB_range_list,
-        #                             "exposant": exposant,
-        #                             "n_melvecs_to_suppress": n_melvecs_to_suppress,
-        #                             "bool_add_background": bool_add_background,
-        #                             "batch_size": bathch_size,
-        #                             "activation": activation.__name__ ,
-        #                             "IO": IO,
-        #                             "n_melvecs_to_suppress": n_melvecs_to_suppress,
-        #                             "n_epochs": n_epochs
-        #                        })
-        # results.save(f"results_{model_name}.pkl")
+        results = ModelResults(model_name = model_name,
+                               model=mlp,
+                               accuracy={"train": train_acc, "test": test_acc},
+                               confusion_matrix=mlp.get_confusion_matrix(x_test, y_test),
+                               classes=MLP_halikarnassos_classes,
+                               epochs=n_epochs,
+                               loss_curves={"train": train_losses, "test": test_losses},
+                               params={
+                                    "hidden_layers_sizes": hidden_layers_sizes,
+                                    "learning_rate": learning_rate,
+                                    "dropout_rate": dropout_rate,
+                                    "attenuation_dB_range_list": attenuation_dB_range,
+                                    "exposant": exposant,
+                                    "n_melvecs_to_suppress": n_melvecs_to_suppress,
+                                    "batch_size": bathch_size,
+                                    "activation": activation.__name__ ,
+                                    "IO": IO,
+                                    "n_melvecs_to_suppress": n_melvecs_to_suppress,
+                                    "n_epochs": n_epochs
+                               })
+        results.save(f"results_{model_name}.pkl")
 
         # Save model on all the dataset
         duration = time.time()
@@ -765,75 +757,779 @@ if MLP_halikarnassos:
         print(f"Training time on all the dataset: {duration//3600}h {duration//60%60:.2f}min {duration%60:.2f}s")
         pickle.dump(mlp, open("MLP_halikarnassos_pytorch.pkl", "wb"))
 
-        print(f"Model trained and confusion matrix saved for Halikarnassos dataset with PyTorch implementation.{"\n" + "#"*90}\n\n\n")
+        print(f"Model trained and confusion matrix saved for Halikarnassos dataset with PyTorch implementation.{string_bar}\n\n\n")
         print(f"The model's classes are: {MLP_halikarnassos_classes}")
 
-MLP_tests = 0
-if MLP_tests:
-    records = [("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+MLP_chainsaw = False
+if MLP_chainsaw:
+
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]
+               #("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+    Gen_chainsaw = True
+    GS_chainsaw = False
+
+    # Load data and labels
+    data, labels, labels_encoded, MLP_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
+
+    if GS_chainsaw:
+        
+        x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.2, random_state=42, shuffle=True, stratify=labels_encoded)
+
+        param_grid = {
+            'hidden_layers_sizes': [(600, 300, 100), (300, 300, 200, 100, 50), (600, 600, 300, 100), (300, 200, 100), (200, 100)],
+            "activation": [nn.ReLU], # relu est clairement le meilleur
+            'num_epochs': [150],
+            "batch_size": [len(labels_encoded)],
+            "plot_loss": [False],
+            "loss_filename": [None],
+            "verbose": [False],
+            "learning_rate": [1e-3, 1e-2],
+            "dropout_rate": [0.25, 0.5],
+            "keeped_frequencies": [(0, 10), (0, 19), (0, 15), (5, 19)],
+            "add_background": [(-20, -15), (-20, 0), (-20, 5)],
+            "exposant": [0.5, 0.75, 1]
+        }
+
+        GS_MLP_chainsaw = TorchMLP()
+        GS_MLP_chainsaw.GridSearch(x_train, y_train, param_grid, cv=4, verbose=False)
+
+    if Gen_chainsaw:
+        string_bar = "#"*90 + "\n"
+        print(f"\n\n\n{string_bar}Gen_chainsaw:\n\nTraining MLP on Chainsaw dataset with PyTorch implementation...")
+
+        class_name = "chainsaw"
+        bool_save_model = True
+
+        # Params
+        params = {
+            "model_name": "chainsaw_v17_HF_final",
+            'hidden_layers_sizes': (600, 300, 100), # (300, 200, 100)
+            "activation": nn.ReLU,
+            'num_epochs': 250,
+            "batch_size": len(labels_encoded),
+            "learning_rate": 1e-2,
+            "dropout_rate": 0.2,
+            "class_weights": [1, 1, 1, 1, 1],
+            "plot_loss": True,
+            "verbose": True,
+            "loss_filename": None
+        }
+
+        data_construction = {
+            "keeped_frequencies": (5, 19),
+            "attenuation_dB_range": (-20, 0),
+            "exposant": 1,
+            "transform_mean_std": True
+        }
+
+        n_freq = data_construction["keeped_frequencies"][1] - data_construction["keeped_frequencies"][0] + 1
+        params["IO"] = (20 * n_freq // (10 if data_construction["transform_mean_std"] else 1), 5)
+        data_construction["n_freq"] = n_freq
+        # sel = (13, int(params["model_name"][-2:])+1)
+        train_and_save_model(params=params,
+                             data_construction=data_construction,
+                             data=data,
+                             labels_encoded=labels_encoded,
+                             MLP_classes=MLP_classes,
+                             class_name=class_name,
+                             bool_save_model=bool_save_model)
+    
+        print(f"Model trained and confusion matrix saved.{string_bar}\n\n\n")
+
+MLP_fire = False
+if MLP_fire:
+    """
+    Objectifs :
+    - Faire un modèle spécialisé sur les feux
+    """
+
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]
+               #("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+    Gen_fire = True
+    GS_fire = False
 
     ### Load and preprocess data
 
     # Load data and labels
-    data, labels, labels_encoded, MLP_classes = load_data(records)
-    print(MLP_classes)
+    data, labels, labels_encoded, MLP_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
+
+    if GS_fire:
+
+        param_grid = {
+            'hidden_layers_sizes': [(600, 300, 100), (300, 200, 100), (200, 100)],
+            "activation": [nn.ReLU], # relu est clairement le meilleur
+            'num_epochs': [150],
+            "batch_size": [len(labels_encoded)],
+            "plot_loss": [False],
+            "loss_filename": [None],
+            "verbose": [False],
+            "learning_rate": [1e-3, 1e-2],
+            "dropout_rate": [0.25, 0.5],
+            "keeped_frequencies": [(0, 10), (0, 19), (0, 5), (0, 7), (0, 4), (0, 3)],
+            "add_background": [(-20, -15), (-20, 0), (-20, 5)],
+            "exposant": [0.5, 0.75, 1]
+        }
+
+        GS_MLP_fire = TorchMLP()
+        GS_MLP_fire.GridSearch(x_train, y_train, param_grid, cv=4, verbose=False)
+
+    if Gen_fire:
+        string_bar = "#"*90 + "\n"
+        print(f"\n\n\n{string_bar}Gen_fire:\n\nTraining MLP on Fire dataset with PyTorch implementation...")
+
+        class_name = "fire"
+        bool_save_model = True
+
+        # Params
+        params = {
+            "model_name": "fire_v26_HF_final",
+            'hidden_layers_sizes': (600, 300, 100), # (300, 200, 100)
+            "activation": nn.ReLU,
+            'num_epochs': 800,
+            "batch_size": len(labels_encoded),
+            "learning_rate": 1e-2,
+            "dropout_rate": 0.5,
+            "class_weights": [1, 1, 1.5, 2, 1],
+            "plot_loss": True,
+            "verbose": True,
+            "loss_filename": None
+        }
+
+        data_construction = {
+            "keeped_frequencies": (5, 19),
+            "attenuation_dB_range": (-20, 0),
+            "exposant": 1,
+            "transform_mean_std": True
+        }
+
+        n_freq = data_construction["keeped_frequencies"][1] - data_construction["keeped_frequencies"][0] + 1
+        params["IO"] = (20 * n_freq // (10 if data_construction["transform_mean_std"] else 1), 5)
+        data_construction["n_freq"] = n_freq
+        # sel = (17, int(params["model_name"][-2:])+1)
+        sel = False
+        train_and_save_model(params=params,
+                             data_construction=data_construction,
+                             data=data,
+                             labels_encoded=labels_encoded,
+                             MLP_classes=MLP_classes,
+                             class_name=class_name,
+                             bool_save_model=bool_save_model)
+    
+        print(f"Model trained and confusion matrix saved.{string_bar}\n\n\n")
+
+MLP_fireworks = False
+if MLP_fireworks:
+    """
+    Objectifs :
+    - Faire un modèle spécialisé sur les feux d'artifice
+    """
+
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]#("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+    Gen_fireworks = True
+    GS_fireworks = False
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data, labels, labels_encoded, MLP_fireworks_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
+    data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+
+    x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.2, random_state=42, shuffle=True, stratify=labels_encoded)
+
     # Function to load and preprocess data for Halikarnassos dataset, with options for frequency suppression and background addition
-    def load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=10, bool_add_background=False, attenuation_dB_range_list=((-20, -15))):
-        # Normalize data
-        data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+    def load_data_fireworks(data, labels_encoded, n_melvecs_to_keep=(0, 19), attenuation_dB_range=(-20, -15)):
+        """
+        1. Keep only the specified range of mel frequency bins (e.g., keep only the high frequencies)
+        2. Normalize the data
+        3. Add background noise to the data with random attenuation in the specified dB range
+        """
 
+        bool_add_background = attenuation_dB_range is not None
+        
         # Suppress low frequencies in the data
-        data_normalized_HF = suppress_low_frequencies(data=data_normalized, n_melvecs_to_suppress=n_melvecs_to_suppress)
+        data_HF = keep_frequencies(data=data, n_melvecs_to_keep=n_melvecs_to_keep)
 
+        # Normalize data
+        data_HF_normalized = data_HF / (np.linalg.norm(data_HF, axis=1, keepdims=True) + 1e-16)  # Add a small value to avoid division by zero
         # Add background in the training data with random attenuation between -20 and -15 dB
         if bool_add_background:
+            data_HF_normalized_background, labels_encoded_background = add_background(data_normalized=data_HF_normalized, labels=labels_encoded, attenuation_dB_range=attenuation_dB_range)
 
-            for attenuation_dB_range in attenuation_dB_range_list:
-                if attenuation_dB_range == attenuation_dB_range_list[0]:
-                    data_normalized_HF_background, labels_encoded_background = add_background(data_normalized=data_normalized_HF, labels=labels_encoded,
-                                                                      attenuation_dB_range=attenuation_dB_range)
-                else:
-                    new_data, new_labels = add_background(  data_normalized=data_normalized_HF, labels=labels_encoded,
-                                                            attenuation_dB_range=attenuation_dB_range)
-                    data_normalized_HF_background = np.concatenate((data_normalized_HF_background, new_data), axis=0)
-                    labels_encoded_background = np.concatenate((labels_encoded_background, new_labels), axis=0) 
-        return data_normalized_HF if not bool_add_background else data_normalized_HF_background, labels_encoded if not bool_add_background else labels_encoded_background
+        return data_HF_normalized if not bool_add_background else data_HF_normalized_background, labels_encoded.copy() if not bool_add_background else labels_encoded_background
 
+    if GS_fireworks:
+
+        param_grid = {
+            'hidden_layers_sizes': [(600, 300, 100), (300, 200, 100), (200, 100), (400, 300, 200, 100, 50)],
+            "activation": [nn.ReLU], # relu est clairement le meilleur
+            'num_epochs': [150],
+            "batch_size": [len(labels_encoded)],
+            "plot_loss": [False],
+            "loss_filename": [None],
+            "verbose": [False],
+            "learning_rate": [1e-3, 1e-2],
+            "dropout_rate": [0.25, 0.5],
+            "keeped_frequencies": [(0, 10), (0, 19), (0, 14), (5, 15), (5, 19)],
+            "add_background": [(-20, -15), (-20, 0), (-20, 5)],
+            "exposant": [0.5, 0.75, 1]
+        }
+
+        GS_MLP_fireworks = TorchMLP()
+        GS_MLP_fireworks.GridSearch(x_train, y_train, param_grid, cv=4, verbose=False, savename="fireworks")
+
+    if Gen_fireworks:
+        string_bar = "#"*90 + "\n"
+        print(f"\n\n\n{string_bar}Gen_fireworks:\n\nTraining MLP on Fireworks dataset with PyTorch implementation...")
+
+        # Params
+        model_name = "fireworks_v25_AF_final"
+        keeped_fequencies = (0, 19)
+        exposant              = 1
+        n_epochs              = 200
+        hidden_layers_sizes = [600, 300, 100]#[600, 300, 100]
+        class_weights = [1, 1, 1, 1, 1]
+
+        activation = nn.ReLU
+        bathch_size = len(labels_encoded)
+        learning_rate = 1e-2
+        dropout_rate = 0.25
+        attenuation_dB_range = (-20, 0)
+        transform_mean_std = True
+        # Paramètres secondaires
+        n_freq = keeped_fequencies[1] - keeped_fequencies[0] + 1
+        inputs = 20 * n_freq // (10 if transform_mean_std else 1) # 10 car on transforme les melspecgram en données de moyenne et d'écart-type, ce qui divise le nombre de features par 10
+        IO = (inputs, 5)
+
+
+        # Load and preprocess data with specified parameters
+        data_normalized_HF, labels_encoded = load_data_fireworks(data, labels_encoded, n_melvecs_to_keep=keeped_fequencies, attenuation_dB_range=attenuation_dB_range)
+        
+
+        if transform_mean_std:
+            data_normalized_HF = transform_melspecgram_to_mean_std_data(data_normalized_HF, n_freq=n_freq)
+
+        data_normalized_HF = data_normalized_HF**exposant
+
+        x_train, x_test, y_train, y_test = train_test_split(data_normalized_HF, labels_encoded, test_size=0.2, random_state=42, shuffle=True, stratify=labels_encoded)
+        x_train, x_val, y_train, y_val   = train_test_split(x_train, y_train, test_size=0.2, random_state=42, shuffle=True, stratify=y_train)
+
+        # Training the model
+        duration = time.time()
+        mlp = TorchMLP(hidden_layers_sizes=hidden_layers_sizes, activation=activation, IO=IO,  num_epochs=n_epochs, batch_size=bathch_size,
+                    learning_rate=learning_rate, dropout_rate=dropout_rate, class_weights=class_weights,
+                    x_val=x_val, y_val=y_val, plot_loss=True, verbose=True,
+                    loss_filename="LOSS_CURVES_fireworks_pytorch.pdf")
+        train_losses, test_losses = mlp.fit(x_train, y_train)
+        duration = time.time() - duration
+        print(f"Training time: {duration:.2f} seconds")
+        mlp.save_proba_class_x(x_val, y_val, class_idx=3, class_name="fireworks")
+
+        # Print performances and save confusion matrix
+        train_acc = mlp.score(x_train, y_train)
+        val_acc  = mlp.score(x_val, y_val)
+        test_acc  = mlp.score(x_test, y_test)
+        diff_acc = train_acc - test_acc
+        print(f"Accuracy train : {train_acc:.4f}")
+        print(f"Accuracy val   : {val_acc:.4f}")
+        print(f"Accuracy test  : {test_acc:.4f}" )
+        print(f"Difference train - test accuracy: {diff_acc:.4f}")
+
+        mlp.save_confusion_matrix(x_test, y_test, class_names=MLP_fireworks_classes, show=True, filename="confusion_matrix_halikarnassos_pytorch.pdf")
+        
+        # Save model results
+        results = ModelResults(model_name = model_name,
+                               model=mlp,
+                               accuracy={"train": train_acc, "test": test_acc},
+                               confusion_matrix=mlp.get_confusion_matrix(x_test, y_test),
+                               classes=MLP_fireworks_classes,
+                               epochs=n_epochs,
+                               loss_curves={"train": train_losses, "test": test_losses},
+                               params={
+                                    "hidden_layers_sizes": hidden_layers_sizes,
+                                    "learning_rate": learning_rate,
+                                    "dropout_rate": dropout_rate,
+                                    "attenuation_dB_range_list": attenuation_dB_range,
+                                    "exposant": exposant,
+                                    "keeped_fequencies": keeped_fequencies,
+                                    "batch_size": bathch_size,
+                                    "activation": activation.__name__ ,
+                                    "IO": IO,
+                                    "n_epochs": n_epochs,
+                                    "class_weights": class_weights,
+                                    "transform_mean_std": transform_mean_std
+                               })
+        
+        results.save(f"results_{model_name}.pkl")
+
+        # Save model on all the dataset
+        duration = time.time()
+        mlp = TorchMLP(hidden_layers_sizes=hidden_layers_sizes, activation=activation, IO=IO,  num_epochs=n_epochs, batch_size=bathch_size,
+                    learning_rate=learning_rate, dropout_rate=dropout_rate, class_weights=class_weights,
+                    x_val=None, y_val=None, plot_loss=False, verbose=True,
+                    loss_filename=None)
+        
+        train_losses, _ = mlp.fit(data_normalized_HF, labels_encoded)
+        duration = time.time() - duration
+        print(f"Training time on all the dataset: {duration//3600}h {duration//60%60:.2f}min {duration%60:.2f}s")
+
+        results = ModelResults(model_name = model_name,
+                               model=mlp,
+                               accuracy={"train": None, "test": None},
+                               confusion_matrix=mlp.get_confusion_matrix(x_test, y_test),
+                               classes=MLP_fireworks_classes,
+                               epochs=n_epochs,
+                               loss_curves={"train": train_losses, "val": None},
+                               params={
+                                    "hidden_layers_sizes": hidden_layers_sizes,
+                                    "learning_rate": learning_rate,
+                                    "dropout_rate": dropout_rate,
+                                    "attenuation_dB_range_list": attenuation_dB_range,
+                                    "exposant": exposant,
+                                    "keeped_fequencies": keeped_fequencies,
+                                    "batch_size": bathch_size,
+                                    "activation": activation.__name__ ,
+                                    "IO": IO,
+                                    "n_epochs": n_epochs,
+                                    "class_weights": class_weights,
+                                    "transform_mean_std": transform_mean_std
+                               })
+        results.save(f"model_{model_name}.pkl")
+
+        print(f"Model trained and confusion matrix saved for Fireworks dataset with PyTorch implementation.{string_bar}\n\n\n")
+        print(f"The model's classes are: {MLP_fireworks_classes}")
+
+MLP_gunshot_old = False
+if MLP_gunshot_old: # AF = model 13, HF = 25
+    """
+    Objectifs :
+    - Faire un modèle spécialisé sur les coups de fusil
+    """
+
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]
+               #("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+    Gen_gunshot = True
+    GS_gunshot = False
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data, labels, labels_encoded, MLP_gunshot_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
+    data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+
+
+    # Function to load and preprocess data for Halikarnassos dataset, with options for frequency suppression and background addition
+    def load_data_gunshot(data, labels_encoded, n_melvecs_to_keep=(0,19), attenuation_dB_range=(-20, -15)):
+        """
+        1. Keep only the specified range of mel frequency bins (e.g., keep only the high frequencies)
+        2. Normalize the data
+        3. Add background noise to the data with random attenuation in the specified dB range
+        """
+
+        bool_add_background = attenuation_dB_range is not None
+        
+        # Suppress low frequencies in the data
+        data_HF = keep_frequencies(data=data, n_melvecs_to_keep=n_melvecs_to_keep)
+
+        # Normalize data
+        data_HF_normalized = data_HF / (np.linalg.norm(data_HF, axis=1, keepdims=True) + 1e-16)  # Add a small value to avoid division by zero
+        # Add background in the training data with random attenuation between -20 and -15 dB
+        if bool_add_background:
+            data_HF_normalized_background, labels_encoded_background = add_background(data_normalized=data_HF_normalized, labels=labels_encoded, attenuation_dB_range=attenuation_dB_range)
+
+        return data_HF_normalized if not bool_add_background else data_HF_normalized_background, labels_encoded.copy() if not bool_add_background else labels_encoded_background
+
+    if GS_gunshot:
+
+        data_normalized = data / np.linalg.norm(data, axis=1, keepdims=True)
+        x_train, x_test, y_train, y_test = train_test_split(data_normalized, labels_encoded, test_size=0.2, random_state=42, shuffle=True, stratify=labels_encoded)
+
+        param_grid = {
+            'hidden_layers_sizes': [(600, 300, 100)],# (300, 200, 100), (200, 100), (400, 300, 200, 100, 50)],
+            "activation": [nn.ReLU], # relu est clairement le meilleur
+            'num_epochs': [300],
+            "batch_size": [len(labels_encoded)],
+            "plot_loss": [False],
+            "loss_filename": [None],
+            "verbose": [False],
+            "learning_rate": [1e-2],# 1e-3],
+            "dropout_rate": [0.25],#, 0.5],
+            "keeped_frequencies": [(0, 19), (10, 19), (7, 19)],# (7, 17)],
+            "add_background": [(-20, -15)],#, (-20, 0), (-20, 5)],
+            "exposant": [0.5, 0.75, 1],
+            "class_weights": [(10., 10., 10., 10., 1.)]
+        }
+
+        GS_MLP_gunshot = TorchMLP()
+        GS_MLP_gunshot.GridSearch(x_train, y_train, param_grid, cv=4, verbose=False, savename="gunshot")
+
+    if Gen_gunshot:
+        string_bar = "#"*90 + "\n"
+        print(f"\n\n\n{string_bar}Gen_gunshot:\n\nTraining MLP on Gunshot dataset with PyTorch implementation...")
+
+        # Params
+        model_name = "Gunshot_v13_AF_final"
+        keeped_frequencies = (0, 19)
+        exposant              = 1
+        n_epochs              = 100
+        hidden_layers_sizes = [600, 300, 100]
+        activation = nn.ReLU
+        batch_size = len(labels_encoded)
+        learning_rate = 1e-2
+        dropout_rate = 0.5
+        attenuation_dB_range = (-20, 0)
+        class_weights = (1.0, 2.0, 3.0, 2.0, 1.0)
+
+        # Paramètres secondaires
+        inputs = (keeped_frequencies[1] - keeped_frequencies[0] + 1) * 20
+        IO = (inputs, 5)
+
+        
+
+        # Load and preprocess data with specified parameters
+        data_HF_normalized, labels_encoded = load_data_gunshot(data, labels_encoded, n_melvecs_to_keep=keeped_frequencies, attenuation_dB_range=attenuation_dB_range)
+        
+        data_HF_normalized = data_HF_normalized ** exposant
+
+        x_train, x_test, y_train, y_test = train_test_split(data_HF_normalized, labels_encoded, test_size=0.15, random_state=42, shuffle=True, stratify=labels_encoded)
+        x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=42, shuffle=True, stratify=y_train)
+
+        # Training the model
+        duration = time.time()
+        mlp = TorchMLP(hidden_layers_sizes=hidden_layers_sizes, activation=activation, IO=IO,  num_epochs=n_epochs, batch_size=batch_size,
+                    learning_rate=learning_rate, dropout_rate=dropout_rate, class_weights=class_weights,
+                    x_val=x_val, y_val=y_val, plot_loss=True, verbose=True,
+                    loss_filename=f"LOSS_CURVES_{model_name}.pdf")
+
+        train_losses, test_losses = mlp.fit(x_train, y_train)
+        duration = time.time() - duration
+        print(f"Training time: {duration:.2f} seconds")
+
+        mlp.save_proba_class_x(x_val, y_val, class_idx=4, class_name="gunshot")
+
+        # Print performances and save confusion matrix
+        train_acc = mlp.score(x_train, y_train)
+        val_acc  = mlp.score(x_val, y_val)
+        test_acc  = mlp.score(x_test, y_test)
+        diff_acc = train_acc - test_acc
+
+        print(f"Accuracy train : {train_acc:.4f}")
+        print(f"Accuracy val   : {val_acc:.4f}")
+        print(f"Accuracy test  : {test_acc:.4f}" )
+        print(f"Difference train - test accuracy: {diff_acc:.4f}")
+
+        mlp.save_confusion_matrix(x_val, y_val, class_names=MLP_gunshot_classes, show=True, filename=f"confusion_matrix_{model_name}.pdf")
+        
+        # Save model results
+        results = ModelResults(model_name = model_name,
+                               model=mlp,
+                               accuracy={"train": train_acc, "test": test_acc},
+                               confusion_matrix=mlp.get_confusion_matrix(x_val, y_val),
+                               classes=MLP_gunshot_classes,
+                               epochs=n_epochs,
+                               loss_curves={"train": train_losses, "test": test_losses},
+                               params={
+                                    "hidden_layers_sizes": hidden_layers_sizes,
+                                    "learning_rate": learning_rate,
+                                    "dropout_rate": dropout_rate,
+                                    "attenuation_dB_range_list": attenuation_dB_range,
+                                    "exposant": exposant,
+                                    "keeped_frequencies": keeped_frequencies,
+                                    "batch_size": batch_size,
+                                    "activation": activation.__name__ ,
+                                    "IO": IO,
+                                    "n_epochs": n_epochs,
+                                    "class_weights": class_weights,
+                                    "exposant": exposant
+                               })
+        results.save(f"results_{model_name}.pkl")
+
+        # Save model on all the dataset
+        duration = time.time()
+        mlp = TorchMLP(hidden_layers_sizes=hidden_layers_sizes, activation=activation, IO=IO,  num_epochs=n_epochs, batch_size=len(labels_encoded),
+            learning_rate=learning_rate, dropout_rate=dropout_rate, plot_loss=False, verbose=True, loss_filename=None, class_weights=class_weights)
+        train_losses, _ = mlp.fit(data_HF_normalized, labels_encoded)
+        duration = time.time() - duration
+        print(f"Training time on all the dataset: {duration//3600}h {duration//60%60:.2f}min {duration%60:.2f}s")
+        results = ModelResults(model_name = model_name,
+                               model=mlp,
+                               accuracy=None,
+                               confusion_matrix=None,
+                               classes=MLP_gunshot_classes,
+                               epochs=n_epochs,
+                               loss_curves={"train": train_losses, "test": None},
+                               params={
+                                    "hidden_layers_sizes": hidden_layers_sizes,
+                                    "learning_rate": learning_rate,
+                                    "dropout_rate": dropout_rate,
+                                    "attenuation_dB_range_list": attenuation_dB_range,
+                                    "exposant": exposant,
+                                    "keeped_frequencies": keeped_frequencies,
+                                    "batch_size": batch_size,
+                                    "activation": activation.__name__ ,
+                                    "IO": IO,
+                                    "n_epochs": n_epochs,
+                                    "class_weights": class_weights,
+                               })
+        results.save(f"model_{model_name}.pkl")
+
+        print(f"Model trained and confusion matrix saved for Gusnhot dataset with PyTorch implementation.\n{string_bar}\n\n\n")
+        print(f"The model's classes are: {MLP_gunshot_classes}")
+
+MLP_background = False
+if MLP_background:
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]
+               #("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+ 
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data, labels, labels_encoded, MLP_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
+
+
+    string_bar = "#"*90 + "\n"
+    print(f"\n\n\n{string_bar}Gen_background:\n\nTraining MLP on Background dataset with PyTorch implementation...")
+
+    class_name = "background"
+    bool_save_model = True
 
     # Params
-    model_name = "Halikarnassos_dB_-20_-15"
-    n_melvecs_to_suppress = 0
-    exposant              = 0.5
-    bool_add_background   = False
-    attenuation_dB_range_list = [(-20, -15)]
+    params = {
+        "model_name": "background_v9_AF_final",
+        'hidden_layers_sizes': (600, 300, 100), # (300, 200, 100)
+        "activation": nn.ReLU,
+        'num_epochs': 400,
+        "batch_size": len(labels_encoded),
+        "learning_rate": 1e-2,
+        "dropout_rate": 0.5,
+        "class_weights": [1, 2, 2, 1.5, 1.5],
+        "plot_loss": True,
+        "verbose": True,
+        "loss_filename": None
+    }
+
+    data_construction = {
+        "keeped_frequencies": (0, 19),
+        "attenuation_dB_range": (-20, 0),
+        "exposant": 1,
+        "transform_mean_std": True
+    }
+
+    n_freq = data_construction["keeped_frequencies"][1] - data_construction["keeped_frequencies"][0] + 1
+    params["IO"] = (20 * n_freq // (10 if data_construction["transform_mean_std"] else 1), 5)
+    data_construction["n_freq"] = n_freq
+    # sel = (1, int(params["model_name"][-2:])+1)
+    sel = False
+    train_and_save_model(params=params,
+                            data_construction=data_construction,
+                            data=data,
+                            labels_encoded=labels_encoded,
+                            MLP_classes=MLP_classes,
+                            class_name=class_name,
+                            bool_save_model=bool_save_model)
+
+    print(f"Model trained and confusion matrix saved.{string_bar}\n\n\n")
+
+MLP_gunshot = False
+if MLP_gunshot:
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]
+               #("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+ 
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data, labels, labels_encoded, MLP_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
 
 
-    # Load and preprocess data with specified parameters
-    data_normalized_HF, labels_encoded = load_data_halikarnassos(data, labels_encoded, n_melvecs_to_suppress=n_melvecs_to_suppress,
-                                                                    bool_add_background=bool_add_background,
-                                                                    attenuation_dB_range_list=attenuation_dB_range_list)
-    
+    string_bar = "#"*90 + "\n"
+    print(f"\n\n\n{string_bar}Gen_gunshot:\n\nTraining MLP on Gunshot dataset with PyTorch implementation...")
 
-    data_normalized_HF = data_normalized_HF ** exposant
+    class_name = "gunshot"
+    bool_save_model = True
 
-    model = pickle.load(open("MLP_halikarnassos_pytorch.pkl", "rb"))
+    # Params
+    params = {
+        "model_name": "gunshot_v8_HF_final",
+        'hidden_layers_sizes': (600, 300, 100), # (300, 200, 100)
+        "activation": nn.ReLU,
+        'num_epochs': 400,
+        "batch_size": len(labels_encoded),
+        "learning_rate": 1e-2,
+        "dropout_rate": 0.5,
+        "class_weights": [1, 2, 2, 1.5, 1],
+        "plot_loss": True,
+        "verbose": True,
+        "loss_filename": None
+    }
 
-    y_pred = model.predict(data_normalized_HF)
+    data_construction = {
+        "keeped_frequencies": (5, 19),
+        "attenuation_dB_range": (-20, 0),
+        "exposant": 1,
+        "transform_mean_std": True
+    }
 
-    accuracy = np.mean(y_pred == labels_encoded)
-    print(f"Accuracy on the whole dataset: {accuracy:.4f}")
+    n_freq = data_construction["keeped_frequencies"][1] - data_construction["keeped_frequencies"][0] + 1
+    params["IO"] = (20 * n_freq // (10 if data_construction["transform_mean_std"] else 1), 5)
+    data_construction["n_freq"] = n_freq
+    try:
+        sel = (1, int(params["model_name"][-2:])+1)
+    except:
+        sel = False
+    train_and_save_model(params=params,
+                            data_construction=data_construction,
+                            data=data,
+                            labels_encoded=labels_encoded,
+                            MLP_classes=MLP_classes,
+                            class_name=class_name,
+                            bool_save_model=bool_save_model)
+
+    print(f"Model trained and confusion matrix saved.{string_bar}\n\n\n")
+
+MLP_general = True
+if MLP_general:
+    records = [("mcu13", "fisher", "local speakers - spec_20_20"),         # 5 classes, 122 samples per class
+               ("mcu13", "vinikot", "JBL Flip 5 - Auguste - spec_20_20"),
+               ("mcu13", "sud5", "local speakers - spec_20_20"),       # 5 classes, 122 samples per class
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Jonathan"),
+               ("mcu13", "sud11", "local speakers - spec_20_20 - Raphael")]
+               #("mcu13", "sud8", "local speakers - spec_20_20")]         # 5 classes, 122 samples per class]
+
+ 
+
+    ### Load and preprocess data
+
+    # Load data and labels
+    data, labels, labels_encoded, MLP_classes = load_data(records, classes=["background", "chainsaw", "crackling fire", "fireworks", "gunshot"])
 
 
-# ModelResults().load_and_display(filenames=["results_Halikarnassos_dB_-20_-5.pkl",
-#                                            "results_Halikarnassos_dB_-20_0.pkl" ,
-#                                            "results_Halikarnassos_dB_-20_5.pkl" ,
-#                                            "results_Halikarnassos_dB_0_5.pkl"   ,
-#                                            "results_Halikarnassos_dB_-20_-15.pkl"  ],
-#                                 savename="Halikarnassos mausoleum.pdf")
+    string_bar = "#"*90 + "\n"
+    print(f"\n\n\n{string_bar}Gen_gunshot:\n\nTraining MLP on Gunshot dataset with PyTorch implementation...")
 
-# with open("ephesos_GS_Mon Apr 13 01_53_50 2026.pkl", "rb") as f:
-#     hyperparameter_tuning = pickle.load(f)
-# # trier le dictionnaire hyperparameter_tuning selon "mean_score"
-# # hyperparameter_tuning = sorted(hyperparameter_tuning, key=lambda x: hyperparameter_tuning["mean_score"], reverse=True)
-# for element in hyperparameter_tuning:
-#     print(f"Mean score: {element['mean_score']:.4f}, learning rate: {element['params']['learning_rate']}, dropout rate: {element['params']['dropout_rate']}, hidden layers sizes: {element['params']['hidden_layers_sizes']}")#, Params: {element['params']}")
+    class_name = "panda nounours"
+    bool_save_model = False
+
+    # Params
+    params = {
+        "model_name": "general_v15",
+        'hidden_layers_sizes': (600, 300, 100), # (300, 200, 100)
+        "activation": nn.ReLU,
+        'num_epochs': 450,
+        "batch_size": len(labels_encoded),
+        "learning_rate": 1e-2,
+        "dropout_rate": 0.5,
+        "class_weights": [1, 1, 1, 1, 1],
+        "plot_loss": True,
+        "verbose": True,
+        "loss_filename": None
+    }
+
+    data_construction = {
+        "keeped_frequencies": (5, 19),
+        "attenuation_dB_range": (-20, 0),
+        "exposant": 1,
+        "transform_mean_std": True
+    }
+
+    n_freq = data_construction["keeped_frequencies"][1] - data_construction["keeped_frequencies"][0] + 1
+    params["IO"] = (20 * n_freq // (10 if data_construction["transform_mean_std"] else 1), 5)
+    data_construction["n_freq"] = n_freq
+    try:
+        sel = (1, int(params["model_name"].split("_v")[-1])+1)
+    except:
+        sel = False
+    train_and_save_model(params=params,
+                            data_construction=data_construction,
+                            data=data,
+                            labels_encoded=labels_encoded,
+                            MLP_classes=MLP_classes,
+                            class_name=class_name,
+                            bool_save_model=bool_save_model)
+
+    print(f"Model trained and confusion matrix saved.{string_bar}\n\n\n")
+
+
+
+
+try:
+    liste = [f"results_general_v{i}.pkl" for i in range(*sel)]
+except:
+    None
+if sel:
+    ModelResults().load_and_display(filenames=liste,
+                                    savename="Halikarnassos mausoleum.pdf")
+
+liste = [("chainsaw_GS_24_04.pkl", 1), ("fire_GS_24_04.pkl", 2), ("fireworks_GS_25_04.pkl", 3), ("gunshot_GS_25_04.pkl", 4)]
+liste = [("fire_GS_24_04.pkl", 2), ("fireworks_GS_25_04.pkl", 3), ("gunshot_GS_25_04.pkcl", 4)]
+liste = [("fire_GS_24_04.pkl", 2)]
+
+print_GS_results = False
+if print_GS_results:
+    for file, class_idx in liste:
+        hyperparameter_tuning_raw = pickle.load(open(file, "rb"))
+        hyperparameter_tuning = []
+        for i in range(len(hyperparameter_tuning_raw)):
+            if hyperparameter_tuning_raw[i]['background_range'] == (-20,0):
+                hyperparameter_tuning.append(hyperparameter_tuning_raw[i])
+        n_first_elements_to_display = 10
+        n_first_elements_to_display = min(n_first_elements_to_display, len(hyperparameter_tuning))
+        print(f"\n\n\nResults for {file}:\n")
+        
+        for index in range(n_first_elements_to_display):
+
+            element = hyperparameter_tuning[index]
+
+            # confusion_matrices = element['fold_cm']
+            # sum_confusion_matrix = np.sum(confusion_matrices, axis=0)
+            # TP = np.zeros(len(confusion_matrices))
+            # FP = np.zeros(len(confusion_matrices))
+            # FN = np.zeros(len(confusion_matrices))
+
+            # for fold in range(len(element['fold_cm'])):
+            #     TP[fold] = confusion_matrices[fold][class_idx, class_idx]
+            #     FP[fold] = np.sum(confusion_matrices[fold][:, class_idx]) - TP[fold]
+            #     FN[fold] = np.sum(confusion_matrices[fold][class_idx, :]) - TP[fold]
+
+            # total_P_declared = np.mean(TP) + np.mean(FP)
+            # total_P_actual = np.mean(TP) + np.mean(FN)
+            # TP = np.mean(TP) / total_P_declared if total_P_declared > 0 else 0
+            # FP = np.mean(FP) / total_P_declared if total_P_declared > 0 else 0
+            # FN = np.mean(FN) / total_P_actual if total_P_actual > 0 else 0
+
+            print(f"Mean score: {element['mean_score']:.4f}, learning rate: {element['params']['learning_rate']}, dropout rate: {element['params']['dropout_rate']}, hidden layers sizes: {element['params']['hidden_layers_sizes']}, background: {element['background_range']}, exposant: {element['exposant']}, frequencies: {element['frequencies']}")#, Params: {element['params']})
+
+            # print(f"Mean score: {element['mean_score']:.4f}, TP: {TP*100:.2f} %, FP: {FP*100:.2f} %, FN: {FN*100:.2f} %, learning rate: {element['params']['learning_rate']}, dropout rate: {element['params']['dropout_rate']}, hidden layers sizes: {element['params']['hidden_layers_sizes']}, background: {element['background_range']}, exposant: {element['exposant']}, frequencies: {element['frequencies']}")#, Params: {element['params']})
+            # show sum confusion matrix
+            # save_confusion_matrix_from_array(confusion_matrix=sum_confusion_matrix, filename=None, show=True, labels=["background", "chainsaw", "fire", "fireworks", "gunshot"])
+        print("\n\n\n\n\n")
