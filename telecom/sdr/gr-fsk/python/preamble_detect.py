@@ -31,17 +31,57 @@ from gnuradio import gr
 #     """
 #     Preamble detection.
 #     """
-#     y_abs = np.abs(y)
-#     for i in range(0, int(len(y) / L)):
-#         sum_abs = np.sum(y_abs[i * L : (i + 1) * L])
-#         if sum_abs > threshold * L:
-#             return i * L + 20
+#     # y_abs = np.abs(y)
+#     # for i in range(0, int(len(y) / L)):
+#     #     sum_abs = np.sum(y_abs[i * L : (i + 1) * L])
+#     #     if sum_abs > threshold * L:
+#     #         return i * L + 20
+
+#     long_term_sum_W = 256
+#     short_term_sum_W = 32
+
+#     min_samples = max(long_term_sum_W, short_term_sum_W)
+
+#     if len(y) < min_samples:
+#         return None
+#     else:
+#         K = threshold * (short_term_sum_W / long_term_sum_W)
+
+#         long_window = np.ones(long_term_sum_W)
+#         short_window = np.ones(short_term_sum_W)
+#         yabs = np.abs(y)  # Energy of the received signal (squared magnitude)
+#         ylen = len(y)
+                
+#         # long_sum = np.convolve(yabs, long_window, mode="valid")
+#         # short_sum = np.convolve(yabs, short_window, mode="valid")
+#         long_sum = signal.convolve(yabs, long_window, mode = "valid", method="direct")
+#         short_sum = signal.convolve(yabs, short_window, mode = "valid", method="direct")
+#         # long_sum = np.cumsum(yabs[:long_term_sum_W])
+#         # short_sum = np.cumsum(yabs[:short_term_sum_W])
+#         offset = long_term_sum_W - short_term_sum_W
+#         short_sum_aligned = short_sum[offset : offset + len(long_sum)]
+#         detection = short_sum_aligned > (long_sum * K)
+#         detected_indices = np.where(detection)[0]
+#         first_idx = (
+#                     (detected_indices[0] + long_term_sum_W + short_term_sum_W-40)
+#                     if detected_indices.size > 0
+#                     else None
+#                 )
+#         return first_idx    
 
 #     return None
 
 
 def preamble_detect_energy(y, L, threshold):
-            preamble = np.array([ 1.0000000e+00+0.0000000e+00j,  9.9879545e-01+4.9067676e-02j,
+            
+    long_term_sum_W = 256
+    short_term_sum_W = 32
+    min_samples = max(long_term_sum_W, short_term_sum_W)
+
+    if len(y) < min_samples:
+        return None
+    else:
+        preamble = np.array([ 1.0000000e+00+0.0000000e+00j,  9.9879545e-01+4.9067676e-02j,
             9.9518472e-01+9.8017141e-02j,  9.8917651e-01+1.4673047e-01j,
             9.8078525e-01+1.9509032e-01j,  9.7003126e-01+2.4298018e-01j,
             9.5694035e-01+2.9028466e-01j,  9.4154406e-01+3.3688986e-01j,
@@ -1066,52 +1106,50 @@ def preamble_detect_energy(y, L, threshold):
             9.8078525e-01+1.9509032e-01j,  9.8917651e-01+1.4673047e-01j,
             9.9518472e-01+9.8017141e-02j,  9.9879545e-01+4.9067676e-02j])
 
-            long_term_sum_W = 256*2
-            short_term_sum_W = 32
-            R = 8
-            K = 0 * (short_term_sum_W / long_term_sum_W)
+        R = 8
+        K = threshold * (short_term_sum_W / long_term_sum_W)
+        # K = 7
 
-            long_window = np.ones(long_term_sum_W)
-            short_window = np.ones(short_term_sum_W)
-            yabs = (np.abs(y))**2  # Energy of the received signal (squared magnitude)
-            ylen = len(y)
+        long_window = np.ones(long_term_sum_W)
+        short_window = np.ones(short_term_sum_W)
+        yabs = (np.abs(y))**2  # Energy of the received signal (squared magnitude)
+        ylen = len(y)
             
-            long_sum = np.convolve(yabs, long_window, mode="valid")
-            short_sum = np.convolve(yabs, short_window, mode="valid")
-            offset = long_term_sum_W - short_term_sum_W
-            short_sum_aligned = short_sum[offset : offset + len(long_sum)]
+        long_sum = signal.convolve(yabs, long_window, mode = "valid", method="direct")
+        short_sum = signal.convolve(yabs, short_window, mode = "valid", method="direct")
+        offset = long_term_sum_W - short_term_sum_W
+        short_sum_aligned = short_sum[offset : offset + len(long_sum)]
 
-            detection = short_sum_aligned > (long_sum * K)
-            detected_indices = np.where(detection)[0]
+        detection = short_sum_aligned > (long_sum * K)
+        detected_indices = np.where(detection)[0]
 
             # --- Correlation-based preamble detection ---
-            if(detected_indices.size == 0):
-                return None
-            start = detected_indices[0] + long_term_sum_W + short_term_sum_W
-            end   = start + 256   # marge de sécurité
-            y_shifted = np.concatenate([np.zeros(2*R), y])
-            corr_signal = np.abs(signal.correlate(y_shifted[start:end], preamble[::64//R], mode='full'))
-            n_peaks = 1  # nombre de pics
-            idx = np.argpartition(corr_signal, -n_peaks)[-n_peaks:]   # indices des n plus grands
-            top_values = corr_signal[idx]                 # valeurs correspondantes
-            Decision_variable = np.mean(top_values)              # moyenne des n plus grands
-            idx_first_peak = idx[np.argmax(top_values)]  # index du pic le plus grand
+        if(detected_indices.size == 0):
+            return None
+        start = detected_indices[0] + long_term_sum_W + short_term_sum_W
+        if start >= len(y):
+            return None
+        end   = start + 256   # marge de sécurité
+        # y_shifted = np.concatenate([np.zeros(2*R), y])
+        corr_signal = np.abs(signal.correlate(y[start:end], preamble[::64//R], mode='full'))
+        Decision_variable = np.max(corr_signal)              # moyenne des n plus grands
+        # idx_first_peak = np.argmax(corr_signal)  # index du pic le plus grand
 
-            noise_zone = yabs[:long_term_sum_W]  # Zone supposée sans signal pour estimer le bruit
-            sigma2 = np.median(noise_zone)
-            threshold1 = 0 * sigma2 * np.sqrt(256)  # Seuil basé sur l'énergie du bruit et la longueur du préambule
-            # pattern_detected = np.max(corr_signal) > threshold
-            pattern_detected = Decision_variable > threshold1
+        # noise_zone = yabs[:long_term_sum_W]  # Zone supposée sans signal pour estimer le bruit
+        noise_floor = np.median(yabs)
+        noise_samples = yabs[yabs < 2 * noise_floor]
+        sigma2 = np.mean(noise_samples)
+        threshold1 = 0 * sigma2 * np.sqrt(256)  # Seuil basé sur l'énergie du bruit et la longueur du préambule
+        # pattern_detected = np.max(corr_signal) > threshold
+        pattern_detected = Decision_variable > threshold1
+         # --- Final index ---
+        if pattern_detected:
+            first_idx = detected_indices[0] + long_term_sum_W + short_term_sum_W
+        else:
+            first_idx = None
 
 
-            # --- Final index ---
-            if detected_indices.size > 0 and pattern_detected:
-                first_idx = detected_indices[0] + long_term_sum_W + short_term_sum_W -40
-            else:
-                first_idx = None
-
-
-            return first_idx
+        return first_idx
 
 
 class preamble_detect(gr.basic_block):
@@ -1179,7 +1217,7 @@ class preamble_detect(gr.basic_block):
             if (self.rem_samples == 0) :
                 PMT_msg = pmt.from_double(self.power_est/ (8 * self.osr * (self.packet_len + 1) + self.osr))
                 self.message_port_pub(pmt.intern("SignalPow"), PMT_msg)
-
+            
             return n_out
         else:
             N = len(output_items[0]) - len(output_items[0]) % self.filter_len

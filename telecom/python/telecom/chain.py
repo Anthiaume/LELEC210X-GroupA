@@ -291,27 +291,27 @@ class BasicChain(Chain):
                 first_idx = None
 
             return first_idx
-        else:
-            corr = np.correlate(y, x_pr, mode='valid')
+        # else:
+        #     corr = np.correlate(y, x_pr, mode='valid')
 
-            # Détecter le pic
-            start_index = np.argmax(np.abs(corr)**2)
-            print("Préambule détecté à l'échantillon :", start_index)
+        #     # Détecter le pic
+        #     start_index = np.argmax(np.abs(corr)**2)
+        #     print("Préambule détecté à l'échantillon :", start_index)
 
-            yabs = (np.abs(y))**2  # Energy of the received signal (squared magnitude)
-            noise_zone = yabs[:256]  # Zone supposée sans signal pour estimer le bruit
-            sigma2 = np.median(noise_zone)
-            threshold = 5 * sigma2 * np.sqrt(256)  # Seuil basé sur l'énergie du bruit et la longueur du préambule
-            pattern_detected = np.max(np.abs(corr)**2) > threshold
+        #     yabs = (np.abs(y))**2  # Energy of the received signal (squared magnitude)
+        #     noise_zone = yabs[:256]  # Zone supposée sans signal pour estimer le bruit
+        #     sigma2 = np.median(noise_zone)
+        #     threshold = 5 * sigma2 * np.sqrt(256)  # Seuil basé sur l'énergie du bruit et la longueur du préambule
+        #     pattern_detected = np.max(np.abs(corr)**2) > threshold
 
 
-            # --- Final index ---
-            if pattern_detected:
-                first_idx = start_index
-            else:
-                first_idx = None
+        #     # --- Final index ---
+        #     if pattern_detected:
+        #         first_idx = start_index
+        #     else:
+        #         first_idx = None
 
-            return first_idx
+        #     return first_idx
 
         
 

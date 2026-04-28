@@ -78,6 +78,8 @@ def hex_to_bytes(ctx: click.Context, param: click.Parameter, value: str) -> byte
 @common.click.melvec_length
 @common.click.n_melvecs
 @common.click.verbosity
+
+
 def main(
     _input: click.File | None,
     output: click.File,
@@ -154,8 +156,10 @@ def main(
     input_stream = reader()
     for msg in input_stream:
         try:
-            sender, payload = unwrapper.unwrap_packet(msg)
-            logger.debug(f"From {sender}, received packet: {payload.hex()}")
+            sender, payload, serial = unwrapper.unwrap_packet(msg)
+            id_packet = serial
+            logger.debug(f"From {sender}, received packet: {payload.hex()}, id_packet = {id_packet}")
+            print("id_packet:", id_packet)
             output.write(PRINT_PREFIX + payload.hex() + "\n")
             output.flush()
 

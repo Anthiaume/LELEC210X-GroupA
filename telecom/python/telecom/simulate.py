@@ -480,7 +480,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
 
         # Écriture
         with open(full_path, "w") as f:
-            f.write(f"# METHOD: {sto_method} | PAYLOAD: {p_len} | PACKETS: {n_pkts} | FREQ_DEV: {chain.freq_dev} | PPD: {chain.use_dynamic_ppd}\n")
+            f.write(f"# PAYLOAD: {p_len} | PACKETS: {n_pkts} | PPD: {chain.use_dynamic_ppd}\n")
             f.write("# EsN0_dB\tBER\tPER\tRMSE_cfo\tRMSE_sto\n")
             np.savetxt(f, save_var, delimiter="\t", fmt="%.8e")
         
@@ -521,7 +521,7 @@ def main(chain_name: str, seed: int, dest: Path):  # noqa: C901
             match = re.search(r"sim_(.*)_len(\d+)", path.name)
             if match:
                 method, p_len = match.groups()
-                label = f"{method} (L={p_len}, FreqDev={freq_dev})"
+                label = f"{method} (L={p_len}, PPD={PPD_algo})"
             else:
                 label = path.name
 

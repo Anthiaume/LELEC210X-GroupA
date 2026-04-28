@@ -122,3 +122,4 @@ This script is made with gunshots in mind and thus detects the peak of the
 to defined the time of occurence of a shot.
 
 You can use it like `uv run merge-audio ./src/classification/datasets/soundfiles/gunshot_`.
+ 

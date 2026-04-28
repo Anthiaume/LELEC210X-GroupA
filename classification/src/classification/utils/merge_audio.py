@@ -40,7 +40,7 @@ def random_time_gen(n, start, end, min_dist):
 @click.argument(
     "sources",
     nargs=-1,
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    type=click.Path(exists=True, path_type=Path),
 )
 @click.option(
     "-n",
@@ -101,8 +101,23 @@ def random_time_gen(n, start, end, min_dist):
     default=500,
     show_default=True,
     type=click.IntRange(min=0),
-    help="Slack at the beginning and end of the clip. (ms)",
+    help="Gain to reduce the background intensity. (dB)",
 )
+
+@click.option(
+    "--background",
+    type=click.Path(exists=True, path_type=Path),
+    default=None,
+    help="Background audio to play during the whole clip.",
+)
+@click.option(
+    "--bg_gain",
+    default=-15,
+    show_default=True,
+    type=click.IntRange(min=-60, max=0),
+    help="Gain applied to the background audio (dB).",
+)
+
 @common.click.verbosity
 def main(
     sources: tuple[Path, ...],
@@ -114,9 +129,22 @@ def main(
     seed: int | None,
     directory: Path,
     prefix: str | None,
+    background: tuple[Path, ...],
+    bg_gain: int | None,
 ) -> None:
     random.seed(seed)
     directory.mkdir(parents=True, exist_ok=True)
+
+    # Si un seul argument est donné et c'est un dossier, prendre tous les .wav dedans
+    if len(sources) == 1 and sources[0].is_dir():
+        folder = sources[0]
+        sources = tuple(sorted(folder.glob("*.wav")))
+        if not sources:
+            raise ValueError(f"Aucun fichier .wav trouvé dans le dossier {folder}")
+
+    # Vérifier qu'il y a au moins un fichier source
+    if not sources:
+        raise ValueError("Aucun fichier source fourni.")
 
     duration_ms = duration * 1000
     delta_ms = time_delta * 1000
@@ -124,7 +152,14 @@ def main(
     cache: dict[Path, tuple[AudioSegment, float]] = {}
 
     for clip_index in trange(num_clips, desc="Generating audio files..."):
-        piece = AudioSegment.silent(duration=int(duration_ms))
+        if background:
+            bg = AudioSegment.from_wav(background).apply_gain(bg_gain)
+
+            # boucler le background pour remplir toute la durée
+            repeats = int(duration_ms / len(bg)) + 1
+            piece = (bg * repeats)[:int(duration_ms)]
+        else:
+            piece = AudioSegment.silent(duration=int(duration_ms))
 
         max_start = duration_ms - (occurences - 1) * delta_ms
         if max_start < 0:
@@ -132,20 +167,30 @@ def main(
                 "Duration too short for required occurrences and time_delta."
             )
 
-        shot_times = random_time_gen(occurences, slack, duration_ms - slack, delta_ms)
+        current_time = slack
 
-        for shot_time, path in zip(shot_times, random.choices(sources, k=occurences)):
+        # choisir les sons dans un ordre aléatoire
+        chosen_sounds = random.sample(list(sources), k=occurences) if len(sources) >= occurences else random.choices(sources, k=occurences)
+
+        for path in chosen_sounds:
+
             if path not in cache:
                 audio = AudioSegment.from_wav(path)
                 audio = audio.apply_gain(-audio.max_dBFS)
-                shot_offset = get_shot_offset_ms(audio)
-                cache[path] = (audio, shot_offset)
+                cache[path] = audio
 
-            audio, shot_offset = cache[path]
+            audio = cache[path]
 
-            overlay_position = shot_time - shot_offset
+            # placer le son
+            piece = piece.overlay(audio, position=int(current_time))
 
-            piece = piece.overlay(audio, position=int(overlay_position))
+            # avancer le temps : durée du son + espace minimum
+            current_time += len(audio) + delta_ms
+
+            if current_time > duration_ms:
+                raise ValueError(
+                    "Clip trop court pour placer tous les sons avec l'intervalle demandé."
+                )
 
         filename = f"{prefix or 'clip'}_{clip_index:02d}.wav"
         piece.export(directory / filename, format="wav")

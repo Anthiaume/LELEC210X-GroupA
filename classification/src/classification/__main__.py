@@ -82,7 +82,7 @@ def main(
     """
 
     global begin_time, models, predicted_probabilities, predicted_classes, pca_models
-
+    print("Jpeux pas décrocher, ya NOUNOURS")
     if submit:
         if key is None:
             raise click.UsageError("You must provide a key to submit guesses.")
