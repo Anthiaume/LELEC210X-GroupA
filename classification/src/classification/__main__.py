@@ -14,33 +14,9 @@ from leaderboard.utils import get_url
 import numpy as np
 
 from .utils import payload_to_melvecs
-from student_fct import suppress_low_frequencies, TorchMLP
+from student_fct import *
 load_dotenv()
 
-global begin_time, models, predicted_probabilities, predicted_classes, pca_models
-begin_time = 0 # Equivaut au 1 janvier 1970, 00:00:00 UTC, soit une date très ancienne, pour forcer l'initialisation des variables lors du premier appel à student_var_initialization().
-
-def student_var_initialization():
-    global begin_time, models, predicted_probabilities, predicted_classes, pca_models
-    # Initialization of the begin time
-    begin_time = time.time()
-
-    # Load the models
-    models = ["MLP_ephesos_pytorch.pkl", "MLP_flaviopolis_pytorch.pkl", "MLP_gangra_pytorch.pkl"]
-    for model in range(len(models)):
-        with open(models[model], "rb") as f:
-            models[model] = pickle.load(f)
-
-    # Load the PCA models
-    # pca_models = ["PCA_albaniana.pkl"]
-    # for i, model in enumerate(pca_models):
-    #     with open(model, "rb") as f:
-    #         pca_models[i] = pickle.load(f)
-
-    # Initialization of the prediction probabilities
-    predicted_probabilities = [ [] for i in range(len(models))]
-    # Initialization of the predicted classes
-    predicted_classes = [ [] for i in range(len(models))]
 
 @click.command()
 @click.option(
@@ -127,47 +103,21 @@ def main(
             ###########################################################
             ### BEGIN STUDENT MODIFICATIONS ###########################
             ###########################################################
-            save = True
+            save = False
             if save:
                 pickle.dump(melvecs, open(f"Melvec_{time.ctime()}.pkl", "wb"))
                 print(f"Melvecs saved in file Melvec_{time.ctime()}.pkl")
 
-            melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
-
-            # if time.time() - begin_time > 6:
-            #     student_var_initialization()
-
-            # for model in range(len(models)):
-            #     if model == "MLP_flaviopolis_pytorch.pkl":
-            #         melvecs_normalized_f = melvecs_normalized.reshape(1, -1)**0.3
-            #         predicted_classes[model].append(models[model].predict(melvecs_normalized_f)[0])
-            #         predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized_f)) 
-            #     elif model == "MLP_gangra_pytorch.pkl":
-            #         melvecs_normalized_g = melvecs_normalized.reshape(1, -1)**0.6
-            #         melvecs_normalized_g = suppress_low_frequencies(melvecs_normalized_g, n_melvecs_to_suppress=7)
-            #         predicted_classes[model].append(models[model].predict(melvecs_normalized_g)[0])
-            #         predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized_g))
-            #     elif model == "MLP_ephesos_pytorch.pkl":
-            #         predicted_classes[model].append(models[model].predict(melvecs_normalized.reshape(1, -1))[0])
-            #         predicted_probabilities[model].append(models[model].predict_proba(melvecs_normalized.reshape(1, -1))) 
-            with open("MLP_gangra_pytorch.pkl", "rb") as f:
-                model_g = pickle.load(f)
-            melvecs_normalized_g = melvecs_normalized.reshape(1, -1)**0.6
-            melvecs_normalized_g = suppress_low_frequencies(melvecs_normalized_g, n_melvecs_to_suppress=7)
-            predicted_classes_g = model_g.predict(melvecs_normalized_g)[0]
-            # predictions = []
-            # for model in range(len(models)):
-            #     sum = np.zeros(predicted_probabilities[model][0].shape[1])
-            #     for i in range(len(predicted_probabilities[model])):
-            #         sum += predicted_probabilities[model][i].reshape(5)
-            #     predictions.append(models[model].classes_[np.argmax(sum)])
+            models = load_models()
+            predictions = np.zeros(len(models))
+            for current_model in range(len(models)):
+                x_test_processed = process_data_for_MLP(melvecs, models[current_model]["params"])
+                y_pred = models[current_model]["model"].predict(x_test_processed)
+                predictions[current_model] = y_pred[0]
+            prediction = int(np.bincount(predictions.astype(int)).argmax())
             classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
-            guess = classes[predicted_classes_g]
-            # guess = str(max(set(predictions), key=predictions.count))
+            guess = classes[prediction]
 
-            # correction crackling fire -> fire
-            # if guess == "crackling fire":
-            #     guess = "fire"
             print("GUESS = |", guess, "|", time.ctime(), sep="")
             print(type(guess))
             # Submit the guess to the leaderboard if required

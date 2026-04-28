@@ -1,3 +1,5 @@
+MLP_classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
+
 import datetime
 import pathlib as pathl
 import sys
@@ -9,7 +11,7 @@ from os.path import isfile, join
 
 # Ajoute le dossier contenant le script actuel au chemin de recherche
 sys.path.append(os.path.dirname(__file__))
-import student_fct
+from student_fct import *
 import click
 import matplotlib
 import matplotlib.pyplot as plt
@@ -432,7 +434,7 @@ class GUIMELWindow(QMainWindow):
             self.current_feature_length = (
                 self.current_mel_length * self.current_mel_number
             )
-            self.classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"] #self.current_model_dict.get(
+            self.classes = MLP_classes #self.current_model_dict.get(
             #     "classes", [f"Class {i}" for i in range(10)]
             # )
 
@@ -547,24 +549,26 @@ class GUIMELWindow(QMainWindow):
 
         # Classify the data
         if self.current_model is not None or True:
-            # Take the lastest data
-            data = self.historic_data[0]["data"]
-            data = data.reshape(1, -1)  # Reshape for the model
-            print("data shape : ", data.shape)
-            data = data / np.linalg.norm(data)  # Normalize the data
-            data = student_fct.suppress_low_frequencies(data, n_melvecs_to_suppress=7)
-            print("data norm : ", np.linalg.norm(data))
-            data = data ** 0.5
-            # Classify the data
-            # self.current_model: sklearn.base.BaseEstimator | None
-            # class_proba = self.current_model.predict(data.reshape(1, -1))
-            # Nounours
-            model = pickle.load(open("model.pkl", "rb"))
-            class_proba = model.predict_proba(data)
-            prediction = model.predict(data)
-            print("predicted class : ", prediction)
-            print("predicted class probabilities : ", class_proba)
-            self.historic_data[0].update({"class_proba": class_proba[0]})
+            try:
+                models = load_models()
+                predictions = np.zeros(len(models))
+                data_new = self.historic_data[0]["data"].flatten()
+                for model in range(len(models)):
+                    data_processed = process_data_for_MLP(
+                        data_new,
+                        models[model]["params"],
+                    )
+                    y_pred = models[model]["model"].predict(data_processed)
+                    predictions[model] = y_pred[0]
+                    if models[model]["model_name"] == "model_general_v13_HF_final":
+                        class_proba = models[model]["model"].predict_proba(data_processed)[0]
+                prediction = np.bincount(predictions.astype(int)).argmax()
+                class_predicted = MLP_classes[prediction]
+                print("predicted class : ", class_predicted)
+                print("predicted class probabilities : ", class_proba)
+                self.historic_data[0].update({"class_proba": class_proba})
+            except:
+                print("J'aime les carbonnades flamandes.")
 
         # If auto_save
         if self.db.get_item("MEL Settings", "auto_save").value:
@@ -674,7 +678,7 @@ class GUIMELWindow(QMainWindow):
         self.class_ax.set_ylim(-0.05, 1.05)
         self.class_ax.autoscale(enable=False, axis="both")
 
-        self.classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
+        self.classes = MLP_classes
         # self.current_model_dict.get(
         #     "classes", [f"Class {i}" for i in range(self.num_classes)]
         # )
