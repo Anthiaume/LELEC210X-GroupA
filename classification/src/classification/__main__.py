@@ -14,7 +14,7 @@ from leaderboard.utils import get_url
 import numpy as np
 
 from .utils import payload_to_melvecs
-from student_fct import suppress_low_frequencies, TorchMLP
+from student_fct import *
 load_dotenv()
 
 
@@ -103,27 +103,21 @@ def main(
             ###########################################################
             ### BEGIN STUDENT MODIFICATIONS ###########################
             ###########################################################
-            save = True
+            save = False
             if save:
                 pickle.dump(melvecs, open(f"Melvec_{time.ctime()}.pkl", "wb"))
                 print(f"Melvecs saved in file Melvec_{time.ctime()}.pkl")
 
-            melvecs_normalized = melvecs / np.linalg.norm(melvecs.flatten(), axis=0, keepdims=True)
-
-            with open("MLP_gangra_pytorch.pkl", "rb") as f:
-                model_g = pickle.load(f)
-
-            melvecs_normalized_g = melvecs_normalized.reshape(1, -1)**0.6
-            melvecs_normalized_g = suppress_low_frequencies(melvecs_normalized_g, n_melvecs_to_suppress=7)
-            predicted_classes_g = model_g.predict(melvecs_normalized_g)[0]
-            
+            models = load_models()
+            predictions = np.zeros(len(models))
+            for current_model in range(len(models)):
+                x_test_processed = process_data_for_MLP(melvecs, models[current_model]["params"])
+                y_pred = models[current_model]["model"].predict(x_test_processed)
+                predictions[current_model] = y_pred[0]
+            prediction = int(np.bincount(predictions.astype(int)).argmax())
             classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
-            guess = classes[predicted_classes_g]
-            # guess = str(max(set(predictions), key=predictions.count))
+            guess = classes[prediction]
 
-            # correction crackling fire -> fire
-            # if guess == "crackling fire":
-            #     guess = "fire"
             print("GUESS = |", guess, "|", time.ctime(), sep="")
             print(type(guess))
             # Submit the guess to the leaderboard if required

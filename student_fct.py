@@ -28,6 +28,24 @@ def load_models():
 
 def process_data_for_MLP(x_data, params):
 
+    x_data_reshaped = x_data.reshape(1, 400)
+
+    x_data_HF = keep_frequencies(data=x_data_reshaped, n_melvecs_to_keep=params["keeped_frequencies"])
+
+    x_data_HF_normalized = x_data_HF / (np.linalg.norm(x_data_HF, axis=1, keepdims=True) + 1e-16)  # Add a small value to avoid division by zero
+
+    if params["attenuation_dB_range"] is not None:
+        x_data_HF_normalized, _ = add_background(data_normalized=x_data_HF_normalized, labels=np.zeros(x_data_HF_normalized.shape[0], dtype=int), attenuation_dB_range=params["attenuation_dB_range"])
+
+    if params["transform_mean_std"]:
+        x_data_HF_normalized = transform_melspecgram_to_mean_std_data(x_data_HF_normalized, n_freq=params["n_freq"])
+
+    x_data_HF_normalized = x_data_HF_normalized**params["exposant"]
+
+    return x_data_HF_normalized
+
+def process_data_for_MLP_for_test(x_data, params):
+
     x_data_HF = keep_frequencies(data=x_data, n_melvecs_to_keep=params["keeped_frequencies"])
 
     x_data_HF_normalized = x_data_HF / (np.linalg.norm(x_data_HF, axis=1, keepdims=True) + 1e-16)  # Add a small value to avoid division by zero
