@@ -121,7 +121,7 @@ def main(
             print("GUESS = |", guess, "|", time.ctime(), sep="")
             print(type(guess))
             # Submit the guess to the leaderboard if required
-            if submit and guess != "background":
+            if submit and guess != "background" and not get_bool_submitt_good():
                 response = requests.post(
                     f"{url}/lelec210x/leaderboard/submit/{key}/{guess}"
                 )
@@ -130,6 +130,9 @@ def main(
 
                 if response.status_code == 200:
                     logger.info(response_as_dict)
+                    bool_response = response_as_dict['penalized']
+                    if bool_response:
+                        change_bool_submitt_good()
                 else:
                     logger.error(response_as_dict)
             ###########################################################

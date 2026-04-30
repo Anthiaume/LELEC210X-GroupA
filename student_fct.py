@@ -35,6 +35,20 @@ def get_bool_activation():
 def get_project_root_path():
     return os.path.dirname(os.path.abspath(__file__))
 
+def get_bool_submitt_good():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "submit_good.txt")
+    with open(path, "r") as f:
+        submit_good = f.readlines()
+    return bool(int(submit_good[0]))
+
+def change_bool_submitt_good():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "submit_good.txt")
+    with open(path, "w") as f:
+        f.write(str(int(1)))
+    time.sleep(5)
+    with open(path, "w") as f:
+        f.write(str(int(0)))
+
 def process_data_for_MLP(x_data, params):
 
     x_data_reshaped = x_data.reshape(1, 400)
