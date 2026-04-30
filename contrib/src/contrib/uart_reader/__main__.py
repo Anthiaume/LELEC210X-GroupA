@@ -1,4 +1,5 @@
 MLP_classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
+i_love_print = False
 
 import datetime
 import pathlib as pathl
@@ -549,34 +550,42 @@ class GUIMELWindow(QMainWindow):
 
         # Classify the data
         if self.current_model is not None or True:
-            try:
-                models = load_models()
-                predictions = np.zeros(len(models))
-                data_new = self.historic_data[0]["data"].flatten()
-                for model in range(len(models)):
-                    data_processed = process_data_for_MLP(
-                        data_new,
-                        models[model]["params"],
-                    )
-                    y_pred = models[model]["model"].predict(data_processed)
-                    predictions[model] = y_pred[0]
-                    print(model[model]["model_name"])
+            # try:
+            models = load_models()
+            predictions = np.zeros(len(models))
+            data_new = self.historic_data[0]["data"].flatten()
+
+            if get_bool_activation():
+                with open(os.path.join(get_project_root_path(), "results_uart.txt"), "a") as f:
+                    f.write(f"New predictions :\n")
+
+            for model in range(len(models)):
+                data_processed = process_data_for_MLP(
+                    data_new,
+                    models[model]["params"],
+                )
+                y_pred = models[model]["model"].predict(data_processed)
+                predictions[model] = y_pred[0]
+                if models[model]["model_name"] == "general_v13_HF_final":
                     class_proba = models[model]["model"].predict_proba(data_processed)[0]
-                    print(models[model]["model"].predict_proba(data_processed)[0])
-                    if models[model]["model_name"] == "model_general_v13_HF_final":
-                        class_proba = models[model]["model"].predict_proba(data_processed)[0]
-                        print(type(class_proba))
-                        raise ("Youyou")
-                print("predictions:", predictions)
-                print("count prediction:", np.unique(predictions, return_counts=True))
-                prediction = np.bincount(predictions.astype(int)).argmax()
-                class_predicted = MLP_classes[prediction]
-                print("predicted class : ", class_predicted)
-                print("predicted class probabilities : ", class_proba)
-                self.historic_data[0].update({"class_proba": class_proba})
-                print("Ole")
-            except:
-                print("J'aime les carbonnades flamandes.")
+                print(f"Model {models[model]['model_name']} predicted class {MLP_classes[y_pred[0]]}")
+
+                if get_bool_activation():
+                    with open(os.path.join(get_project_root_path(), "results_uart.txt"), "a") as f:
+                        model_name = models[model]["model_name"]
+                        f.write(f"Model {model_name}" + (50-len(model_name))*" " + ":" + str(MLP_classes[y_pred[0]]) + "\n")
+            
+            if get_bool_activation():
+                with open(os.path.join(get_project_root_path(), "results_uart.txt"), "a") as f:
+                    f.write("\n\n")
+
+            prediction = np.bincount(predictions.astype(int)).argmax()
+            class_predicted = MLP_classes[prediction]
+            print("Predicted class : ", class_predicted)
+            
+            self.historic_data[0].update({"class_proba": class_proba})
+            # except:
+            #     print("J'aime les carbonnades flamandes.")
 
         # If auto_save
         if self.db.get_item("MEL Settings", "auto_save").value:
@@ -1195,12 +1204,13 @@ class GUIMainWindow(QMainWindow):
         log_message = f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {prefix} : {message}"
         with open(str(log_path / log_file), "a") as f:
             f.write(log_message + "\n")
-        print(
-            f"Received {len(message)} bytes for prefix {prefix}, check the log file for the whole message"
-        )
-        self.logger.info(
-            f"Received {len(message)} bytes for prefix {prefix}, check the log file for the whole message"
-        )
+        if i_love_print:
+            print(
+                f"Received {len(message)} bytes for prefix {prefix}, check the log file for the whole message"
+            )
+            self.logger.info(
+                f"Received {len(message)} bytes for prefix {prefix}, check the log file for the whole message"
+            )
 
         # self.logger.info(f"Received {len(message)} bytes for prefix {prefix}")
         if prefix == self.db.get_item("Serial Settings", "database_prefix").value:

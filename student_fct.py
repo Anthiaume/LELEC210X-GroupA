@@ -26,6 +26,15 @@ def load_models():
             models.append(model)
     return models
 
+def get_bool_activation():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "activation.txt")
+    with open(path, "r") as f:
+        activation = f.readlines()
+    return bool(int(activation[0]))
+
+def get_project_root_path():
+    return os.path.dirname(os.path.abspath(__file__))
+
 def process_data_for_MLP(x_data, params):
 
     x_data_reshaped = x_data.reshape(1, 400)
@@ -474,15 +483,6 @@ def train_and_save_model(params, data_construction, data, labels_encoded, MLP_cl
 
         print(f"The model's classes are: {MLP_classes}")
 
-
-
-
-
-
-            
-
-
-
 class ModelResults:
     def __init__(self, model_name=None, model=None, accuracy=None, confusion_matrix=None, classes=None, epochs=None, loss_curves=None, params=None):
         self.model_name = model_name
@@ -752,7 +752,9 @@ class TorchMLP(nn.Module):
         Outputs - probs: output tensor of shape (batch_size, num_classes) where each row sums to
                   1 and represents the predicted probabilities for each class.
         """
-        return torch.softmax(self(x), dim=1)
+        if not isinstance(x, torch.Tensor):
+            x = torch.tensor(x, dtype=torch.float32)
+        return torch.softmax(self(x), dim=1).detach().numpy()
 
     def score(self, x, y):
         self.eval()  # Désactive dropout etc.
