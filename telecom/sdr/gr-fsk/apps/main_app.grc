@@ -447,7 +447,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     packet_len: packet_len
-    threshold: '7'
+    threshold: '0'
   states:
     bus_sink: false
     bus_source: false
@@ -459,7 +459,7 @@ blocks:
   id: fsk_synchronization
   parameters:
     Grx: rx_gain
-    N_Moose: '2'
+    N_Moose: '8'
     affinity: ''
     alias: ''
     comment: ''

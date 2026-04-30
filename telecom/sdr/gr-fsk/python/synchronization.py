@@ -1281,11 +1281,14 @@ class synchronization(gr.basic_block):
     def general_work(self, input_items, output_items):
         if self.rem_samples == 0:  # new packet to process, compute the CFO and STO
             y = input_items[0][: self.hdr_len * 8 * self.osr]
-            self.cfo = cfo_estimation(y, self.drate, self.osr, self.fdev, self.N_Moose)
+
+            mean_CFO = 6721.732280
+            t = np.arange(len(y)) / (self.drate * self.osr)
+            y_cfo_statique = np.exp(-1j*2*np.pi*mean_CFO*t)*y
+            self.cfo = cfo_estimation(y_cfo_statique, self.drate, self.osr, self.fdev, self.N_Moose)
 
             # Correct CFO in preamble
-            t = np.arange(len(y)) / (self.drate * self.osr)
-            y_cfo = np.exp(-1j * 2 * np.pi * self.cfo * t) * y
+            y_cfo = np.exp(-1j * 2 * np.pi * self.cfo * t) * y_cfo_statique
             self.t0 = t[-1]
 
             sto = sto_estimation(y_cfo, self.drate, self.osr, self.fdev)
@@ -1302,7 +1305,7 @@ class synchronization(gr.basic_block):
 
             # Correct CFO before transferring samples to demodulation stage
             t = self.t0 + np.arange(1, len(y) + 1) / (self.drate * self.osr)
-            y_corr = np.exp(-1j * 2 * np.pi * self.cfo * t) * y
+            y_corr = np.exp(-1j * 2 * np.pi * (self.cfo+ 6721.732280) * t) * y
             self.t0 = t[
                 -1
             ]  # we keep the CFO correction continuous across buffer chunks

@@ -44,7 +44,6 @@ void eval_radio(void)
 			}
 		}
 	}
-
 	DEBUG_PRINT("=== Finished evaluation, reset the board to run again\r\n");
 	while (1);
 }

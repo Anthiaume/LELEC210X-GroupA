@@ -1107,7 +1107,7 @@ def preamble_detect_energy(y, L, threshold):
             9.9518472e-01+9.8017141e-02j,  9.9879545e-01+4.9067676e-02j])
 
         R = 8
-        K = threshold * (short_term_sum_W / long_term_sum_W)
+        K = 6 * (short_term_sum_W / long_term_sum_W)
         # K = 7
 
         long_window = np.ones(long_term_sum_W)

@@ -52,7 +52,7 @@ void Spectrogram_Format(q15_t *buf)
 }
 
 // Compute spectrogram of samples and transform into MEL vectors.
-void Spectrogram_Compute(q15_t *samples, q15_t *melvec, arm_rfft_instance_q15 rfft_inst)
+void Spectrogram_Compute(q15_t *samples, q15_t *melvec)
 {
 	// STEP 1  : Windowing of input samples
 	//           --> Pointwise product
@@ -67,9 +67,9 @@ void Spectrogram_Compute(q15_t *samples, q15_t *melvec, arm_rfft_instance_q15 rf
 	//           Number of cycles: <TODO>
 
 	// Since the FFT is a recursive algorithm, the values are rescaled in the function to ensure that overflow cannot happen.
-	// arm_rfft_instance_q15 rfft_inst;
+	arm_rfft_instance_q15 rfft_inst;
 
-	// arm_rfft_init_q15(&rfft_inst, SAMPLES_PER_MELVEC, 0, 1);
+	arm_rfft_init_q15(&rfft_inst, SAMPLES_PER_MELVEC, 0, 1);
 
 	arm_rfft_q15(&rfft_inst, buf, buf_fft);
 

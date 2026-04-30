@@ -560,13 +560,21 @@ class GUIMELWindow(QMainWindow):
                     )
                     y_pred = models[model]["model"].predict(data_processed)
                     predictions[model] = y_pred[0]
+                    print(model[model]["model_name"])
+                    class_proba = models[model]["model"].predict_proba(data_processed)[0]
+                    print(models[model]["model"].predict_proba(data_processed)[0])
                     if models[model]["model_name"] == "model_general_v13_HF_final":
                         class_proba = models[model]["model"].predict_proba(data_processed)[0]
+                        print(type(class_proba))
+                        raise ("Youyou")
+                print("predictions:", predictions)
+                print("count prediction:", np.unique(predictions, return_counts=True))
                 prediction = np.bincount(predictions.astype(int)).argmax()
                 class_predicted = MLP_classes[prediction]
                 print("predicted class : ", class_predicted)
                 print("predicted class probabilities : ", class_proba)
                 self.historic_data[0].update({"class_proba": class_proba})
+                print("Ole")
             except:
                 print("J'aime les carbonnades flamandes.")
 
