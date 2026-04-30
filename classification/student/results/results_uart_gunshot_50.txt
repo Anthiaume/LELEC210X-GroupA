@@ -1,0 +1,1710 @@
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fire
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :fire
+Model fire_v26_HF_final                                 :fire
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fire
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :fire
+Model fire_v26_HF_final                                 :fire
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fire
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :fire
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :fire
+Model fire_v26_HF_final                                 :fire
+Model general_v13_HF_final                              :fire
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :fireworks
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :fireworks
+Model fireworks_v24_HF_final                            :fireworks
+Model fireworks_v25_AF_final                            :fireworks
+Model fire_v16_AF_final                                 :fireworks
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :fireworks
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :fireworks
+
+
+New predictions :
+Model background_v4_HF_final                            :fire
+Model background_v9_AF_final                            :fire
+Model chainsaw_v10_AF_final_vfinal                      :fire
+Model chainsaw_v17_HF_final                             :fire
+Model fireworks_v24_HF_final                            :fire
+Model fireworks_v25_AF_final                            :fire
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fire
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fire
+Model gunshot_v2_AF_final                               :fire
+Model gunshot_v8_HF_final                               :fire
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :fireworks
+Model chainsaw_v10_AF_final_vfinal                      :fireworks
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :fireworks
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :fireworks
+Model gunshot_v2_AF_final                               :fireworks
+Model gunshot_v8_HF_final                               :gunshot
+
+
+New predictions :
+Model background_v4_HF_final                            :gunshot
+Model background_v9_AF_final                            :gunshot
+Model chainsaw_v10_AF_final_vfinal                      :gunshot
+Model chainsaw_v17_HF_final                             :gunshot
+Model fireworks_v24_HF_final                            :gunshot
+Model fireworks_v25_AF_final                            :gunshot
+Model fire_v16_AF_final                                 :gunshot
+Model fire_v26_HF_final                                 :gunshot
+Model general_v13_HF_final                              :gunshot
+Model general_v7_AF_final                               :gunshot
+Model gunshot_v2_AF_final                               :gunshot
+Model gunshot_v8_HF_final                               :gunshot
+
+
