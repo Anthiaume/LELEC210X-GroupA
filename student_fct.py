@@ -804,7 +804,7 @@ class TorchMLP(nn.Module):
         cm = confusion_matrix(y_true, y_pred)
         return cm
 
-    def save_confusion_matrix(self, x_test, y_test, class_names=None, filename="CONFUSION_MATRIX.pdf", show=True):
+    def save_confusion_matrix(self, x_test, y_test, class_names=None, filename="CONFUSION_MATRIX.pdf", show=True, normalize=False):
         self.eval()
         with torch.no_grad():
             if not isinstance(x_test, torch.Tensor):
@@ -823,7 +823,7 @@ class TorchMLP(nn.Module):
             y_pred,
             display_labels=class_names,
             cmap=plt.cm.Blues,
-            normalize=None,
+            normalize="all" if normalize else None,
         )
 
         ticks = range(len(class_names))
