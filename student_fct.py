@@ -21,11 +21,51 @@ def load_models():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "classification", "data", "models")
     # Load all models
     for file in os.listdir(path):
-        if file.endswith(".pkl"):
+        if file.endswith(".pkl") and "super" not in file:
             model = pickle.load(open(os.path.join(path, file), "rb"))
             models.append(model)
     return models
 
+def load_super_model():
+    models = []
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "classification", "data", "models")
+    # Load all models
+    for file in os.listdir(path):
+        if file.endswith(".pkl") and "super" in file:
+            model = pickle.load(open(os.path.join(path, file), "rb"))
+            models.append(model)
+    return models[0]
+
+def get_data():
+    path_bool = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bool_data_uart.txt")
+    with open(path_bool, "r") as f:
+        activation = f.readlines()
+    if bool(int(activation[0])):
+        path_data = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_uart.pkl")
+        data = pickle.load(open(path_data, "rb"))
+        with open(path_bool, "w") as f:
+            f.write(str(0))
+        return data
+    else:
+        return None
+    
+def set_bool_false():
+    path_bool = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bool_data_uart.txt")
+    with open(path_bool, "w") as f:
+        f.write(str(0))
+
+
+def rule_grand_mere(predictions):
+    # background AF, chainsaw AF, fire AF
+    candidates = sorted(predictions)
+    if candidates.count("fireworks") >= 9:
+        return "fireworks", "rule_grand_mere"
+    else:
+        if "fireworks" in candidates:
+            candidates =  [elem for elem in candidates if elem != "fireworks"]
+        winner = max(candidates, key=candidates.count)
+        return winner, "rule_grand_mere"
+    
 def get_bool_activation():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "activation.txt")
     with open(path, "r") as f:

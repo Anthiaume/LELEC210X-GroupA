@@ -555,10 +555,18 @@ class GUIMELWindow(QMainWindow):
             predictions = np.zeros(len(models))
             data_new = self.historic_data[0]["data"].flatten()
 
+            path = os.path.join(get_project_root_path(), "data_uart.pkl")
+            pickle.dump(data_new, open(path, "wb"))
+
+            with open(os.path.join(get_project_root_path(), "bool_data_uart.txt"), "w") as f:
+                f.write(str(1))
+
+
+
             if get_bool_activation():
                 with open(os.path.join(get_project_root_path(), "results_uart.txt"), "a") as f:
                     f.write(f"New predictions :\n")
-
+            class_proba = np.zeros(len(MLP_classes))
             for model in range(len(models)):
                 data_processed = process_data_for_MLP(
                     data_new,
