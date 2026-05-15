@@ -26,6 +26,22 @@ def load_models():
             models.append(model)
     return models
 
+def load_knn():
+    knn = None
+    pca = None
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "classification", "data", "models")
+    # Load all models
+    print(os.listdir(path))
+    for file in os.listdir(path):
+        if file.endswith(".pkl"):
+            if "knn" in file:
+                knn = pickle.load(open(os.path.join(path, file), "rb"))
+            elif "pca" in file:
+                pca = pickle.load(open(os.path.join(path, file), "rb"))
+    if knn is None or pca is None:
+        raise ValueError("KNN model or PCA model not found in the specified path.")
+    return knn, pca
+
 def load_super_model():
     models = []
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "classification", "data", "models")
@@ -107,6 +123,23 @@ def process_data_for_MLP(x_data, params):
 
     return x_data_HF_normalized
 
+def process_data_for_KNN(x_data, params):
+    if params is None:
+        params = {"keeped_frequencies": (10, 19),
+                "attenuation_dB_range": None,
+                "transform_mean_std": True,
+                "n_freq": 20,
+                "exposant": 1
+        }
+
+    x_data_HF_normalized = process_data_for_MLP(x_data, params)
+
+    _, pca = load_knn()
+
+    x_data_HF_normalized = pca.transform(x_data_HF_normalized)
+
+    return x_data_HF_normalized
+
 def process_data_for_MLP_for_test(x_data, params):
 
     x_data_HF = keep_frequencies(data=x_data, n_melvecs_to_keep=params["keeped_frequencies"])
@@ -120,6 +153,23 @@ def process_data_for_MLP_for_test(x_data, params):
         x_data_HF_normalized = transform_melspecgram_to_mean_std_data(x_data_HF_normalized, n_freq=params["n_freq"])
 
     x_data_HF_normalized = x_data_HF_normalized**params["exposant"]
+
+    return x_data_HF_normalized
+
+def process_data_for_KNN_for_test(x_data, params):
+    if params is None:
+        params = {"keeped_frequencies": (0, 19),
+                "attenuation_dB_range": None,
+                "transform_mean_std": True,
+                "n_freq": 20,
+                "exposant": 1
+        }
+        
+    x_data_HF_normalized = process_data_for_MLP_for_test(x_data, params)
+
+    _, pca = load_knn()
+
+    x_data_HF_normalized = pca.transform(x_data_HF_normalized)
 
     return x_data_HF_normalized
 
