@@ -366,7 +366,7 @@ def plot_specgram(
     # cbar.set_label('log scale', rotation=270)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    ax.set_title(title)
+    ax.set_title(title.capitalize(), fontsize=14, fontweight="bold")
     return None
 
 def add_background(data_normalized, labels, attenuation_dB_range=(-20, -15)):
@@ -419,25 +419,21 @@ def add_background(data_normalized, labels, attenuation_dB_range=(-20, -15)):
         plt.close()
 
     background_data = data_normalized[labels == 0]
-    background_labels = labels[labels == 0]
-    usefull_data = data_normalized[labels != 0]
-    usefull_labels = labels[labels != 0]
+    result = data_normalized.copy()  # on travaille sur une copie de tout le dataset
 
-    for sample in range(usefull_data.shape[0]):
+    useful_indices = np.where(labels != 0)[0]  # indices globaux des échantillons utiles
+
+    for idx in useful_indices:
         background_index = random.randint(0, background_data.shape[0] - 1)
 
         attenuation_dB = np.random.uniform(*attenuation_dB_range)
         attenuation_factor = 10 ** (attenuation_dB / 20)
 
-        # copy_to_plot = usefull_data[sample,:].copy()
-
-        new_data = usefull_data[sample,:] + (attenuation_factor * background_data[background_index,:].astype(np.float64)).astype(usefull_data.dtype)
+        new_data = data_normalized[idx] + (attenuation_factor * background_data[background_index].astype(np.float64)).astype(data_normalized.dtype)
         new_data_normalized = new_data / np.linalg.norm(new_data)
-        usefull_data[sample,:] = new_data_normalized
+        result[idx] = new_data_normalized
 
-        # plot3(copy_to_plot, background_data[background_index,:], usefull_data[sample,:])
-
-    return np.concatenate((usefull_data, background_data)), np.concatenate((usefull_labels, background_labels))
+    return result, labels  # labels inchangés, ordre préservé
 
 def suppress_low_frequencies(data, n_melvecs_to_suppress=10):
     """
@@ -813,16 +809,25 @@ class TorchMLP(nn.Module):
                 epoch_loss += loss.item()
                 num_batches += 1
 
-            # Average loss over all batches for this epoch
-            avg_train_loss = epoch_loss / num_batches
-            train_losses.append(avg_train_loss)
-
-            # --- Validation step ---
-            if has_val:
-                self.eval()
-                with torch.no_grad():
+            # À la fin de chaque époque, recalculer proprement
+            self.eval()
+            with torch.no_grad():
+                avg_train_loss = loss_fn(self(x_train), y_train).item()
+                train_losses.append(avg_train_loss)
+                if has_val:
                     val_loss = loss_fn(self(self.x_val), self.y_val).item()
-                val_losses.append(val_loss)
+                    val_losses.append(val_loss)
+            scheduler.step()
+            # # Average loss over all batches for this epoch
+            # avg_train_loss = epoch_loss / num_batches
+            # train_losses.append(avg_train_loss)
+
+            # # --- Validation step ---
+            # if has_val:
+            #     self.eval()
+            #     with torch.no_grad():
+            #         val_loss = loss_fn(self(self.x_val), self.y_val).item()
+            #     val_losses.append(val_loss)
 
             if self.verbose and n % 50 == 0:
                 msg = f"Epoch {n}, Train Loss: {avg_train_loss:.4f}"
@@ -834,11 +839,13 @@ class TorchMLP(nn.Module):
             plt.figure(figsize=(8, 5))
             plt.plot(train_losses, label="Train Loss", color="steelblue")
             if has_val:
-                plt.plot(val_losses, label="Val Loss", color="tomato")
-            plt.xlabel("Epoch")
-            plt.ylabel("Loss")
-            plt.title("Loss Curves")
-            plt.legend()
+                plt.plot(val_losses, label="Test Loss", color="tomato")
+            plt.xlabel("Epoch", fontsize=14)
+            plt.ylabel("Loss", fontsize=14)
+            # plt.title("Loss Curves")
+            plt.xticks(fontsize=12)
+            plt.yticks(fontsize=12)
+            plt.legend(fontsize=14)
             plt.grid(True)
             plt.tight_layout()
             if self.loss_filename is not None:

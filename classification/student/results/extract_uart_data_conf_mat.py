@@ -241,73 +241,73 @@ confusion_matrix_decision_rule = np.zeros((5, 5), dtype=float)
 inputs = []
 outputs = []
 
-for real_data in refined_data.keys():
+# for real_data in refined_data.keys():
 
-    real_label = get_class_int(real_data)
+#     real_label = get_class_int(real_data)
 
-    for loudness in refined_data[real_data].keys():
-        for i in range(len(refined_data[real_data][loudness][0])//12):
+#     for loudness in refined_data[real_data].keys():
+#         for i in range(len(refined_data[real_data][loudness][0])//12):
 
-            models_used = refined_data[real_data][loudness][0][i*12:(i+1)*12]
-            predictions = refined_data[real_data][loudness][1][i*12:(i+1)*12]
+#             models_used = refined_data[real_data][loudness][0][i*12:(i+1)*12]
+#             predictions = refined_data[real_data][loudness][1][i*12:(i+1)*12]
 
-            inputs.append(predictions)
-            outputs.append(get_class_str(real_data))
+#             inputs.append(predictions)
+#             outputs.append(get_class_str(real_data))
 
-            # predicted_label, rule = rule_majority_vote(predictions)
-            predicted_label, rule = rule_grand_mere(models_used, predictions)
-            model = pickle.load(open("mlp_model.pkl", "rb"))
-            classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
-            predicted_label = classes[model.predict(np.array([get_class_int(pred) for pred in predictions]).reshape(1, -1))[0]]
+#             # predicted_label, rule = rule_majority_vote(predictions)
+#             predicted_label, rule = rule_grand_mere(models_used, predictions)
+#             model = pickle.load(open("mlp_model.pkl", "rb"))
+#             classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
+#             predicted_label = classes[model.predict(np.array([get_class_int(pred) for pred in predictions]).reshape(1, -1))[0]]
 
-            if predicted_label == get_class_str(real_data):
-                well_classified += 1
-            total += 1
+#             if predicted_label == get_class_str(real_data):
+#                 well_classified += 1
+#             total += 1
 
-            predicted_label_int = get_class_int(predicted_label)
+#             predicted_label_int = get_class_int(predicted_label)
 
-            confusion_matrix_decision_rule[real_label, predicted_label_int] += 1
+#             confusion_matrix_decision_rule[real_label, predicted_label_int] += 1
 
-print(f"Overall accuracy: {well_classified/total:.1%} ({well_classified}/{total})")
+# print(f"Overall accuracy: {well_classified/total:.1%} ({well_classified}/{total})")
 
-mlp = MLPClassifier(random_state=42, max_iter=1000, learning_rate="adaptive", early_stopping=True, hidden_layer_sizes=(100, 100, 100), activation="relu", solver="adam")
-# Encode string labels to integers for MLP
+# mlp = MLPClassifier(random_state=42, max_iter=1000, learning_rate="adaptive", early_stopping=True, hidden_layer_sizes=(100, 100, 100), activation="relu", solver="adam")
+# # Encode string labels to integers for MLP
 
-inputs_float = np.array([[get_class_int(pred) for pred in sample] for sample in inputs], dtype=float)
-outputs_int = np.array([get_class_int(label) for label in outputs])
+# inputs_float = np.array([[get_class_int(pred) for pred in sample] for sample in inputs], dtype=float)
+# outputs_int = np.array([get_class_int(label) for label in outputs])
 
-print(inputs_float.shape, outputs_int.shape)
+# print(inputs_float.shape, outputs_int.shape)
 
-x_train, x_test, y_train, y_test = train_test_split(inputs_float, outputs_int, test_size=0.2, random_state=42, stratify=outputs_int, shuffle=True)
-
-
-mlp.fit(inputs_float, outputs_int)
-score_mlp = mlp.score(x_test, y_test)
-print(f"MLP accuracy: {score_mlp:.1%} ({int(score_mlp*len(y_test))}/{len(y_test)})")
+# x_train, x_test, y_train, y_test = train_test_split(inputs_float, outputs_int, test_size=0.2, random_state=42, stratify=outputs_int, shuffle=True)
 
 
-pickle.dump(mlp, open("mlp_supermodel.pkl", "wb"))
-
-# Display Normalized Confusion Matrix
-classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
-cm_normalized = confusion_matrix_decision_rule / np.sum(confusion_matrix_decision_rule) * 100
-disp = ConfusionMatrixDisplay(confusion_matrix=cm_normalized, display_labels=classes)
-disp.plot(cmap=plt.cm.Blues, colorbar=False)
-disp.ax_.set_xticklabels(classes, rotation=45, ha='right', rotation_mode='anchor', fontsize=fontsize)
-disp.ax_.set_yticklabels(classes, fontsize=fontsize)
-disp.ax_.set_xlabel("Predicted Label", fontsize=fontsize*1.2)
-disp.ax_.set_ylabel("True Label", fontsize=fontsize*1.2)
-disp.ax_.set_title(f"{rule}\nAccuracy: {well_classified/total:.1%}", fontsize=fontsize*1.5)
-plt.tight_layout()
-if 1:
-    plt.savefig(f"CONFUSION_MATRIX_Live_final_models_{rule}.pdf", bbox_inches='tight')
-    plt.savefig(f"temp.pdf", bbox_inches='tight')
-    subprocess.Popen(["temp.pdf"],shell=True)
-    sleep(1)
-    os.remove(f"temp.pdf")
+# mlp.fit(inputs_float, outputs_int)
+# score_mlp = mlp.score(x_test, y_test)
+# print(f"MLP accuracy: {score_mlp:.1%} ({int(score_mlp*len(y_test))}/{len(y_test)})")
 
 
-to_plot = False
+# pickle.dump(mlp, open("mlp_supermodel.pkl", "wb"))
+
+# # Display Normalized Confusion Matrix
+# classes = ["background", "chainsaw", "fire", "fireworks", "gunshot"]
+# cm_normalized = confusion_matrix_decision_rule / np.sum(confusion_matrix_decision_rule) * 100
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm_normalized, display_labels=classes)
+# disp.plot(cmap=plt.cm.Blues, colorbar=False)
+# disp.ax_.set_xticklabels(classes, rotation=45, ha='right', rotation_mode='anchor', fontsize=fontsize)
+# disp.ax_.set_yticklabels(classes, fontsize=fontsize)
+# disp.ax_.set_xlabel("Predicted Label", fontsize=fontsize*1.2)
+# disp.ax_.set_ylabel("True Label", fontsize=fontsize*1.2)
+# disp.ax_.set_title(f"{rule}\nAccuracy: {well_classified/total:.1%}", fontsize=fontsize*1.5)
+# plt.tight_layout()
+# if 1:
+#     plt.savefig(f"CONFUSION_MATRIX_Live_final_models_{rule}.pdf", bbox_inches='tight')
+#     plt.savefig(f"temp.pdf", bbox_inches='tight')
+#     subprocess.Popen(["temp.pdf"],shell=True)
+#     sleep(1)
+#     os.remove(f"temp.pdf")
+
+
+to_plot = True
 if to_plot:
     # Three confusion matrices per model (one for each loudness level)
 
@@ -396,8 +396,13 @@ if to_plot:
                 disp.ax_.set_ylabel("True Label", fontsize=fontsize*1.2)
                 title = ""
                 for cls in classes + ["general"]:
-                    if cls in models[model + plot*4].lower():
+                    if cls in models[model + plot*4].lower() and "fire" not in cls:
                         title = cls.capitalize()
+                        break
+                    elif cls in models[model + plot*4].lower():
+                        
+                        title = "Fire" if "fireworks" not in models[model + plot*4].lower() else "Fireworks"
+                        print("title =", title)
                         break
                 title += " " + "HF" if "hf" in models[model + plot*4].lower() else " AF"
                 title += f"\nAccuracy: {accuracy(cm):.1%}"

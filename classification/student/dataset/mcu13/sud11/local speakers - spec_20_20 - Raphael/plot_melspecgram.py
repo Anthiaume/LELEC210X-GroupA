@@ -9,7 +9,7 @@ import serial
 from serial.tools import list_ports
 import pickle, time
 
-from classification.utils.plots import plot_specgram
+from student_fct import plot_specgram
 
 PRINT_PREFIX = "DF:HEX:"  
 FREQ_SAMPLING = 10200
@@ -17,12 +17,12 @@ MELVEC_LENGTH = 20
 N_MELVECS = 20
 
 types = ["chainsaw", "gunshot", "fireworks", "crackling fire", "background"]
-
+types = ["background"]
 for TYPE in types:
 #TYPE = "crackling fire" # "chainsaw", "gunshot", "fireworks", "crackling fire", "background"
     NUMBER = 1 # number of the melspectrogram to plot, only for single plot
     plot_type = "all" # "single" or "all"
-    multiple_plot_dimension = 4 # It is a squared plot, so it is the number of rows and columns (e.g., 4 means 4x4 = 16 plots)
+    multiple_plot_dimension = 2 # It is a squared plot, so it is the number of rows and columns (e.g., 4 means 4x4 = 16 plots)
 
 
 
@@ -36,7 +36,7 @@ for TYPE in types:
         with open(os.path.join(mypath, onlyfiles[i]), "rb") as f:
             melvec = pickle.load(f)
             data.append(melvec)
-
+    data = data[0:16]
     plots = 0
     while plots < len(data):
         fig, axes = plt.subplots(multiple_plot_dimension, multiple_plot_dimension, figsize=(12, 12))
@@ -55,7 +55,7 @@ for TYPE in types:
                     axes[i, j].axis("off")
         # save if the square is full or if it's the last row
         plt.tight_layout()
-        plt.savefig(f"Melspectrograms beauty - {TYPE} - part {plots // 16}.pdf")
-        plots += 16
+        plt.savefig(f"Melspectrograms beauty - {TYPE} - part {plots // (multiple_plot_dimension * multiple_plot_dimension)}.png", bbox_inches="tight", dpi=300, transparent=True)
+        plots += multiple_plot_dimension * multiple_plot_dimension
         plt.close()
 
